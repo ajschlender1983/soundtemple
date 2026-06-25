@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SoundTemple — Brand Look Book</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Playfair+Display:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    /* === RESET === */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #050309; color: #F2EAD8; font-family: 'Playfair Display', Georgia, serif; overflow-x: hidden; }
+    img { display: block; max-width: 100%; }
+
+    /* === CSS VARIABLES === */
+    :root {
+      --void: #050309;
+      --jade-dark: #0D4038;
+      --teal: #4AADAD;
+      --teal-bright: #5CC5C5;
+      --violet: #6B3FA0;
+      --violet-mid: #8B5FCA;
+      --gold-warm: #C4922A;
+      --gold-light: #F5D47A;
+      --gold-bright: #E8B84B;
+      --cream: #F2EAD8;
+      --text-muted: rgba(242,234,216,0.52);
+      --border-subtle: rgba(242,234,216,0.08);
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-mono: 'DM Mono', 'Courier New', monospace;
+      --r-sm: 4px;
+      --r-md: 8px;
+    }
+
+    /* === KEYFRAMES === */
+    @keyframes breathe {
+      0%, 100% { opacity: 0.65; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.025); }
+    }
+    @keyframes goldPulse {
+      0%, 100% { opacity: 0.72; }
+      50% { opacity: 1; }
+    }
+    @keyframes breatheSlow {
+      0%, 100% { opacity: 0.35; transform: scale(1); }
+      50% { opacity: 0.65; transform: scale(1.005); }
+    }
+    @keyframes nodeGlow {
+      0%, 100% { opacity: 0.75; filter: blur(0px); }
+      50% { opacity: 1; filter: blur(0.5px); }
+    }
+    @keyframes tealGlow {
+      0%, 100% { opacity: 0.65; }
+      50% { opacity: 1; }
+    }
+    @keyframes ringBreathe {
+      0%, 100% { transform: scale(0.96); opacity: 0.55; }
+      50% { transform: scale(1.04); opacity: 0.85; }
+    }
+    @keyframes waveDash {
+      from { stroke-dashoffset: 220; }
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes hw3-beat {
+      0%, 100% { opacity: 0.15; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* === SCROLL REVEAL === */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.15s; }
+    .reveal-delay-2 { transition-delay: 0.30s; }
+    .reveal-delay-3 { transition-delay: 0.45s; }
+
+    /* === REDUCED MOTION === */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+
+    /* === TOUCH TO MOVE === */
+    .ttm-wrap { position: relative; overflow: hidden; cursor: pointer; -webkit-user-select: none; user-select: none; }
+    .ttm-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; transform-origin: center center; will-change: transform; transition: transform 1.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    .ttm-badge { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.38em; text-transform: uppercase; color: var(--teal-bright); background: rgba(5,3,9,0.72); border: 1px solid rgba(92,197,197,0.38); border-radius: 20px; padding: 5px 14px; backdrop-filter: blur(10px); pointer-events: none; transition: opacity 0.5s ease, transform 0.5s ease; white-space: nowrap; z-index: 2; }
+    .ttm-wrap.active .ttm-badge { opacity: 0; transform: translateX(-50%) translateY(6px); }
+    @keyframes ttm-float {
+      0%   { transform: scale(1)    translateY(0%)    translateX(0%); }
+      20%  { transform: scale(1.04) translateY(-2.5%) translateX(0.8%); }
+      45%  { transform: scale(1.07) translateY(-5%)   translateX(-0.6%); }
+      70%  { transform: scale(1.09) translateY(-6.5%) translateX(1.2%); }
+      100% { transform: scale(1.1)  translateY(-8%)   translateX(0%); }
+    }
+    @keyframes ttm-pan {
+      0%   { transform: scale(1)    translateX(0%); }
+      100% { transform: scale(1.06) translateX(-10%); }
+    }
+    @keyframes ttm-approach {
+      0%   { transform: scale(1)    translateY(0%); }
+      30%  { transform: scale(1.05) translateY(-1.5%); }
+      70%  { transform: scale(1.1)  translateY(-3%); }
+      100% { transform: scale(1.14) translateY(-4.5%); }
+    }
+    .ttm-wrap.ttm-float.active img    { animation: ttm-float    16s ease-in-out infinite; transition: none; }
+    .ttm-wrap.ttm-pan.active img      { animation: ttm-pan      20s linear infinite alternate; transition: none; }
+    .ttm-wrap.ttm-approach.active img { animation: ttm-approach 14s ease-in-out infinite; transition: none; }
+
+    /* === TYPOGRAPHY UTILITIES === */
+    .eyebrow { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.38em; text-transform: uppercase; color: var(--teal-bright); margin-bottom: 16px; }
+    .pull-quote { font-family: var(--font-display); font-weight: 300; font-style: italic; color: var(--cream); line-height: 1.25; }
+    .body-copy { font-family: var(--font-display); font-weight: 300; font-size: clamp(14px, 1.6vw, 17px); line-height: 1.7; color: var(--text-muted); }
+
+    /* === CHAPTER SECTIONS === */
+    .chapter { position: relative; }
+
+    /* === WORDMARK REVEAL === */
+    @keyframes wordmarkExpand {
+      0%   { letter-spacing: -0.05em; text-shadow: 0 0 12px rgba(92,197,197,0.9); opacity: 0; }
+      6%   { opacity: 0.7; }
+      58%  { letter-spacing: 0.62em;  text-shadow: 0 0 7px rgba(92,197,197,0.45); opacity: 0.88; }
+      70%  { letter-spacing: 0.65em;  text-shadow: 0 0 30px rgba(92,197,197,0.65), 0 0 72px rgba(92,197,197,0.18), 0 0 4px rgba(255,255,255,0.1); opacity: 1; }
+      87%  { letter-spacing: 0.65em;  text-shadow: 0 0 5px rgba(92,197,197,0.12); opacity: 0.62; }
+      100% { letter-spacing: 0.65em;  text-shadow: none; opacity: 0.55; }
+    }
+    .lb-wordmark {
+      animation: wordmarkExpand 2.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+      animation-play-state: paused;
+    }
+    .lb-wordmark.wm-play { animation-play-state: running; }
+    @keyframes lb-shimmer {
+      0%   { transform: translateX(-160%); }
+      100% { transform: translateX(360%); }
+    }
+    .lb-wordmark.lb-shimmer-ready { position: relative; overflow: hidden; display: inline-block; }
+    .lb-wordmark.lb-shimmer-ready::after {
+      content: ''; position: absolute; top: -4px; left: 0; bottom: -4px; width: 55%;
+      background: linear-gradient(90deg, transparent 0%, rgba(245,212,122,0.38) 50%, transparent 100%);
+      transform: translateX(-160%);
+      animation: lb-shimmer 1.4s ease forwards; animation-play-state: paused; pointer-events: none;
+    }
+    .lb-wordmark.lb-shine::after { animation-play-state: running; }
+
+    /* === CH6 PHASE CARDS === */
+    .lb-phase-card { background: rgba(13,9,26,0.6); border: 1px solid rgba(92,197,197,0.15); border-radius: var(--r-sm); padding: 16px 12px; text-align: center; position: relative; }
+    .lb-phase-card.lb-depth { background: radial-gradient(ellipse 90% 80% at 50% 40%, rgba(107,63,160,0.38) 0%, rgba(45,125,125,0.15) 50%, rgba(13,9,26,0.8) 80%); border: 1px solid rgba(139,95,202,0.55); border-top: 2px solid #9B6FD8; box-shadow: 0 0 60px rgba(107,63,160,0.38); transform: translateY(-6px); }
+    .lb-depth-label { background: linear-gradient(135deg,#9B6FD8 0%,#5CC5C5 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:inline-block; }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 768px) {
+      .lb-ch2-grid       { grid-template-columns: 1fr !important; }
+      .lb-ch3-photos     { grid-template-columns: 1fr !important; }
+      .lb-ch3-caption    { grid-template-columns: 1fr !important; }
+      .lb-ch5-panels     { grid-template-columns: 1fr !important; }
+      .lb-ch5-stats      { grid-template-columns: repeat(2,1fr) !important; }
+      .lb-ch7-tiers      { grid-template-columns: 1fr !important; max-width: 420px; margin-left: auto; margin-right: auto; }
+      .lb-ch6-phases     { grid-template-columns: repeat(3,1fr) !important; }
+    }
+    @media (max-width: 600px) {
+      .lb-ch2-grid > div:first-child { height: 50vh; min-height: 280px; }
+      .lb-ch4-pair       { grid-template-columns: 1fr !important; }
+      .lb-ch5-stats      { grid-template-columns: 1fr !important; }
+      .lb-ch6-phases {
+        display: flex !important; overflow-x: auto; gap: 10px !important;
+        padding-bottom: 12px; scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+      }
+      .lb-ch6-phases > div { flex: 0 0 220px; scroll-snap-align: start; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════ Ch 1 — Opening ═══ -->
+  <section class="chapter" style="position: relative; width: 100%; height: 100vh; overflow: hidden;">
+    <img src="SoundTemple%20Content/6ed95a4c-345d-40f5-bb30-533d6a4122ab.jpg"
+         style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%;"
+         alt="Sacred jungle temple"/>
+    <div style="position: absolute; inset: 0; background: linear-gradient(to right, rgba(5,3,9,0.88) 0%, rgba(5,3,9,0.08) 55%, rgba(5,3,9,0.45) 100%);"></div>
+    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(24px,4vw,56px);">
+      <div>
+        <p class="lb-wordmark wm-play" style="font-family: var(--font-mono); font-size: 9px; color: var(--teal-bright); text-transform: uppercase;">SOUNDTEMPLE</p>
+      </div>
+      <div style="display: flex; align-items: flex-end; justify-content: space-between;">
+        <div class="reveal" style="max-width: 520px;">
+          <p class="pull-quote" style="font-size: clamp(1.2rem,2.5vw,1.8rem); color: var(--gold-light); animation: goldPulse 8s ease-in-out infinite;">A movement toward global coherence.</p>
+        </div>
+        <div class="reveal reveal-delay-1" style="text-align: center; padding-bottom: 4px;">
+          <span style="display: block; width: 6px; height: 6px; border-radius: 50%; background: var(--teal-bright); margin: 0 auto 6px; animation: breathe 4s ease-in-out infinite;"></span>
+          <span style="font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.35em; color: rgba(92,197,197,0.55); text-transform: uppercase;">scroll</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ Ch 2 — The Sound ═══ -->
+  <section class="chapter lb-ch2-grid" style="min-height: 100vh; background: var(--void); display: grid; grid-template-columns: 1fr 1fr; align-items: center; padding: clamp(48px,8vw,96px) clamp(24px,6vw,80px); gap: clamp(32px,5vw,64px);">
+    <div>
+      <p class="eyebrow reveal">The Sound</p>
+      <p class="pull-quote reveal reveal-delay-1" style="font-size: clamp(1.8rem,3.5vw,3rem); margin-bottom: clamp(16px,3vw,28px);">"Sound does not ask permission. It enters."</p>
+      <div style="width: 40px; height: 1px; background: rgba(92,197,197,0.25); margin-bottom: clamp(16px,3vw,24px);"></div>
+      <p class="body-copy reveal reveal-delay-2">The Opus SoundBed delivers vibration directly through the body — not through the air, but through the bones. Every session is a conversation between frequency and the nervous system.</p>
+    </div>
+    <div class="reveal reveal-delay-1" style="height: 70vh; overflow: hidden; border-radius: var(--r-sm);">
+      <img src="SoundTemple%20Content/f44d93b6-a22b-4049-a8ba-ef9641173b32.jpg"
+           style="width: 100%; height: 100%; object-fit: cover;" alt="The Great Gong"/>
+    </div>
+    <div class="reveal" style="grid-column: 1 / -1; padding-top: clamp(16px,3vw,32px);">
+      <svg viewBox="0 0 800 32" width="100%" height="32" aria-hidden="true">
+        <path d="M 0,24 L 50,24 L 58,4 L 62,24 L 120,24 L 132,8 L 138,24 L 200,24 L 215,2 L 222,24 L 280,24 L 294,6 L 300,24 L 360,24 L 374,4 L 380,24 L 440,24 L 450,8 L 456,24 L 520,24 L 532,2 L 538,24 L 600,24 L 612,6 L 618,24 L 680,24 L 692,4 L 698,24 L 760,24 L 772,8 L 778,24 L 800,24"
+              stroke="#E8B84B" stroke-width="1.4" fill="none" opacity="0.65"
+              style="animation: goldPulse 6s ease-in-out infinite;"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ Ch 3 — The Body ═══ -->
+  <section class="chapter" style="min-height: 100vh; background: #080510; padding: clamp(64px,10vw,120px) clamp(24px,6vw,64px);">
+    <div style="text-align: center; margin-bottom: clamp(32px,5vw,56px);">
+      <p class="eyebrow reveal">The Body</p>
+      <p class="pull-quote reveal reveal-delay-1" style="font-size: clamp(1.6rem,2.8vw,2.8rem); max-width: 640px; margin: 0 auto;">"What transformation looks like from the outside."</p>
+    </div>
+    <div class="reveal reveal-delay-2 lb-ch3-photos" style="display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 5px;">
+      <div style="aspect-ratio: 3/4; overflow: hidden; border-radius: var(--r-sm);">
+        <img src="SoundTemple%20Content/e8410898-2001-4647-9417-592066abc552.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Jade figure in emergence"/>
+      </div>
+      <div style="aspect-ratio: 3/4; overflow: hidden; border-radius: var(--r-sm);">
+        <img src="SoundTemple%20Content/7a5caac8-601d-4c64-83e3-55eb313675aa.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Electric transmission"/>
+      </div>
+      <div style="aspect-ratio: 3/4; overflow: hidden; border-radius: var(--r-sm);">
+        <img src="SoundTemple%20Content/b953b783-26c7-4dce-990d-8e9ef2cd18a6.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="Release and ecstasy"/>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-3 lb-ch3-caption" style="display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 5px; margin-top: 10px;">
+      <p style="font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.25em; color: rgba(242,234,216,0.38); text-transform: uppercase; text-align: center;">Receiving</p>
+      <p style="font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.25em; color: rgba(242,234,216,0.38); text-transform: uppercase; text-align: center;">Transmission</p>
+      <p style="font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.25em; color: rgba(242,234,216,0.38); text-transform: uppercase; text-align: center;">Release</p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ Ch 4 — The Space ═══ -->
+  <section class="chapter" style="background: var(--void);">
+    <div class="ttm-wrap ttm-float" style="width: 100%; height: 100vh;"
+         onmousedown="this.classList.add('active')" onmouseup="this.classList.remove('active')" onmouseleave="this.classList.remove('active')"
+         ontouchstart="this.classList.add('active');event.preventDefault()" ontouchend="this.classList.remove('active')">
+      <img src="SoundTemple%20Content/311136f4-c689-4d84-94db-9f2763f43694.jpg"
+           style="object-position: center;" alt="Underwater jade temple with rainbow light"/>
+      <span class="ttm-badge">Touch to move</span>
+      <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(5,3,9,0.72) 0%, transparent 50%); pointer-events: none;"></div>
+      <div class="reveal" style="position: absolute; bottom: clamp(32px,5vw,64px); left: clamp(24px,5vw,64px); pointer-events: none;">
+        <p class="pull-quote" style="font-size: clamp(1.4rem,3vw,2.6rem);">Sacred architecture.<br>Transcendent form.<br>Sound made visible.</p>
+      </div>
+    </div>
+    <div class="lb-ch4-pair" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0;">
+      <div class="ttm-wrap ttm-pan" style="aspect-ratio: 16/9;"
+           onmousedown="this.classList.add('active')" onmouseup="this.classList.remove('active')" onmouseleave="this.classList.remove('active')"
+           ontouchstart="this.classList.add('active');event.preventDefault()" ontouchend="this.classList.remove('active')">
+        <img src="SoundTemple%20Content/d95bdecd-eb3b-4750-9dd4-827ee95ab15f.jpg" alt="Ancient sand temples"/>
+        <span class="ttm-badge">Touch to move</span>
+      </div>
+      <div class="ttm-wrap ttm-approach" style="aspect-ratio: 16/9;"
+           onmousedown="this.classList.add('active')" onmouseup="this.classList.remove('active')" onmouseleave="this.classList.remove('active')"
+           ontouchstart="this.classList.add('active');event.preventDefault()" ontouchend="this.classList.remove('active')">
+        <img src="SoundTemple%20Content/ad85d350-42d2-41d4-8586-3b7ac705aaf2.jpg" alt="Crystal pyramid complex"/>
+        <span class="ttm-badge">Touch to move</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ Ch 5 — The Field ═══ -->
+  <section class="chapter" style="min-height: 100vh; background: linear-gradient(180deg, #0A0618 0%, #050309 100%); padding: clamp(64px,10vw,120px) clamp(24px,6vw,64px);">
+    <!-- Intro -->
+    <div style="text-align: center; margin-bottom: clamp(48px,7vw,80px);">
+      <p class="eyebrow reveal">The Coherence Field System</p>
+      <p class="pull-quote reveal reveal-delay-1" style="font-size: clamp(1.6rem,2.8vw,2.8rem); max-width: 640px; margin: 0 auto;">"When bodies synchronize, something larger emerges."</p>
+    </div>
+
+    <!-- Two-panel grid -->
+    <div class="reveal lb-ch5-panels" style="display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px,5vw,64px); align-items: start; margin-bottom: clamp(48px,7vw,80px);">
+
+      <!-- Panel A: The Entanglement -->
+      <div>
+        <p style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.3em; color: var(--teal-bright); text-transform: uppercase; margin-bottom: 20px; text-align: center;">The Entanglement</p>
+        <svg viewBox="0 0 360 180" width="100%" aria-hidden="true" style="display: block; overflow: visible;">
+          <defs>
+            <radialGradient id="lb-ent-teal" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#9BE8E8"/>
+              <stop offset="45%" stop-color="#4AADAD"/>
+              <stop offset="100%" stop-color="#0D4038"/>
+            </radialGradient>
+            <radialGradient id="lb-ent-gold" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#FFF8E1"/>
+              <stop offset="40%" stop-color="#F5D47A"/>
+              <stop offset="100%" stop-color="#C4922A"/>
+            </radialGradient>
+            <linearGradient id="lb-ent-wave" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#4AADAD" stop-opacity="0.9"/>
+              <stop offset="50%" stop-color="#8B5FCA" stop-opacity="0.7"/>
+              <stop offset="100%" stop-color="#4AADAD" stop-opacity="0.9"/>
+            </linearGradient>
+          </defs>
+          <!-- Teal node — left -->
+          <circle cx="76" cy="90" r="11" fill="url(#lb-ent-teal)" style="animation: nodeGlow 5s ease-in-out infinite;"/>
+          <circle cx="76" cy="90" r="36" fill="none" stroke="#4AADAD" stroke-width="0.8" opacity="0.35" style="animation: ringBreathe 6s ease-in-out infinite;"/>
+          <circle cx="76" cy="90" r="52" fill="none" stroke="#4AADAD" stroke-width="0.5" opacity="0.15" style="animation: ringBreathe 6s ease-in-out infinite; animation-delay:-2s;"/>
+          <!-- Gold node — right -->
+          <circle cx="284" cy="90" r="11" fill="url(#lb-ent-gold)" style="animation: nodeGlow 5s ease-in-out infinite;"/>
+          <circle cx="284" cy="90" r="36" fill="none" stroke="#E8B84B" stroke-width="0.8" opacity="0.35" style="animation: ringBreathe 6s ease-in-out infinite; animation-delay:-1s;"/>
+          <circle cx="284" cy="90" r="52" fill="none" stroke="#E8B84B" stroke-width="0.5" opacity="0.15" style="animation: ringBreathe 6s ease-in-out infinite; animation-delay:-3s;"/>
+          <!-- Wave connection -->
+          <path d="M87,90 C115,62 145,118 180,90 C215,62 245,118 273,90"
+                fill="none" stroke="url(#lb-ent-wave)" stroke-width="1.5" stroke-dasharray="220" stroke-dashoffset="220"
+                style="animation: waveDash 4s linear infinite;"/>
+          <!-- Labels -->
+          <text x="180" y="52" text-anchor="middle" font-family="'DM Mono', monospace" font-size="9" fill="#4AADAD" letter-spacing="2" opacity="0.8">Δφ = 0°</text>
+          <text x="76" y="145" text-anchor="middle" font-family="'DM Mono', monospace" font-size="7.5" fill="rgba(92,197,197,0.6)" letter-spacing="1.5">RECEIVING</text>
+          <text x="284" y="145" text-anchor="middle" font-family="'DM Mono', monospace" font-size="7.5" fill="rgba(245,212,122,0.6)" letter-spacing="1.5">RESONANT</text>
+          <text x="180" y="168" text-anchor="middle" font-family="'DM Mono', monospace" font-size="7" fill="rgba(139,95,202,0.65)" letter-spacing="2">PHASE LOCKED</text>
+        </svg>
+        <p class="body-copy" style="font-size: 12px; text-align: center; margin-top: 16px; font-style: italic;">Two bodies. One coherence field. The moment of phase lock.</p>
+      </div>
+
+      <!-- Panel B: The Field — 9-node ring -->
+      <div>
+        <p style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.3em; color: var(--teal-bright); text-transform: uppercase; margin-bottom: 20px; text-align: center;">The Field</p>
+        <svg viewBox="0 0 340 340" width="100%" aria-hidden="true" style="display: block; overflow: visible;">
+          <defs>
+            <radialGradient id="lb-field-jade" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#8abfa8"/>
+              <stop offset="45%" stop-color="#2D7D7D"/>
+              <stop offset="100%" stop-color="#0D4038"/>
+            </radialGradient>
+            <radialGradient id="lb-field-gold" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#FFF8E1"/>
+              <stop offset="40%" stop-color="#F5D47A"/>
+              <stop offset="100%" stop-color="#C4922A"/>
+            </radialGradient>
+          </defs>
+          <!-- Concentric hexagons (flat-top) -->
+          <polygon points="170,70 246,115 246,205 170,250 94,205 94,115" fill="none" stroke="#2D7D7D" stroke-width="0.6" opacity="0.18" style="animation: breatheSlow 18s ease-in-out infinite;"/>
+          <polygon points="170,90 234,125 234,195 170,230 106,195 106,125" fill="none" stroke="#2D7D7D" stroke-width="0.6" opacity="0.14" style="animation: breatheSlow 18s ease-in-out infinite; animation-delay:-4s;"/>
+          <polygon points="170,108 222,136 222,184 170,212 118,184 118,136" fill="none" stroke="#4AADAD" stroke-width="0.6" opacity="0.1" style="animation: breatheSlow 18s ease-in-out infinite; animation-delay:-8s;"/>
+          <polygon points="170,124 212,147 212,173 170,196 128,173 128,147" fill="none" stroke="#4AADAD" stroke-width="0.6" opacity="0.08" style="animation: breatheSlow 18s ease-in-out infinite; animation-delay:-12s;"/>
+          <!-- Thread lines (node-to-node) -->
+          <line x1="270" y1="170" x2="247" y2="234" stroke="#4AADAD" stroke-width="0.4" opacity="0.18"/>
+          <line x1="247" y1="234" x2="187" y2="269" stroke="#4AADAD" stroke-width="0.4" opacity="0.18"/>
+          <line x1="187" y1="269" x2="120" y2="257" stroke="#4AADAD" stroke-width="0.4" opacity="0.18"/>
+          <line x1="120" y1="257" x2="76"  y2="204" stroke="#4AADAD" stroke-width="0.4" opacity="0.18"/>
+          <line x1="76"  y1="204" x2="76"  y2="136" stroke="#4AADAD" stroke-width="0.4" opacity="0.18"/>
+          <line x1="76"  y1="136" x2="120" y2="83"  stroke="#4AADAD" stroke-width="0.4" opacity="0.18"/>
+          <line x1="120" y1="83"  x2="187" y2="72"  stroke="#4AADAD" stroke-width="0.4" opacity="0.18"/>
+          <line x1="187" y1="72"  x2="247" y2="106" stroke="#4AADAD" stroke-width="0.4" opacity="0.18"/>
+          <line x1="247" y1="106" x2="270" y2="170" stroke="#4AADAD" stroke-width="0.4" opacity="0.18"/>
+          <!-- Cross threads -->
+          <line x1="270" y1="170" x2="76"  y2="136" stroke="#4AADAD" stroke-width="0.3" opacity="0.09"/>
+          <line x1="247" y1="234" x2="120" y2="83"  stroke="#4AADAD" stroke-width="0.3" opacity="0.09"/>
+          <line x1="187" y1="269" x2="187" y2="72"  stroke="#4AADAD" stroke-width="0.3" opacity="0.09"/>
+          <!-- 9 gold nodes at r=100 from center (170,170) at 40° intervals -->
+          <circle cx="270" cy="170" r="6.5" fill="url(#lb-field-gold)" style="animation: nodeGlow 6s ease-in-out infinite; animation-delay:0s;"/>
+          <circle cx="247" cy="234" r="6.5" fill="url(#lb-field-gold)" style="animation: nodeGlow 6s ease-in-out infinite; animation-delay:-0.7s;"/>
+          <circle cx="187" cy="269" r="6.5" fill="url(#lb-field-gold)" style="animation: nodeGlow 6s ease-in-out infinite; animation-delay:-1.4s;"/>
+          <circle cx="120" cy="257" r="6.5" fill="url(#lb-field-gold)" style="animation: nodeGlow 6s ease-in-out infinite; animation-delay:-2.1s;"/>
+          <circle cx="76"  cy="204" r="6.5" fill="url(#lb-field-gold)" style="animation: nodeGlow 6s ease-in-out infinite; animation-delay:-2.8s;"/>
+          <circle cx="76"  cy="136" r="6.5" fill="url(#lb-field-gold)" style="animation: nodeGlow 6s ease-in-out infinite; animation-delay:-3.5s;"/>
+          <circle cx="120" cy="83"  r="6.5" fill="url(#lb-field-gold)" style="animation: nodeGlow 6s ease-in-out infinite; animation-delay:-4.2s;"/>
+          <circle cx="187" cy="72"  r="6.5" fill="url(#lb-field-gold)" style="animation: nodeGlow 6s ease-in-out infinite; animation-delay:-4.9s;"/>
+          <circle cx="247" cy="106" r="6.5" fill="url(#lb-field-gold)" style="animation: nodeGlow 6s ease-in-out infinite; animation-delay:-5.6s;"/>
+          <!-- Central jade orb -->
+          <circle cx="170" cy="170" r="15" fill="url(#lb-field-jade)" style="animation: tealGlow 5s ease-in-out infinite;"/>
+          <circle cx="170" cy="170" r="22" fill="none" stroke="#4AADAD" stroke-width="0.8" opacity="0.3" style="animation: ringBreathe 6s ease-in-out infinite;"/>
+        </svg>
+        <p class="body-copy" style="font-size: 12px; text-align: center; margin-top: 16px; font-style: italic;">Nine bodies. One room. The planet's smallest coherence event.</p>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="reveal lb-ch5-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border-subtle); border: 1px solid var(--border-subtle); border-radius: var(--r-md); overflow: hidden;">
+      <div style="background: rgba(13,9,26,0.6); padding: clamp(24px,4vw,40px) clamp(16px,3vw,32px); text-align: center;">
+        <p style="font-family: var(--font-mono); font-size: clamp(2.2rem,4vw,3.2rem); color: var(--teal-bright); animation: breathe 6s ease-in-out infinite;">62%</p>
+        <p style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.25em; color: var(--text-muted); text-transform: uppercase; margin-top: 8px;">Average HRV Improvement</p>
+      </div>
+      <div style="background: rgba(13,9,26,0.6); padding: clamp(24px,4vw,40px) clamp(16px,3vw,32px); text-align: center;">
+        <p style="font-family: var(--font-mono); font-size: clamp(2.2rem,4vw,3.2rem); color: var(--teal-bright); animation: breathe 6s ease-in-out infinite; animation-delay:-2s;">0.84</p>
+        <p style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.25em; color: var(--text-muted); text-transform: uppercase; margin-top: 8px;">Peak Coherence Score</p>
+      </div>
+      <div style="background: rgba(13,9,26,0.6); padding: clamp(24px,4vw,40px) clamp(16px,3vw,32px); text-align: center;">
+        <p style="font-family: var(--font-mono); font-size: clamp(2.2rem,4vw,3.2rem); color: var(--teal-bright); animation: breathe 6s ease-in-out infinite; animation-delay:-4s;">1,200+</p>
+        <p style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.25em; color: var(--text-muted); text-transform: uppercase; margin-top: 8px;">Bodies on Beds Globally</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ Ch 6 — The Session ═══ -->
+  <section class="chapter" style="min-height: 100vh; background: linear-gradient(180deg, #08051A 0%, #050309 80%); padding: clamp(64px,10vw,120px) clamp(24px,6vw,64px);">
+    <!-- Intro -->
+    <div style="text-align: center; margin-bottom: clamp(32px,5vw,48px);">
+      <p class="eyebrow reveal">The Session Arc</p>
+      <p class="pull-quote reveal reveal-delay-1" style="font-size: clamp(1.4rem,2.5vw,2.2rem); max-width: 560px; margin: 0 auto;">"The experience has a shape. It goes somewhere."</p>
+    </div>
+
+    <!-- Journey Spine SVG -->
+    <div class="reveal" style="margin-bottom: 4px;">
+      <svg viewBox="0 0 1000 60" width="100%" height="60" aria-hidden="true" style="display:block; overflow:visible;">
+        <defs>
+          <linearGradient id="lb-spine-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#2D7D7D" stop-opacity="0.45"/>
+            <stop offset="25%"  stop-color="#4AADAD" stop-opacity="0.75"/>
+            <stop offset="50%"  stop-color="#8B5FCA" stop-opacity="1.0"/>
+            <stop offset="75%"  stop-color="#E8B84B" stop-opacity="0.82"/>
+            <stop offset="100%" stop-color="#2D7D7D" stop-opacity="0.32"/>
+          </linearGradient>
+          <linearGradient id="lb-spine-energy" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#2D7D7D" stop-opacity="0.12"/>
+            <stop offset="25%"  stop-color="#4AADAD" stop-opacity="0.28"/>
+            <stop offset="50%"  stop-color="#6B3FA0" stop-opacity="0.55"/>
+            <stop offset="65%"  stop-color="#E8B84B" stop-opacity="0.38"/>
+            <stop offset="85%"  stop-color="#C4922A" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#2D7D7D" stop-opacity="0.08"/>
+          </linearGradient>
+        </defs>
+        <rect x="50" y="26" width="900" height="8" rx="4" fill="url(#lb-spine-energy)"/>
+        <line x1="50" y1="30" x2="950" y2="30" stroke="url(#lb-spine-grad)" stroke-width="1"/>
+        <text x="200" y="27" text-anchor="middle" fill="rgba(242,234,216,0.14)" font-family="'DM Mono',monospace" font-size="10">›</text>
+        <text x="400" y="27" text-anchor="middle" fill="rgba(242,234,216,0.2)"  font-family="'DM Mono',monospace" font-size="10">›</text>
+        <text x="600" y="27" text-anchor="middle" fill="rgba(242,234,216,0.18)" font-family="'DM Mono',monospace" font-size="10">›</text>
+        <text x="800" y="27" text-anchor="middle" fill="rgba(242,234,216,0.12)" font-family="'DM Mono',monospace" font-size="10">›</text>
+        <text x="100" y="14" text-anchor="middle" fill="#2D7D7D" font-family="'DM Mono',monospace" font-size="7" letter-spacing="2" opacity="0.65">OPENING</text>
+        <text x="300" y="14" text-anchor="middle" fill="#4AADAD" font-family="'DM Mono',monospace" font-size="7" letter-spacing="2" opacity="0.72">DEEPENING</text>
+        <text x="500" y="12" text-anchor="middle" fill="#8B5FCA" font-family="'DM Mono',monospace" font-size="8" letter-spacing="3" opacity="0.9">PEAK</text>
+        <text x="700" y="14" text-anchor="middle" fill="#E8B84B" font-family="'DM Mono',monospace" font-size="7" letter-spacing="2" opacity="0.75">INTEGRATING</text>
+        <text x="900" y="14" text-anchor="middle" fill="rgba(242,234,216,0.28)" font-family="'DM Mono',monospace" font-size="7" letter-spacing="2">RETURNING</text>
+        <circle cx="100" cy="30" r="5" fill="#4AADAD" opacity="0.75" style="animation:breathe 8s ease-in-out infinite"/>
+        <circle cx="300" cy="30" r="5" fill="#5CC5C5" opacity="0.85" style="animation:breathe 7s ease-in-out infinite; animation-delay:-1s"/>
+        <circle cx="500" cy="30" r="9" fill="#8B5FCA" opacity="0.95" style="animation:breathe 4s ease-in-out infinite"/>
+        <circle cx="500" cy="30" r="15" fill="none" stroke="#8B5FCA" stroke-width="1" opacity="0.45" style="animation:breathe 4s ease-in-out infinite; animation-delay:-1s"/>
+        <circle cx="700" cy="30" r="5" fill="#F5D47A" opacity="0.9" style="animation:goldPulse 8s ease-in-out infinite"/>
+        <circle cx="900" cy="30" r="4" fill="#4AADAD" opacity="0.45" style="animation:breatheSlow 10s ease-in-out infinite"/>
+      </svg>
+    </div>
+
+    <!-- MEMORY / PRESENT / FUTURE -->
+    <div class="reveal" style="display:flex; justify-content:space-around; align-items:center; margin-bottom: 20px; padding: 0 2%;">
+      <span style="font-family:var(--font-mono); font-size:7px; letter-spacing:0.25em; color:rgba(92,197,197,0.38); text-transform:uppercase;">MEMORY</span>
+      <span style="font-family:var(--font-mono); font-size:8px; letter-spacing:0.35em; color:rgba(139,95,202,0.9); text-transform:uppercase; animation:breathe 4s ease-in-out infinite;">PRESENT</span>
+      <span style="font-family:var(--font-mono); font-size:7px; letter-spacing:0.25em; color:rgba(232,184,75,0.38); text-transform:uppercase;">FUTURE</span>
+    </div>
+
+    <!-- Five Phase Cards -->
+    <div class="reveal lb-ch6-phases" style="display:grid; grid-template-columns:repeat(5,1fr); gap:12px; align-items:end;">
+
+      <!-- ARRIVAL -->
+      <div class="lb-phase-card" style="border-top: 2px solid rgba(92,197,197,0.55); opacity: 0.78;">
+        <span style="font-family:var(--font-mono); font-size:6px; letter-spacing:0.18em; color:#4AADAD; opacity:0.28; position:absolute; top:10px; left:10px;">01/05</span>
+        <svg viewBox="0 0 80 80" width="52" height="52" aria-hidden="true" style="display:block; margin:0 auto 10px;">
+          <defs><radialGradient id="lb-arr-g" cx="42%" cy="38%" r="55%"><stop offset="0%" stop-color="#1E5A46" stop-opacity="0.95"/><stop offset="100%" stop-color="#060E0C" stop-opacity="1"/></radialGradient></defs>
+          <circle cx="40" cy="40" r="28" fill="url(#lb-arr-g)" stroke="#4AADAD" stroke-width="0.7" opacity="0.75"/>
+          <ellipse cx="40" cy="40" rx="28" ry="7" fill="none" stroke="#4AADAD" stroke-width="0.4" opacity="0.22"/>
+          <circle cx="30" cy="36" r="2.5" fill="#5CC5C5" opacity="0.55" style="animation:breathe 8s ease-in-out infinite"/>
+        </svg>
+        <p style="font-family:var(--font-mono); font-size:7px; letter-spacing:0.22em; color:#5CC5C5; text-transform:uppercase; margin-bottom:6px;">Arrival</p>
+        <svg viewBox="0 0 52 30" width="44" height="26" aria-hidden="true" style="display:inline-block; overflow:visible; margin-bottom:8px;">
+          <path d="M 6 26 A 20 20 0 0 1 46 26" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 6 26 A 20 20 0 0 1 46 26" fill="none" stroke="#4AADAD" stroke-width="3" stroke-linecap="round" stroke-dasharray="62.8" stroke-dashoffset="54" opacity="0.82" style="animation:breathe 8s ease-in-out infinite"/>
+          <text x="26" y="22" text-anchor="middle" font-family="'DM Mono',monospace" font-size="5" fill="rgba(92,197,197,0.6)">0.0–0.2</text>
+        </svg>
+        <div style="display:flex; justify-content:center; gap:5px; margin-bottom:6px;">
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#4AADAD; animation:hw3-beat 8s ease-in-out infinite;"></span>
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#4AADAD; animation:hw3-beat 8s ease-in-out infinite; animation-delay:-4s;"></span>
+        </div>
+        <svg viewBox="0 0 120 18" width="100%" height="14" aria-hidden="true">
+          <path d="M 0,9 C 15,9 15,3 30,3 C 45,3 45,15 60,15 C 75,15 75,3 90,3 C 105,3 105,9 120,9" stroke="#4AADAD" stroke-width="1.1" fill="none" opacity="0.45" style="animation:breathe 8s ease-in-out infinite;"/>
+        </svg>
+        <p style="font-family:var(--font-mono); font-size:6px; letter-spacing:0.16em; color:#5CC5C5; opacity:0.38; border-top:1px solid rgba(242,234,216,0.07); padding-top:7px; margin-top:6px;">let the room learn you</p>
+      </div>
+
+      <!-- DESCENT -->
+      <div class="lb-phase-card" style="border-top: 2px solid rgba(74,173,173,0.65); opacity:0.85;">
+        <span style="font-family:var(--font-mono); font-size:6px; letter-spacing:0.18em; color:#4AADAD; opacity:0.28; position:absolute; top:10px; left:10px;">02/05</span>
+        <svg viewBox="0 0 80 80" width="52" height="52" aria-hidden="true" style="display:block; margin:0 auto 10px;">
+          <defs>
+            <radialGradient id="lb-des-g" cx="42%" cy="38%" r="55%"><stop offset="0%" stop-color="#1E4240" stop-opacity="0.95"/><stop offset="100%" stop-color="#060E0C" stop-opacity="1"/></radialGradient>
+            <radialGradient id="lb-des-z" cx="50%" cy="58%" r="55%"><stop offset="0%" stop-color="#2D7D7D" stop-opacity="0.55"/><stop offset="100%" stop-color="#2D7D7D" stop-opacity="0"/></radialGradient>
+          </defs>
+          <circle cx="40" cy="40" r="28" fill="url(#lb-des-g)" stroke="#4AADAD" stroke-width="0.7" opacity="0.72"/>
+          <circle cx="40" cy="40" r="28" fill="url(#lb-des-z)" style="animation:breathe 7s ease-in-out infinite"/>
+          <line x1="40" y1="12" x2="40" y2="68" stroke="#4AADAD" stroke-width="0.4" opacity="0.14"/>
+          <line x1="16" y1="26" x2="64" y2="54" stroke="#4AADAD" stroke-width="0.4" opacity="0.14"/>
+          <line x1="64" y1="26" x2="16" y2="54" stroke="#4AADAD" stroke-width="0.4" opacity="0.14"/>
+          <circle cx="30" cy="35" r="2.5" fill="#E8B84B" opacity="0.85" style="animation:breathe 5s ease-in-out infinite"/>
+          <circle cx="50" cy="44" r="2"   fill="#5CC5C5" opacity="0.72" style="animation:breathe 5s ease-in-out infinite; animation-delay:-1.5s"/>
+        </svg>
+        <p style="font-family:var(--font-mono); font-size:7px; letter-spacing:0.22em; color:#4AADAD; text-transform:uppercase; margin-bottom:6px;">Descent</p>
+        <svg viewBox="0 0 52 30" width="44" height="26" aria-hidden="true" style="display:inline-block; overflow:visible; margin-bottom:8px;">
+          <path d="M 6 26 A 20 20 0 0 1 46 26" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 6 26 A 20 20 0 0 1 46 26" fill="none" stroke="#4AADAD" stroke-width="3" stroke-linecap="round" stroke-dasharray="62.8" stroke-dashoffset="44" opacity="0.9" style="animation:breathe 7s ease-in-out infinite"/>
+          <text x="26" y="22" text-anchor="middle" font-family="'DM Mono',monospace" font-size="5" fill="rgba(74,173,173,0.65)">0.2–0.4</text>
+        </svg>
+        <div style="display:flex; justify-content:center; gap:5px; margin-bottom:6px;">
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#4AADAD; animation:hw3-beat 6s ease-in-out infinite;"></span>
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#4AADAD; animation:hw3-beat 6s ease-in-out infinite; animation-delay:-2s;"></span>
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#4AADAD; animation:hw3-beat 6s ease-in-out infinite; animation-delay:-4s;"></span>
+        </div>
+        <svg viewBox="0 0 120 18" width="100%" height="14" aria-hidden="true">
+          <path d="M 0,9 C 12,9 12,4 24,4 C 36,4 36,14 50,14 C 64,14 64,2 78,2 C 92,2 92,16 106,16 C 112,16 116,9 120,9" stroke="#4AADAD" stroke-width="1.3" fill="none" opacity="0.55" style="animation:breathe 7s ease-in-out infinite;"/>
+        </svg>
+        <p style="font-family:var(--font-mono); font-size:6px; letter-spacing:0.16em; color:#4AADAD; opacity:0.38; border-top:1px solid rgba(242,234,216,0.07); padding-top:7px; margin-top:6px;">nothing to do but go deeper</p>
+      </div>
+
+      <!-- DEPTH (elevated) -->
+      <div class="lb-phase-card lb-depth">
+        <span style="font-family:var(--font-mono); font-size:6px; letter-spacing:0.18em; color:#9B6FD8; opacity:0.55; position:absolute; top:10px; left:10px;">03/05</span>
+        <p style="font-family:var(--font-mono); font-size:6px; letter-spacing:0.42em; color:#9B6FD8; text-transform:uppercase; margin-bottom:4px; animation:breathe 4s ease-in-out infinite;">● NOW</p>
+        <svg viewBox="0 0 80 80" width="60" height="60" aria-hidden="true" style="display:block; margin:0 auto 10px;">
+          <defs>
+            <radialGradient id="lb-dep-g" cx="42%" cy="38%" r="55%"><stop offset="0%" stop-color="#35196A" stop-opacity="0.92"/><stop offset="45%" stop-color="#1A2030" stop-opacity="0.94"/><stop offset="100%" stop-color="#060408" stop-opacity="1"/></radialGradient>
+            <radialGradient id="lb-dep-f" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#2D7D7D" stop-opacity="0.48"/><stop offset="100%" stop-color="#2D7D7D" stop-opacity="0"/></radialGradient>
+          </defs>
+          <circle cx="40" cy="40" r="35" fill="none" stroke="#8B5FCA" stroke-width="2" opacity="0.42" style="animation:breathe 6s ease-in-out infinite"/>
+          <circle cx="40" cy="40" r="28" fill="url(#lb-dep-f)" style="animation:breathe 4s ease-in-out infinite"/>
+          <circle cx="40" cy="40" r="28" fill="url(#lb-dep-g)" stroke="#5CC5C5" stroke-width="1" opacity="0.82"/>
+          <line x1="40" y1="12" x2="40" y2="68" stroke="#4AADAD" stroke-width="0.5" opacity="0.22"/>
+          <line x1="16" y1="26" x2="64" y2="54" stroke="#4AADAD" stroke-width="0.5" opacity="0.22"/>
+          <line x1="64" y1="26" x2="16" y2="54" stroke="#4AADAD" stroke-width="0.5" opacity="0.22"/>
+          <circle cx="30" cy="34" r="3.5" fill="#F5D47A" style="animation:breathe 4s ease-in-out infinite"/>
+          <circle cx="48" cy="30" r="3"   fill="#5CC5C5" style="animation:breathe 4s ease-in-out infinite; animation-delay:-1s"/>
+          <circle cx="44" cy="48" r="2.5" fill="#E8B84B" opacity="0.9" style="animation:breathe 4s ease-in-out infinite; animation-delay:-2s"/>
+          <path d="M30,34 Q39,27 48,30" fill="none" stroke="#F5D47A" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.72"/>
+          <path d="M48,30 Q46,39 44,48" fill="none" stroke="#4AADAD" stroke-width="0.6" stroke-dasharray="1.5 3" opacity="0.58"/>
+        </svg>
+        <p style="font-family:var(--font-mono); font-size:8px; letter-spacing:0.25em; text-transform:uppercase; margin-bottom:6px;" class="lb-depth-label">Depth</p>
+        <svg viewBox="0 0 52 30" width="44" height="26" aria-hidden="true" style="display:inline-block; overflow:visible; margin-bottom:8px;">
+          <defs><linearGradient id="lb-dep-arc-grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#8B5FCA"/><stop offset="70%" stop-color="#4AADAD"/></linearGradient></defs>
+          <path d="M 6 26 A 20 20 0 0 1 46 26" fill="none" stroke="rgba(107,63,160,0.22)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 6 26 A 20 20 0 0 1 46 26" fill="none" stroke="url(#lb-dep-arc-grad)" stroke-width="4" stroke-linecap="round" stroke-dasharray="62.8" stroke-dashoffset="22" style="animation:breathe 4s ease-in-out infinite"/>
+          <text x="26" y="22" text-anchor="middle" font-family="'DM Mono',monospace" font-size="5" fill="rgba(139,95,202,0.9)">0.4–0.9</text>
+        </svg>
+        <div style="display:flex; justify-content:center; gap:4px; margin-bottom:6px;">
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#8B5FCA; animation:hw3-beat 3.5s ease-in-out infinite;"></span>
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#6BBDBD; animation:hw3-beat 3.5s ease-in-out infinite; animation-delay:-0.7s;"></span>
+          <span style="display:inline-block; width:5px; height:5px; border-radius:50%; background:#9B6FD8; animation:hw3-beat 3.5s ease-in-out infinite; animation-delay:-1.4s;"></span>
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#5CC5C5; animation:hw3-beat 3.5s ease-in-out infinite; animation-delay:-2.1s;"></span>
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#8B5FCA; animation:hw3-beat 3.5s ease-in-out infinite; animation-delay:-2.8s;"></span>
+        </div>
+        <svg viewBox="0 0 120 18" width="100%" height="14" aria-hidden="true">
+          <path d="M 0,9 C 7,2 14,16 21,9 C 28,2 35,16 42,9 C 49,2 56,16 63,9 C 70,2 77,16 84,9 C 91,2 98,16 105,9 C 112,2 119,16 120,9" stroke="#8B5FCA" stroke-width="1.4" fill="none" opacity="0.62" style="animation:breathe 4s ease-in-out infinite;"/>
+          <path d="M 0,9 C 10,15 18,3 26,9 C 34,15 42,3 50,9 C 58,15 66,3 74,9 C 82,15 90,3 98,9 C 106,15 114,3 120,9" stroke="#4AADAD" stroke-width="0.9" fill="none" opacity="0.4" style="animation:breathe 4s ease-in-out infinite; animation-delay:-2s;"/>
+        </svg>
+        <p style="font-family:var(--font-mono); font-size:6px; letter-spacing:0.16em; color:#9B6FD8; opacity:0.55; border-top:1px solid rgba(139,95,202,0.15); padding-top:7px; margin-top:6px;">the field is holding everyone</p>
+      </div>
+
+      <!-- EMERGENCE -->
+      <div class="lb-phase-card" style="border-top: 2px solid rgba(245,212,122,0.85); opacity:0.88;">
+        <span style="font-family:var(--font-mono); font-size:6px; letter-spacing:0.18em; color:#F5D47A; opacity:0.28; position:absolute; top:10px; left:10px;">04/05</span>
+        <svg viewBox="0 0 80 80" width="52" height="52" aria-hidden="true" style="display:block; margin:0 auto 10px;">
+          <defs>
+            <radialGradient id="lb-em-g" cx="42%" cy="38%" r="55%"><stop offset="0%" stop-color="#4A2E08" stop-opacity="0.95"/><stop offset="100%" stop-color="#080400" stop-opacity="1"/></radialGradient>
+            <radialGradient id="lb-em-glow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#C4922A" stop-opacity="0.38"/><stop offset="100%" stop-color="#C4922A" stop-opacity="0"/></radialGradient>
+          </defs>
+          <circle cx="40" cy="40" r="38" fill="url(#lb-em-glow)" style="animation:goldPulse 8s ease-in-out infinite"/>
+          <circle cx="40" cy="40" r="30" fill="none" stroke="#E8B84B" stroke-width="0.7" opacity="0.28" style="animation:breathe 4s ease-in-out infinite"/>
+          <circle cx="40" cy="40" r="24" fill="none" stroke="#F5D47A" stroke-width="0.8" opacity="0.48" style="animation:breathe 4s ease-in-out infinite; animation-delay:-1.5s"/>
+          <circle cx="40" cy="40" r="22" fill="url(#lb-em-g)" stroke="#F5D47A" stroke-width="1.2" opacity="0.88"/>
+          <circle cx="36" cy="36" r="4.5" fill="#F5D47A" style="animation:goldPulse 8s ease-in-out infinite"/>
+          <circle cx="48" cy="44" r="3"   fill="#E8B84B" opacity="0.9" style="animation:breathe 3.5s ease-in-out infinite"/>
+        </svg>
+        <p style="font-family:var(--font-mono); font-size:7px; letter-spacing:0.22em; color:#F5D47A; text-transform:uppercase; margin-bottom:6px; animation:goldPulse 8s ease-in-out infinite;">Emergence</p>
+        <svg viewBox="0 0 52 30" width="44" height="26" aria-hidden="true" style="display:inline-block; overflow:visible; margin-bottom:8px;">
+          <path d="M 6 26 A 20 20 0 0 1 46 26" fill="none" stroke="rgba(232,184,75,0.18)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 6 26 A 20 20 0 0 1 46 26" fill="none" stroke="#F5D47A" stroke-width="4" stroke-linecap="round" stroke-dasharray="62.8" stroke-dashoffset="6" style="animation:goldPulse 8s ease-in-out infinite"/>
+          <circle cx="46" cy="26" r="3" fill="#FFF8E1" style="animation:goldPulse 8s ease-in-out infinite"/>
+          <text x="26" y="22" text-anchor="middle" font-family="'DM Mono',monospace" font-size="5" fill="rgba(245,212,122,0.85)">0.8–1.0</text>
+        </svg>
+        <div style="display:flex; justify-content:center; gap:5px; margin-bottom:6px;">
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#F5D47A; animation:hw3-beat 4s ease-in-out infinite;"></span>
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#E8B84B; animation:hw3-beat 4s ease-in-out infinite; animation-delay:-1s;"></span>
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#F5D47A; animation:hw3-beat 4s ease-in-out infinite; animation-delay:-2s;"></span>
+          <span style="display:inline-block; width:4px; height:4px; border-radius:50%; background:#E8B84B; animation:hw3-beat 4s ease-in-out infinite; animation-delay:-3s;"></span>
+        </div>
+        <svg viewBox="0 0 120 18" width="100%" height="14" aria-hidden="true">
+          <path d="M 0,14 L 12,14 L 16,1 L 20,14 L 35,14 L 41,5 L 45,14 L 58,14 L 64,0 L 68,14 L 80,14 L 86,3 L 90,14 L 103,14 L 109,4 L 113,14 L 120,14" stroke="#F5D47A" stroke-width="1.5" fill="none" opacity="0.78" style="animation:goldPulse 4s ease-in-out infinite;"/>
+        </svg>
+        <p style="font-family:var(--font-mono); font-size:6px; letter-spacing:0.16em; color:#F5D47A; opacity:0.38; border-top:1px solid rgba(245,212,122,0.12); padding-top:7px; margin-top:6px;">feel what has been freed</p>
+      </div>
+
+      <!-- RETURN -->
+      <div class="lb-phase-card" style="border-top: 2px solid rgba(196,146,42,0.38); opacity:0.7;">
+        <span style="font-family:var(--font-mono); font-size:6px; letter-spacing:0.18em; color:#4AADAD; opacity:0.28; position:absolute; top:10px; left:10px;">05/05</span>
+        <svg viewBox="0 0 80 80" width="52" height="52" aria-hidden="true" style="display:block; margin:0 auto 10px;">
+          <defs><radialGradient id="lb-ret-g" cx="42%" cy="38%" r="55%"><stop offset="0%" stop-color="#1E3828" stop-opacity="0.82"/><stop offset="100%" stop-color="#060A07" stop-opacity="1"/></radialGradient></defs>
+          <circle cx="40" cy="40" r="30" fill="none" stroke="#4AADAD" stroke-width="0.6" stroke-dasharray="1 6" opacity="0.18" style="animation:breatheSlow 10s ease-in-out infinite"/>
+          <circle cx="40" cy="40" r="26" fill="url(#lb-ret-g)" stroke="#4AADAD" stroke-width="0.6" opacity="0.62"/>
+          <circle cx="32" cy="37" r="3"   fill="#E8B84B" opacity="0.45" style="animation:breatheSlow 10s ease-in-out infinite"/>
+          <circle cx="48" cy="43" r="2"   fill="#5CC5C5" opacity="0.35" style="animation:breatheSlow 10s ease-in-out infinite; animation-delay:-3s"/>
+        </svg>
+        <p style="font-family:var(--font-mono); font-size:7px; letter-spacing:0.22em; color:rgba(92,197,197,0.6); text-transform:uppercase; margin-bottom:6px;">Return</p>
+        <svg viewBox="0 0 52 30" width="44" height="26" aria-hidden="true" style="display:inline-block; overflow:visible; margin-bottom:8px;">
+          <path d="M 6 26 A 20 20 0 0 1 46 26" fill="none" stroke="rgba(92,197,197,0.12)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M 6 26 A 20 20 0 0 1 46 26" fill="none" stroke="#4AADAD" stroke-width="3" stroke-linecap="round" stroke-dasharray="62.8" stroke-dashoffset="31" opacity="0.48" style="animation:breatheSlow 10s ease-in-out infinite"/>
+          <text x="26" y="22" text-anchor="middle" font-family="'DM Mono',monospace" font-size="5" fill="rgba(92,197,197,0.42)">settling</text>
+        </svg>
+        <div style="display:flex; justify-content:center; gap:5px; margin-bottom:6px;">
+          <span style="display:inline-block; width:3px; height:3px; border-radius:50%; background:#4AADAD; animation:hw3-beat 12s ease-in-out infinite;"></span>
+          <span style="display:inline-block; width:3px; height:3px; border-radius:50%; background:#4AADAD; animation:hw3-beat 12s ease-in-out infinite; animation-delay:-6s;"></span>
+        </div>
+        <svg viewBox="0 0 120 18" width="100%" height="14" aria-hidden="true">
+          <path d="M 0,9 C 12,4 22,14 32,9 C 42,5 52,13 62,9 C 70,6 78,12 85,9 C 92,7 100,11 105,9 C 110,8 115,10 120,9" stroke="#4AADAD" stroke-width="0.9" fill="none" opacity="0.28" style="animation:breatheSlow 10s ease-in-out infinite;"/>
+        </svg>
+        <p style="font-family:var(--font-mono); font-size:6px; letter-spacing:0.16em; color:rgba(92,197,197,0.55); opacity:0.38; border-top:1px solid rgba(242,234,216,0.07); padding-top:7px; margin-top:6px;">carry this with you</p>
+      </div>
+
+    </div><!-- end phase cards -->
+  </section>
+
+  <!-- ═══════════════════════════════════════ Ch 7 — Join Us ═══ -->
+  <section class="chapter" style="min-height: 100vh; background: linear-gradient(180deg, #050309 0%, #070E0C 60%, #050309 100%); padding: clamp(64px,10vw,120px) clamp(24px,6vw,64px); display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <div style="text-align:center; margin-bottom: clamp(32px,5vw,56px);">
+      <p class="eyebrow reveal">Become a Facilitator</p>
+      <p class="pull-quote reveal reveal-delay-1" style="font-size:clamp(1.4rem,2.5vw,2.4rem); max-width:580px; margin: 0 auto;">"The planet needs more people who know how to hold the field."</p>
+    </div>
+
+    <!-- Three tier cards -->
+    <div class="reveal reveal-delay-2 lb-ch7-tiers" style="display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(12px,2vw,24px); width:100%; max-width:900px; margin-bottom:clamp(32px,5vw,56px);">
+      <div style="background:rgba(13,9,26,0.55); border:1px solid rgba(92,197,197,0.15); border-radius:var(--r-md); padding:clamp(24px,3.5vw,40px); text-align:center;">
+        <p style="font-family:var(--font-mono); font-size:9px; letter-spacing:0.25em; color:var(--teal-bright); text-transform:uppercase; margin-bottom:12px;">Practitioner</p>
+        <p class="body-copy" style="font-size:12px; margin-bottom:8px;">Foundation training in SoundBed facilitation. Six-day immersive intensive. Open to all backgrounds.</p>
+        <p style="font-family:var(--font-mono); font-size:8px; color:rgba(92,197,197,0.45); letter-spacing:0.15em;">6-day intensive</p>
+      </div>
+      <div style="background:rgba(13,9,26,0.55); border:1px solid rgba(196,146,42,0.2); border-radius:var(--r-md); padding:clamp(24px,3.5vw,40px); text-align:center;">
+        <p style="font-family:var(--font-mono); font-size:9px; letter-spacing:0.25em; color:var(--gold-light); text-transform:uppercase; margin-bottom:12px;">Facilitator</p>
+        <p class="body-copy" style="font-size:12px; margin-bottom:8px;">Advanced coherence facilitation and session design. Eligible to lead group sessions at partner venues.</p>
+        <p style="font-family:var(--font-mono); font-size:8px; color:rgba(232,184,75,0.45); letter-spacing:0.15em;">Advanced pathway</p>
+      </div>
+      <div style="background:rgba(13,9,26,0.55); border:1px solid rgba(139,95,202,0.2); border-radius:var(--r-md); padding:clamp(24px,3.5vw,40px); text-align:center;">
+        <p style="font-family:var(--font-mono); font-size:9px; letter-spacing:0.25em; color:var(--violet-mid); text-transform:uppercase; margin-bottom:12px;">Master</p>
+        <p class="body-copy" style="font-size:12px; margin-bottom:8px;">Master-level certification. Train the next generation of facilitators. Global network access.</p>
+        <p style="font-family:var(--font-mono); font-size:8px; color:rgba(139,95,202,0.45); letter-spacing:0.15em;">By invitation</p>
+      </div>
+    </div>
+
+    <p class="reveal reveal-delay-3" style="font-family:var(--font-mono); font-size:9px; letter-spacing:0.25em; color:var(--text-muted); text-transform:uppercase; margin-bottom:clamp(24px,4vw,40px); text-align:center;">Venue Partners &mdash; Hotels &middot; Spas &middot; Retreat Centers &middot; Wellness Venues</p>
+
+    <!-- CTA -->
+    <div class="reveal reveal-delay-3">
+      <a href="#" style="display:inline-block; font-family:var(--font-mono); font-size:9px; letter-spacing:0.35em; text-transform:uppercase; color:var(--gold-light); border:1px solid var(--gold-warm); padding:14px 36px; border-radius:40px; text-decoration:none; transition:background 0.4s ease, color 0.4s ease;"
+         onmouseover="this.style.background='#C4922A';this.style.color='#050309'"
+         onmouseout="this.style.background='transparent';this.style.color='var(--gold-light)'">
+        Apply for Certification
+      </a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ Ch 8 — Closing ═══ -->
+  <section class="chapter" style="height:100vh; background:var(--void); display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+    <!-- Ambient violet glow -->
+    <div aria-hidden="true" style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:600px; height:300px; background:radial-gradient(ellipse at 50% 50%, rgba(107,63,160,0.2) 0%, transparent 70%); pointer-events:none; animation:breatheSlow 10s ease-in-out infinite; z-index:0;"></div>
+    <!-- Content -->
+    <div style="position:relative; z-index:1; text-align:center;">
+      <!-- Breathing node -->
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" style="display:block; margin:0 auto clamp(20px,4vw,36px);">
+        <defs>
+          <radialGradient id="lb-node-close" cx="35%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#9BE8E8"/>
+            <stop offset="50%" stop-color="#4AADAD"/>
+            <stop offset="100%" stop-color="#0D4038"/>
+          </radialGradient>
+        </defs>
+        <circle cx="9" cy="9" r="7" fill="url(#lb-node-close)" style="animation:nodeGlow 5s ease-in-out infinite;"/>
+      </svg>
+      <!-- Tagline — wrapped in reveal div to avoid reveal/animation opacity conflict -->
+      <div class="reveal">
+        <p style="font-family:var(--font-display); font-weight:300; font-style:italic; font-size:clamp(3rem,6vw,5rem); color:var(--gold-light); line-height:1.15; animation:goldPulse 10s ease-in-out infinite;">make loving art</p>
+      </div>
+      <!-- Wordmark -->
+      <div class="reveal reveal-delay-1 wm-trigger" style="margin-top:clamp(16px,3vw,28px);">
+        <p class="lb-wordmark" style="font-family:var(--font-mono); font-size:9px; color:var(--teal-bright); text-transform:uppercase;">SOUNDTEMPLE</p>
+      </div>
+      <!-- Rule -->
+      <div class="reveal reveal-delay-2" style="width:40px; height:1px; background:rgba(92,197,197,0.25); margin:clamp(16px,3vw,28px) auto 0;"></div>
+    </div>
+  </section>
+
+  <script>
+    // Scroll reveal — also fires wordmark animation on .wm-trigger wrappers
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          if (e.target.classList.contains('wm-trigger')) {
+            const wm = e.target.querySelector('.lb-wordmark');
+            if (wm) {
+              wm.classList.add('wm-play', 'lb-shimmer-ready');
+              setTimeout(() => wm.classList.add('lb-shine'), 2800);
+            }
+          }
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Shimmer on page-load wordmark
+    const heroLbWm = document.querySelector('.lb-wordmark.wm-play');
+    if (heroLbWm && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      heroLbWm.classList.add('lb-shimmer-ready');
+      setTimeout(() => heroLbWm.classList.add('lb-shine'), 2800);
+    }
+  </script>
+</body>
+</html>

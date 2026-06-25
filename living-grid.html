@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>The Living Grid — SoundTemple</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+
+/* ── RESET ───────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #05030C; }
+
+/* ── CSS VARS ────────────────────────────────────────────── */
+:root {
+  --void:        #05030C;
+  --dark:        #0D0A1A;
+  --cream:       #F2EAD8;
+  --gold-light:  #E8B84B;
+  --gold-bright: #F5D47A;
+  --gold:        #C4922A;
+  --teal-bright: #5CC5C5;
+  --teal:        #4AADAD;
+  --teal-mid:    #2D7D7D;
+  --jade-deep:   #0D4038;
+  --violet:      #6B3FA0;
+  --violet-mid:  #8B5FCA;
+  --ivory:       #F2EAD8;
+  --ivory-55:    rgba(242,234,216,0.55);
+  --ivory-28:    rgba(242,234,216,0.28);
+  --font-display:'Cormorant Garamond', Georgia, serif;
+  --font-mono:   'DM Mono', monospace;
+}
+
+/* ── KEYFRAMES ───────────────────────────────────────────── */
+@keyframes hexBreathe {
+  0%,100% { fill-opacity: var(--hbo,0.06); stroke-opacity: var(--hso,0.09); }
+  50%     { fill-opacity: var(--hpo,0.18); stroke-opacity: var(--hso2,0.22); }
+}
+@keyframes broadcastRing {
+  0%   { transform: scale(1);   opacity: 0.85; }
+  100% { transform: scale(8.5); opacity: 0; }
+}
+@keyframes connectionPulse {
+  0%,100% { stroke-opacity: 0.22; }
+  50%     { stroke-opacity: 0.65; }
+}
+@keyframes nodeGlowAnim {
+  0%,100% { filter: brightness(0.82) saturate(0.88); }
+  50%     { filter: brightness(1.40) saturate(1.20); }
+}
+@keyframes nodeRingAnim {
+  0%,100% { stroke-opacity: 0.35; }
+  50%     { stroke-opacity: 0.80; }
+}
+@keyframes docNodePulse {
+  0%,100% { stroke-opacity: 0.38; }
+  50%     { stroke-opacity: 0.85; }
+}
+@keyframes heartLinkPulse {
+  0%,100% { opacity: 0.20; }
+  50%     { opacity: 0.70; }
+}
+@keyframes microPulse {
+  0%   { r: 8;  stroke-opacity: 0.75; }
+  100% { r: 90; stroke-opacity: 0; }
+}
+@keyframes transAnnounce {
+  0%,15% { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  25%    { opacity: 1; transform: translateX(-50%) translateY(0); }
+  80%    { opacity: 1; }
+  100%   { opacity: 0; }
+}
+@keyframes modeDotPulse {
+  0%,100% { opacity: 0.6; }
+  50%     { opacity: 1; }
+}
+@keyframes infoSlideIn {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ── ROOT CONTAINER ──────────────────────────────────────── */
+#lg-root {
+  position: relative; width: 100vw; height: 100vh; overflow: hidden;
+  background: var(--void);
+}
+
+/* ── CANVAS ──────────────────────────────────────────────── */
+#lg-canvas {
+  position: absolute; inset: 0;
+  pointer-events: none;
+}
+
+/* ── SVG FIELD ───────────────────────────────────────────── */
+#lg-svg {
+  position: absolute; inset: 0;
+  overflow: visible;
+}
+
+/* ── HUD WRAPPER ─────────────────────────────────────────── */
+#lg-hud {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Top-left: wordmark + LRM */
+#lg-hud-tl {
+  position: absolute; top: clamp(20px,3vw,32px); left: clamp(20px,3vw,36px);
+  pointer-events: all;
+}
+.lg-wordmark {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 400;
+  letter-spacing: 0.42em; color: var(--teal-bright); text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.lg-subsystem {
+  font-family: var(--font-mono); font-size: 6.5px;
+  letter-spacing: 0.18em; color: rgba(74,173,173,0.35);
+  text-transform: uppercase;
+}
+
+/* Top-right: mode + trigger */
+#lg-hud-tr {
+  position: absolute; top: clamp(20px,3vw,32px); right: clamp(20px,3vw,36px);
+  display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+  pointer-events: all;
+}
+.lg-mode-row {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 8px;
+  letter-spacing: 0.22em; color: var(--ivory-55); text-transform: uppercase;
+}
+.lg-mode-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  animation: modeDotPulse 3s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.lg-dot-teal { background: var(--teal-bright); }
+.lg-dot-gold { background: var(--gold-bright); animation: modeDotPulse 0.8s ease-in-out infinite; }
+#lg-trigger-btn {
+  font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: rgba(74,173,173,0.45);
+  background: none; border: 1px solid rgba(74,173,173,0.18);
+  padding: 6px 14px; cursor: pointer; border-radius: 20px;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+#lg-trigger-btn:hover { color: var(--gold-light); border-color: rgba(232,184,75,0.45); }
+
+/* Bottom-left: coordinates */
+#lg-hud-bl {
+  position: absolute; bottom: 72px; left: clamp(20px,3vw,36px);
+}
+.lg-coord {
+  font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.18em;
+  color: rgba(74,173,173,0.38); text-transform: uppercase; margin-bottom: 3px;
+}
+.lg-coord-sub {
+  font-family: var(--font-mono); font-size: 6.5px; letter-spacing: 0.14em;
+  color: rgba(74,173,173,0.22); text-transform: uppercase;
+}
+
+/* Bottom bar */
+#lg-bottom {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 60px;
+  background: linear-gradient(to top, rgba(5,3,12,0.92) 0%, rgba(5,3,12,0.72) 70%, transparent 100%);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 0 clamp(20px,3vw,36px) 10px; gap: 5px;
+  border-top: 1px solid rgba(74,173,173,0.08);
+  pointer-events: all;
+}
+#lg-stats {
+  font-family: var(--font-mono); font-size: 7.5px; letter-spacing: 0.14em;
+  color: var(--ivory-55); text-transform: uppercase;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.lg-sep { color: rgba(74,173,173,0.28); }
+#lg-lrm-bar {
+  width: 100%; height: 1px;
+  background: rgba(74,173,173,0.08);
+  position: relative; overflow: hidden;
+}
+#lg-lrm-fill {
+  position: absolute; left: 0; top: 0; height: 100%;
+  background: linear-gradient(to right, var(--teal-mid), var(--teal), var(--gold));
+  width: 0.30%;
+  transition: width 2s ease;
+}
+#lg-lrm-label {
+  font-family: var(--font-mono); font-size: 6px; letter-spacing: 0.14em;
+  color: rgba(74,173,173,0.25); text-transform: uppercase;
+}
+
+/* ── TRANSMISSION ANNOUNCE ───────────────────────────────── */
+#lg-mode-announce {
+  position: fixed; left: 50%; bottom: 80px;
+  transform: translateX(-50%);
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.28em;
+  color: var(--gold-bright); text-transform: uppercase;
+  background: rgba(5,3,12,0.75); border: 1px solid rgba(232,184,75,0.28);
+  padding: 10px 24px; border-radius: 24px;
+  opacity: 0; pointer-events: none; z-index: 20;
+  white-space: nowrap;
+}
+#lg-mode-announce.lg-announce-active {
+  animation: transAnnounce 12s ease forwards;
+}
+
+/* ── INFO PANEL ──────────────────────────────────────────── */
+#lg-info {
+  position: fixed; left: 0; top: 0; height: 100vh; width: 300px;
+  background: linear-gradient(135deg, rgba(13,10,26,0.96) 0%, rgba(5,3,12,0.92) 100%);
+  border-right: 1px solid rgba(74,173,173,0.14);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  padding: clamp(24px,4vw,40px) 28px;
+  display: flex; flex-direction: column; gap: 20px;
+  z-index: 30; pointer-events: all;
+  opacity: 0; transform: translateX(-24px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: none;
+}
+#lg-info.lg-info-visible {
+  opacity: 1; transform: translateX(0); pointer-events: all;
+}
+.lg-info-header {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.lg-info-status-badge {
+  font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.25em;
+  text-transform: uppercase; padding: 4px 10px; border-radius: 12px;
+}
+.lg-status-broadcast { color: var(--gold-bright); border: 1px solid rgba(245,212,122,0.35); background: rgba(245,212,122,0.08); }
+.lg-status-active    { color: var(--teal-bright); border: 1px solid rgba(92,197,197,0.35); background: rgba(92,197,197,0.08); }
+.lg-status-online    { color: var(--teal);        border: 1px solid rgba(74,173,173,0.25); background: rgba(74,173,173,0.06); }
+.lg-status-dormant   { color: rgba(242,234,216,0.35); border: 1px solid rgba(242,234,216,0.10); background: transparent; }
+.lg-info-close {
+  font-family: var(--font-mono); font-size: 9px; color: var(--ivory-28);
+  background: none; border: none; cursor: pointer; padding: 4px 8px;
+  transition: color 0.2s ease;
+}
+.lg-info-close:hover { color: var(--ivory); }
+.lg-info-name {
+  font-family: var(--font-display); font-weight: 300; font-style: italic;
+  font-size: clamp(1.4rem,2.2vw,1.9rem); color: var(--ivory); line-height: 1.15;
+}
+.lg-info-city {
+  font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.18em;
+  color: var(--ivory-28); text-transform: uppercase; margin-top: -12px;
+}
+.lg-info-stats { display: flex; flex-direction: column; gap: 14px; }
+.lg-info-stat {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.lg-info-stat-label {
+  font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.18em;
+  color: var(--ivory-28); text-transform: uppercase;
+}
+.lg-info-stat-val {
+  font-family: var(--font-mono); font-size: 13px; color: var(--teal-bright);
+  letter-spacing: 0.05em;
+}
+.lg-info-heartlink-note {
+  font-family: var(--font-display); font-weight: 300; font-style: italic;
+  font-size: 13px; color: rgba(242,234,216,0.38); line-height: 1.6;
+  margin-top: auto; padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.lg-info-waveform { width: 100%; height: 36px; }
+
+/* ── MOBILE ──────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  #lg-info { width: 100vw; }
+  #lg-stats { font-size: 6.5px; gap: 7px; }
+  .lg-sep { display: none; }
+  #lg-stats > span { display: block; }
+  #lg-bottom { height: auto; padding-bottom: 14px; }
+}
+@media (max-width: 380px) {
+  .lg-wordmark { font-size: 8px; }
+  #lg-trigger-btn { font-size: 6px; padding: 5px 10px; }
+}
+
+</style>
+</head>
+<body>
+
+<div id="lg-root">
+  <canvas id="lg-canvas"></canvas>
+  <svg id="lg-svg" xmlns="http://www.w3.org/2000/svg"
+       aria-label="The Living Grid — SoundTemple planetary coherence field" role="img"></svg>
+
+  <!-- HUD Overlay -->
+  <div id="lg-hud" style="opacity:0;transition:opacity 0.9s ease;">
+
+    <div id="lg-hud-tl">
+      <div class="lg-wordmark">SoundTemple</div>
+      <div class="lg-subsystem">LRM Subsystem 06 · Environmental Coherence Chamber</div>
+    </div>
+
+    <div id="lg-hud-tr">
+      <div class="lg-mode-row">
+        <span id="lg-mode-dot" class="lg-mode-dot lg-dot-teal"></span>
+        <span id="lg-mode-text">Daily Field</span>
+      </div>
+      <button id="lg-trigger-btn">Global Transmission</button>
+    </div>
+
+    <div id="lg-hud-bl">
+      <div class="lg-coord">30.2672°N · 97.7431°W</div>
+      <div class="lg-coord-sub">ATX · Broadcasting · Session Active</div>
+    </div>
+
+    <div id="lg-bottom">
+      <div id="lg-stats">
+        <span>Field Integrity <span id="lg-fi">94.2</span>%</span>
+        <span class="lg-sep">·</span>
+        <span><span id="lg-nodes">12</span> Active Nodes</span>
+        <span class="lg-sep">·</span>
+        <span><span id="lg-hl">30,247</span> ♡ Heart Links</span>
+        <span class="lg-sep">·</span>
+        <span>Next Broadcast <span id="lg-nbc">00:43</span></span>
+      </div>
+      <div id="lg-lrm-bar"><div id="lg-lrm-fill"></div></div>
+      <div id="lg-lrm-label">LRM Target 10,000,000 Heart Links · <span id="lg-lrm-pct">0.30</span>% Critical Mass</div>
+    </div>
+
+  </div><!-- /lg-hud -->
+
+  <!-- Transmission announce -->
+  <div id="lg-mode-announce">◎ Global Transmission Initiating</div>
+
+  <!-- Info panel -->
+  <div id="lg-info">
+    <div class="lg-info-header">
+      <span id="lg-info-status" class="lg-info-status-badge lg-status-broadcast">Broadcast</span>
+      <button class="lg-info-close" id="lg-info-close">✕</button>
+    </div>
+    <div class="lg-info-name" id="lg-info-name">Bathhouse ATX</div>
+    <div class="lg-info-city" id="lg-info-city">Austin, TX</div>
+    <svg class="lg-info-waveform" id="lg-info-waveform" viewBox="0 0 260 36"
+         aria-hidden="true" style="display:block;overflow:visible;margin-bottom:4px;"></svg>
+    <div class="lg-info-stats">
+      <div class="lg-info-stat">
+        <span class="lg-info-stat-label">Coherence</span>
+        <span class="lg-info-stat-val" id="lg-info-coh">0.92</span>
+      </div>
+      <div class="lg-info-stat">
+        <span class="lg-info-stat-label">Sessions Today</span>
+        <span class="lg-info-stat-val" id="lg-info-sessions">14</span>
+      </div>
+      <div class="lg-info-stat">
+        <span class="lg-info-stat-label">Heart Links</span>
+        <span class="lg-info-stat-val" id="lg-info-links">8,234</span>
+      </div>
+    </div>
+    <div class="lg-info-heartlink-note">Heart Links are biometric — private, encrypted, yours.</div>
+  </div>
+
+</div><!-- /lg-root -->
+
+<script>
+(function () {
+  'use strict';
+
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var RM = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ── DIMENSIONS ─────────────────────────────────────────
+  var W = 0, H = 0;
+
+  // ── PROJECTION ─────────────────────────────────────────
+  // Equirectangular crop: lon -160→150, lat 70→-55
+  var LON_MIN = -160, LON_MAX = 150;
+  var LAT_MAX = 70,   LAT_MIN = -55;
+
+  function geo(lat, lon) {
+    return {
+      x: (lon - LON_MIN) / (LON_MAX - LON_MIN) * W,
+      y: (LAT_MAX - lat) / (LAT_MAX - LAT_MIN) * H
+    };
+  }
+
+  // ── TEMPLES ────────────────────────────────────────────
+  var T = [
+    { n:'Bathhouse ATX',     city:'Austin, TX',              lat: 30.27, lon:-97.74,  st:'broadcast', c:0.92, sess:14, hl:8234  },
+    { n:'Red Rock Sedona',   city:'Sedona, AZ',              lat: 34.87, lon:-111.76, st:'active',    c:0.78, sess:7,  hl:3891  },
+    { n:'Cenote Tulum',      city:'Tulum, Mexico',           lat: 20.21, lon:-87.47,  st:'active',    c:0.71, sess:5,  hl:2640  },
+    { n:'Ubud Bali',         city:'Ubud, Indonesia',         lat: -8.51, lon:115.26,  st:'active',    c:0.68, sess:6,  hl:3015  },
+    { n:'Sierra Tahoe',      city:'Lake Tahoe, CA',          lat: 39.10, lon:-120.03, st:'online',    c:0.52, sess:0,  hl:1203  },
+    { n:'Kyoto',             city:'Kyoto, Japan',            lat: 35.01, lon:135.77,  st:'online',    c:0.48, sess:0,  hl:987   },
+    { n:'Tuscany',           city:'Florence, Italy',         lat: 43.77, lon:11.25,   st:'online',    c:0.44, sess:0,  hl:876   },
+    { n:'Oaxaca',            city:'Oaxaca, Mexico',          lat: 17.06, lon:-96.72,  st:'online',    c:0.41, sess:0,  hl:743   },
+    { n:'Cape Town',         city:'Cape Town, South Africa', lat:-33.93, lon:18.42,   st:'dormant',   c:0.18, sess:0,  hl:124   },
+    { n:'Reykjavik',         city:'Reykjavik, Iceland',      lat: 64.13, lon:-21.82,  st:'dormant',   c:0.14, sess:0,  hl:89    },
+    { n:'Chiang Mai',        city:'Chiang Mai, Thailand',    lat: 18.79, lon:98.98,   st:'dormant',   c:0.16, sess:0,  hl:156   },
+    { n:'São Paulo',         city:'São Paulo, Brazil',       lat:-23.55, lon:-46.63,  st:'dormant',   c:0.12, sess:0,  hl:67    }
+  ];
+
+  // Document signal nodes — positioned relative to ATX
+  var DOC = [
+    { label:'Look Book',     desc:'Brand Visual Document',      href:'look-book.html', col:'#5CC5C5', dxF: 0.13, dyF:-0.12 },
+    { label:'Field Guide',   desc:'The Experience Guide',       href:'landing.html',   col:'#8B5FCA', dxF: 0.14, dyF: 0.10 },
+    { label:'Heart Weather', desc:'Science + Live Dashboard',   href:'index.html',     col:'#E8B84B', dxF: 0.22, dyF: 0.00 }
+  ];
+
+  // ── COLOR ──────────────────────────────────────────────
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function cToRgb(c) {
+    var r, g, b, t;
+    if (c < 0.35) {
+      t = c / 0.35;
+      r = Math.round(lerp(0x0D, 0x2D, t));
+      g = Math.round(lerp(0x40, 0x7D, t));
+      b = Math.round(lerp(0x38, 0x7D, t));
+    } else if (c < 0.70) {
+      t = (c - 0.35) / 0.35;
+      r = Math.round(lerp(0x2D, 0x4A, t));
+      g = Math.round(lerp(0x7D, 0xAD, t));
+      b = Math.round(lerp(0x7D, 0xAD, t));
+    } else {
+      t = (c - 0.70) / 0.30;
+      r = Math.round(lerp(0x4A, 0xE8, t));
+      g = Math.round(lerp(0xAD, 0xB8, t));
+      b = Math.round(lerp(0xAD, 0x4B, t));
+    }
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+
+  // ── HEX MATH ───────────────────────────────────────────
+  var HR = 28;
+  var HCW = HR * Math.sqrt(3);
+  var HRH = HR * 1.5;
+
+  function hexPts(cx, cy, R) {
+    var p = [];
+    for (var i = 0; i < 6; i++) {
+      var a = Math.PI / 3 * i + Math.PI / 6;
+      p.push((cx + R * Math.cos(a)).toFixed(1) + ',' + (cy + R * Math.sin(a)).toFixed(1));
+    }
+    return p.join(' ');
+  }
+
+  function templeInf(sx, sy) {
+    var best = 0;
+    for (var i = 0; i < T.length; i++) {
+      var t = T[i], str, rad;
+      if      (t.st === 'broadcast') { str = 1.00; rad = 0.30 * W; }
+      else if (t.st === 'active')    { str = 0.72; rad = 0.19 * W; }
+      else if (t.st === 'online')    { str = 0.32; rad = 0.11 * W; }
+      else continue;
+      var dx = sx - t.sx, dy = sy - t.sy;
+      var inf = str * Math.max(0, 1 - Math.sqrt(dx * dx + dy * dy) / rad);
+      if (inf > best) best = inf;
+    }
+    return Math.max(0.04, Math.min(0.95, best * 0.9 + 0.04));
+  }
+
+  // ── STATE ──────────────────────────────────────────────
+  var HEXES = [];
+  var connGrads = [];
+  var nodeEls = [];
+  var transActive = false;
+  var transStart = 0;
+  var transRAF = 0;
+  var mode = 'daily';
+  var heartLinks = 30247;
+  var fieldInt = 94.2;
+  var bcastSecs = 43;
+
+  // ── SVG FACTORY ────────────────────────────────────────
+  function mk(tag) { return document.createElementNS(SVG_NS, tag); }
+
+  // SVG layer refs
+  var svgEl, svgDefs;
+  var hexL, leyL, hlL, docLineL, nodeL, docNodeL, labelL, transL;
+
+  // ── CANVAS GRID ────────────────────────────────────────
+  var canvas, ctx, cAlpha = 0;
+
+  function drawGrid() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    ctx.globalAlpha = cAlpha;
+
+    var sp = 80;
+    var cols = Math.ceil(W / sp) + 1;
+    var rows = Math.ceil(H / sp) + 1;
+
+    // Main grid lines
+    ctx.strokeStyle = 'rgba(74,173,173,0.045)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    for (var c = 0; c <= cols; c++) { ctx.moveTo(c * sp, 0); ctx.lineTo(c * sp, H); }
+    for (var r = 0; r <= rows; r++) { ctx.moveTo(0, r * sp); ctx.lineTo(W, r * sp); }
+    ctx.stroke();
+
+    // Diagonal schematic accents
+    ctx.strokeStyle = 'rgba(74,173,173,0.012)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    for (var d = -H * 0.4; d < W + H * 0.4; d += sp * 2.5) {
+      ctx.moveTo(d, 0);
+      ctx.lineTo(d + H * 0.28, H);
+    }
+    ctx.stroke();
+
+    // Crosshairs + coordinate labels at intersections
+    ctx.fillStyle = 'rgba(74,173,173,0.20)';
+    ctx.font = '6px "DM Mono", monospace';
+    var lonR = LON_MAX - LON_MIN;
+    var latR = LAT_MAX - LAT_MIN;
+
+    for (var ci = 1; ci < cols; ci++) {
+      var px = ci * sp;
+      for (var ri = 1; ri < rows; ri++) {
+        var py = ri * sp;
+        // Crosshair
+        ctx.strokeStyle = 'rgba(74,173,173,0.10)';
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(px - 4, py); ctx.lineTo(px + 4, py);
+        ctx.moveTo(px, py - 4); ctx.lineTo(px, py + 4);
+        ctx.stroke();
+        // Label (every 3rd intersection)
+        if ((ci + ri) % 3 === 0) {
+          var lonV = LON_MIN + (px / W) * lonR;
+          var latV = LAT_MAX - (py / H) * latR;
+          ctx.fillStyle = 'rgba(74,173,173,0.18)';
+          ctx.fillText(
+            Math.round(Math.abs(latV)) + (latV >= 0 ? '\u00b0N' : '\u00b0S') + ' ' +
+            Math.round(Math.abs(lonV)) + (lonV >= 0 ? '\u00b0E' : '\u00b0W'),
+            px + 4, py - 3
+          );
+        }
+      }
+    }
+    ctx.restore();
+  }
+
+  function bootCanvas(t0) {
+    return function step(t) {
+      cAlpha = Math.min(1, (t - t0) / 900);
+      drawGrid();
+      if (cAlpha < 1) requestAnimationFrame(step);
+    };
+  }
+
+  // ── BUILD HEX LAYER ────────────────────────────────────
+  function buildHexes() {
+    while (hexL.firstChild) hexL.removeChild(hexL.firstChild);
+    HEXES = [];
+    var cols = Math.ceil(W / HCW) + 2;
+    var rows = Math.ceil(H / HRH) + 2;
+    var atx = T[0];
+
+    for (var row = -1; row < rows; row++) {
+      for (var col = -1; col < cols; col++) {
+        var hx = col * HCW + (row % 2 !== 0 ? HCW / 2 : 0);
+        var hy = row * HRH;
+        if (hx < -HR * 2 || hx > W + HR * 2 || hy < -HR * 2 || hy > H + HR * 2) continue;
+        var c = templeInf(hx, hy);
+        var col2 = cToRgb(c);
+        var dur = (8 + Math.random() * 14).toFixed(1);
+        var dly = '-' + (Math.random() * 22).toFixed(1) + 's';
+        var bo = (0.04 + c * 0.09).toFixed(3);
+        var po = (0.12 + c * 0.20).toFixed(3);
+        var so = (0.06 + c * 0.11).toFixed(3);
+        var so2 = (0.10 + c * 0.18).toFixed(3);
+        var poly = mk('polygon');
+        poly.setAttribute('points', hexPts(hx, hy, HR - 1.5));
+        poly.setAttribute('fill', col2);
+        poly.setAttribute('stroke', col2);
+        poly.setAttribute('stroke-width', '0.4');
+        poly.style.cssText = '--hbo:' + bo + ';--hpo:' + po + ';--hso:' + so + ';--hso2:' + so2 +
+          ';animation:hexBreathe ' + dur + 's ease-in-out ' + dly + ' infinite;';
+        hexL.appendChild(poly);
+        var ddx = hx - atx.sx, ddy = hy - atx.sy;
+        HEXES.push({ hx: hx, hy: hy, c: c, bc: c, el: poly, dAtx: Math.sqrt(ddx * ddx + ddy * ddy) });
+      }
+    }
+  }
+
+  // ── BUILD LEY LINES ────────────────────────────────────
+  var LEY = [[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7],[0,8],[0,9],[0,10],[0,11],[1,2],[3,5],[6,9]];
+
+  function buildLeyLines() {
+    while (leyL.firstChild) leyL.removeChild(leyL.firstChild);
+    connGrads = [];
+    for (var ci = 0; ci < LEY.length; ci++) {
+      var a = T[LEY[ci][0]], b = T[LEY[ci][1]];
+      var gId = 'lg-cg-' + ci;
+      var grad = mk('linearGradient');
+      grad.setAttribute('id', gId); grad.setAttribute('gradientUnits', 'userSpaceOnUse');
+      grad.setAttribute('x1', String(a.sx)); grad.setAttribute('y1', String(a.sy));
+      grad.setAttribute('x2', String(b.sx)); grad.setAttribute('y2', String(b.sy));
+      var s0 = mk('stop'); s0.setAttribute('offset', '0%');   s0.setAttribute('stop-color', cToRgb(a.c));
+      var s1 = mk('stop'); s1.setAttribute('offset', '100%'); s1.setAttribute('stop-color', cToRgb(b.c));
+      grad.appendChild(s0); grad.appendChild(s1); svgDefs.appendChild(grad);
+      connGrads.push({ s0: s0, s1: s1, ai: LEY[ci][0], bi: LEY[ci][1] });
+      var isMain = LEY[ci][0] === 0 && T[LEY[ci][1]].st !== 'dormant';
+      var ln = mk('line');
+      ln.setAttribute('x1', String(a.sx)); ln.setAttribute('y1', String(a.sy));
+      ln.setAttribute('x2', String(b.sx)); ln.setAttribute('y2', String(b.sy));
+      ln.setAttribute('stroke', 'url(#' + gId + ')');
+      ln.setAttribute('stroke-width', isMain ? '1.1' : '0.45');
+      ln.setAttribute('stroke-opacity', isMain ? '0.38' : '0.12');
+      if (!RM && isMain) ln.style.animation = 'connectionPulse ' + (4 + Math.random() * 4).toFixed(1) + 's ease-in-out -' + (Math.random() * 5).toFixed(1) + 's infinite';
+      leyL.appendChild(ln);
+    }
+  }
+
+  // ── BUILD DOC LINES ────────────────────────────────────
+  function buildDocLines() {
+    while (docLineL.firstChild) docLineL.removeChild(docLineL.firstChild);
+    var atx = T[0];
+    for (var i = 0; i < DOC.length; i++) {
+      var dn = DOC[i];
+      dn.sx = atx.sx + dn.dxF * W;
+      dn.sy = atx.sy + dn.dyF * H;
+      var gId = 'lg-dg-' + i;
+      var grad = mk('linearGradient');
+      grad.setAttribute('id', gId); grad.setAttribute('gradientUnits', 'userSpaceOnUse');
+      grad.setAttribute('x1', String(atx.sx)); grad.setAttribute('y1', String(atx.sy));
+      grad.setAttribute('x2', String(dn.sx));  grad.setAttribute('y2', String(dn.sy));
+      var s0 = mk('stop'); s0.setAttribute('offset', '0%');   s0.setAttribute('stop-color', '#E8B84B'); s0.setAttribute('stop-opacity', '0.55');
+      var s1 = mk('stop'); s1.setAttribute('offset', '100%'); s1.setAttribute('stop-color', dn.col);    s1.setAttribute('stop-opacity', '0.80');
+      grad.appendChild(s0); grad.appendChild(s1); svgDefs.appendChild(grad);
+      var ddx = dn.sx - atx.sx, ddy = dn.sy - atx.sy;
+      var dlen = Math.sqrt(ddx * ddx + ddy * ddy).toFixed(0);
+      var ln = mk('line');
+      ln.setAttribute('x1', String(atx.sx)); ln.setAttribute('y1', String(atx.sy));
+      ln.setAttribute('x2', String(dn.sx));  ln.setAttribute('y2', String(dn.sy));
+      ln.setAttribute('stroke', 'url(#' + gId + ')');
+      ln.setAttribute('stroke-width', '1.0');
+      ln.setAttribute('stroke-opacity', '0.60');
+      ln.setAttribute('stroke-dasharray', dlen);
+      ln.setAttribute('stroke-dashoffset', dlen);
+      ln.setAttribute('data-dline', String(i));
+      docLineL.appendChild(ln);
+    }
+  }
+
+  // ── BUILD TEMPLE NODES ─────────────────────────────────
+  function buildNodes() {
+    while (nodeL.firstChild) nodeL.removeChild(nodeL.firstChild);
+    nodeEls = [];
+    for (var i = 0; i < T.length; i++) {
+      var t = T[i];
+      var g = mk('g');
+      g.setAttribute('data-ti', String(i));
+      g.style.cursor = 'pointer';
+      var isBc = t.st === 'broadcast', isAct = t.st === 'active', isOn = t.st === 'online';
+      var zR   = isBc ? 68 : isAct ? 46 : isOn ? 26 : 12;
+      var oR   = isBc ? 13 : isAct ?  9 : isOn ?  5 :  3;
+      var rR   = isBc ? 21 : isAct ? 14 : isOn ?  9 :  6;
+      var gradId = isBc ? 'lg-ng' : isAct ? 'lg-nt' : isOn ? 'lg-nj' : 'lg-nd';
+      var zCol = isBc ? '#E8B84B' : isAct ? '#4AADAD' : '#2D7D7D';
+      // Zone
+      var zone = mk('circle');
+      zone.setAttribute('cx', String(t.sx)); zone.setAttribute('cy', String(t.sy));
+      zone.setAttribute('r', String(zR));
+      zone.setAttribute('fill', zCol);
+      zone.setAttribute('fill-opacity', isBc ? '0.07' : isAct ? '0.05' : '0.02');
+      zone.setAttribute('stroke', 'none');
+      g.appendChild(zone);
+      // Broadcast rings
+      if (isBc && !RM) {
+        for (var ri = 0; ri < 3; ri++) {
+          var ring = mk('circle');
+          ring.setAttribute('cx', String(t.sx)); ring.setAttribute('cy', String(t.sy));
+          ring.setAttribute('r', String(oR));
+          ring.setAttribute('fill', 'none');
+          ring.setAttribute('stroke', '#F5D47A');
+          ring.setAttribute('stroke-width', '1.5');
+          ring.style.transformOrigin = t.sx + 'px ' + t.sy + 'px';
+          ring.style.animation = 'broadcastRing ' + (4 + ri * 1.6).toFixed(1) + 's ease-out -' + (ri * 1.9).toFixed(1) + 's infinite';
+          g.appendChild(ring);
+        }
+      }
+      // Outer ring
+      var outR = mk('circle');
+      outR.setAttribute('cx', String(t.sx)); outR.setAttribute('cy', String(t.sy));
+      outR.setAttribute('r', String(rR));
+      outR.setAttribute('fill', 'none');
+      outR.setAttribute('stroke', isBc ? '#F5D47A' : isAct ? '#5CC5C5' : isOn ? '#4AADAD' : '#2D7D7D');
+      outR.setAttribute('stroke-width', isBc ? '0.8' : '0.5');
+      outR.setAttribute('stroke-opacity', isBc ? '0.55' : isAct ? '0.42' : isOn ? '0.22' : '0.10');
+      if (!RM && (isBc || isAct)) outR.style.animation = 'nodeRingAnim ' + (5 + Math.random() * 4).toFixed(1) + 's ease-in-out -' + (Math.random() * 5).toFixed(1) + 's infinite';
+      g.appendChild(outR);
+      // Orb
+      var orb = mk('circle');
+      orb.setAttribute('cx', String(t.sx)); orb.setAttribute('cy', String(t.sy));
+      orb.setAttribute('r', String(oR));
+      orb.setAttribute('fill', 'url(#' + gradId + ')');
+      orb.setAttribute('filter', 'url(#lg-nglow)');
+      if (!RM) orb.style.animation = 'nodeGlowAnim ' + (4 + Math.random() * 5).toFixed(1) + 's ease-in-out -' + (Math.random() * 6).toFixed(1) + 's infinite';
+      g.appendChild(orb);
+      // Specular on ATX
+      if (isBc) {
+        var sp2 = mk('circle');
+        sp2.setAttribute('cx', String(t.sx - 4)); sp2.setAttribute('cy', String(t.sy - 4));
+        sp2.setAttribute('r', '2.5');
+        sp2.setAttribute('fill', 'rgba(255,255,255,0.55)');
+        sp2.setAttribute('pointer-events', 'none');
+        g.appendChild(sp2);
+      }
+      // Events
+      ;(function (idx) {
+        g.addEventListener('click', function (e) { e.stopPropagation(); showInfo(idx); });
+        g.addEventListener('mouseenter', function () { showInfo(idx); });
+      })(i);
+      nodeL.appendChild(g);
+      nodeEls.push(g);
+    }
+  }
+
+  // ── BUILD LABELS ───────────────────────────────────────
+  function buildLabels() {
+    while (labelL.firstChild) labelL.removeChild(labelL.firstChild);
+    for (var i = 0; i < T.length; i++) {
+      var t = T[i];
+      if (t.st === 'dormant') continue;
+      var isBc = t.st === 'broadcast';
+      var yOff = isBc ? 32 : 22;
+      var nm = mk('text');
+      nm.setAttribute('x', String(t.sx)); nm.setAttribute('y', String(t.sy + yOff));
+      nm.setAttribute('text-anchor', 'middle');
+      nm.setAttribute('font-family', "'DM Mono', monospace");
+      nm.setAttribute('font-size', isBc ? '9' : '7');
+      nm.setAttribute('letter-spacing', '0.12em');
+      nm.setAttribute('fill', isBc ? '#F5D47A' : 'rgba(242,234,216,0.65)');
+      nm.setAttribute('pointer-events', 'none');
+      nm.textContent = t.n.toUpperCase();
+      labelL.appendChild(nm);
+      var co = mk('text');
+      co.setAttribute('x', String(t.sx)); co.setAttribute('y', String(t.sy + yOff + 12));
+      co.setAttribute('text-anchor', 'middle');
+      co.setAttribute('font-family', "'DM Mono', monospace");
+      co.setAttribute('font-size', '6.5');
+      co.setAttribute('fill', 'rgba(92,197,197,0.55)');
+      co.setAttribute('pointer-events', 'none');
+      co.setAttribute('data-lgc', String(i));
+      co.textContent = t.c.toFixed(2);
+      labelL.appendChild(co);
+    }
+  }
+
+  // ── BUILD DOC NODES ────────────────────────────────────
+  function buildDocNodes() {
+    while (docNodeL.firstChild) docNodeL.removeChild(docNodeL.firstChild);
+    for (var i = 0; i < DOC.length; i++) {
+      var dn = DOC[i];
+      var g = mk('g');
+      g.setAttribute('data-href', dn.href);
+      g.style.cursor = 'pointer';
+      // Glow zone
+      var gz = mk('circle');
+      gz.setAttribute('cx', String(dn.sx)); gz.setAttribute('cy', String(dn.sy));
+      gz.setAttribute('r', '24'); gz.setAttribute('fill', dn.col); gz.setAttribute('fill-opacity', '0.07');
+      g.appendChild(gz);
+      // Ring
+      var rng = mk('circle');
+      rng.setAttribute('cx', String(dn.sx)); rng.setAttribute('cy', String(dn.sy));
+      rng.setAttribute('r', '12'); rng.setAttribute('fill', 'none');
+      rng.setAttribute('stroke', dn.col); rng.setAttribute('stroke-width', '0.9');
+      rng.setAttribute('stroke-opacity', '0.55');
+      if (!RM) rng.style.animation = 'docNodePulse ' + (5 + i * 1.2).toFixed(1) + 's ease-in-out -' + (i * 2.2).toFixed(1) + 's infinite';
+      g.appendChild(rng);
+      // Dot
+      var dot = mk('circle');
+      dot.setAttribute('cx', String(dn.sx)); dot.setAttribute('cy', String(dn.sy));
+      dot.setAttribute('r', '5'); dot.setAttribute('fill', dn.col); dot.setAttribute('fill-opacity', '0.90');
+      dot.setAttribute('filter', 'url(#lg-nglow)');
+      g.appendChild(dot);
+      // Eyebrow
+      var eyb = mk('text');
+      eyb.setAttribute('x', String(dn.sx)); eyb.setAttribute('y', String(dn.sy - 22));
+      eyb.setAttribute('text-anchor', 'middle');
+      eyb.setAttribute('font-family', "'DM Mono', monospace");
+      eyb.setAttribute('font-size', '6'); eyb.setAttribute('letter-spacing', '0.16em');
+      eyb.setAttribute('fill', 'rgba(242,234,216,0.32)');
+      eyb.setAttribute('pointer-events', 'none');
+      eyb.textContent = dn.desc;
+      g.appendChild(eyb);
+      // Label
+      var lbl = mk('text');
+      lbl.setAttribute('x', String(dn.sx)); lbl.setAttribute('y', String(dn.sy + 28));
+      lbl.setAttribute('text-anchor', 'middle');
+      lbl.setAttribute('font-family', "'DM Mono', monospace");
+      lbl.setAttribute('font-size', '8'); lbl.setAttribute('letter-spacing', '0.22em');
+      lbl.setAttribute('fill', dn.col);
+      lbl.setAttribute('pointer-events', 'none');
+      lbl.textContent = dn.label.toUpperCase();
+      g.appendChild(lbl);
+      // Open arrow
+      var arr = mk('text');
+      arr.setAttribute('x', String(dn.sx)); arr.setAttribute('y', String(dn.sy + 40));
+      arr.setAttribute('text-anchor', 'middle');
+      arr.setAttribute('font-family', "'DM Mono', monospace");
+      arr.setAttribute('font-size', '7'); arr.setAttribute('fill', dn.col);
+      arr.setAttribute('fill-opacity', '0.45');
+      arr.setAttribute('pointer-events', 'none');
+      arr.textContent = '\u2192 OPEN';
+      g.appendChild(arr);
+      // Navigate
+      g.addEventListener('click', function () { window.location.href = this.getAttribute('data-href'); });
+      docNodeL.appendChild(g);
+    }
+  }
+
+  // ── HEART LINK MICRO-DOTS ──────────────────────────────
+  function buildHeartLinks() {
+    while (hlL.firstChild) hlL.removeChild(hlL.firstChild);
+    for (var i = 0; i < T.length; i++) {
+      var t = T[i];
+      if (t.st === 'dormant') continue;
+      var cnt = Math.min(10, Math.floor(t.hl / 600) + 2);
+      for (var d = 0; d < cnt; d++) {
+        var ang = (Math.PI * 2 / cnt) * d + Math.random() * 0.6;
+        var dist = 28 + Math.random() * 55;
+        var hd = mk('circle');
+        hd.setAttribute('cx', (t.sx + Math.cos(ang) * dist).toFixed(1));
+        hd.setAttribute('cy', (t.sy + Math.sin(ang) * dist).toFixed(1));
+        hd.setAttribute('r', '1.8');
+        hd.setAttribute('fill', t.st === 'broadcast' ? '#F5D47A' : '#5CC5C5');
+        hd.setAttribute('fill-opacity', (0.25 + Math.random() * 0.35).toFixed(2));
+        if (!RM) hd.style.animation = 'heartLinkPulse ' + (3 + Math.random() * 6).toFixed(1) + 's ease-in-out -' + (Math.random() * 8).toFixed(1) + 's infinite';
+        hlL.appendChild(hd);
+      }
+    }
+  }
+
+  // ── SVG DEFS ───────────────────────────────────────────
+  function buildDefs() {
+    while (svgDefs.firstChild) svgDefs.removeChild(svgDefs.firstChild);
+
+    function mkRG(id, cx, cy, r, stops) {
+      var g = mk('radialGradient');
+      g.setAttribute('id', id); g.setAttribute('cx', cx); g.setAttribute('cy', cy); g.setAttribute('r', r);
+      stops.forEach(function (s) {
+        var el = mk('stop');
+        el.setAttribute('offset', s[0]); el.setAttribute('stop-color', s[1]);
+        if (s[2]) el.setAttribute('stop-opacity', s[2]);
+        g.appendChild(el);
+      });
+      svgDefs.appendChild(g);
+    }
+
+    mkRG('lg-ng',    '35%','28%','65%', [['0%','#FFF8E1'],['30%','#F5D47A'],['100%','#C4922A']]);
+    mkRG('lg-nt',    '35%','30%','65%', [['0%','#D0FFF0'],['40%','#5CC5C5'],['100%','#2D7D7D']]);
+    mkRG('lg-nj',    '35%','30%','65%', [['0%','#8abfa8'],['50%','#2D7D7D'],['100%','#0D4038']]);
+    mkRG('lg-nd',    '50%','50%','50%', [['0%','#2D7D7D','0.35'],['100%','#0D4038','0.15']]);
+
+    // Node glow filter
+    var flt = mk('filter');
+    flt.setAttribute('id','lg-nglow'); flt.setAttribute('x','-50%'); flt.setAttribute('y','-50%');
+    flt.setAttribute('width','200%'); flt.setAttribute('height','200%');
+    var blur = mk('feGaussianBlur'); blur.setAttribute('stdDeviation','5'); blur.setAttribute('result','blur');
+    var merge = mk('feMerge');
+    var mn1 = mk('feMergeNode'); mn1.setAttribute('in','blur');
+    var mn2 = mk('feMergeNode'); mn2.setAttribute('in','SourceGraphic');
+    merge.appendChild(mn1); merge.appendChild(mn2);
+    flt.appendChild(blur); flt.appendChild(merge); svgDefs.appendChild(flt);
+  }
+
+  // ── INFO PANEL ─────────────────────────────────────────
+  var infoOpen = false;
+
+  function showInfo(idx) {
+    var t = T[idx];
+    document.getElementById('lg-info-name').textContent = t.n;
+    document.getElementById('lg-info-city').textContent = t.city;
+    document.getElementById('lg-info-coh').textContent = t.c.toFixed(2);
+    document.getElementById('lg-info-sessions').textContent = t.sess > 0 ? t.sess + ' today' : '\u2014';
+    document.getElementById('lg-info-links').textContent = t.hl.toLocaleString();
+    var badge = document.getElementById('lg-info-status');
+    badge.textContent = t.st.charAt(0).toUpperCase() + t.st.slice(1);
+    badge.className = 'lg-info-status-badge lg-status-' + t.st;
+    // Draw waveform
+    drawWaveform(t.c);
+    document.getElementById('lg-info').classList.add('lg-info-visible');
+    infoOpen = true;
+  }
+
+  function hideInfo() {
+    document.getElementById('lg-info').classList.remove('lg-info-visible');
+    infoOpen = false;
+  }
+
+  function drawWaveform(c) {
+    var wv = document.getElementById('lg-info-waveform');
+    while (wv.firstChild) wv.removeChild(wv.firstChild);
+    var pts = [];
+    for (var x = 0; x <= 260; x += 4) {
+      var y = 18 + Math.sin(x * 0.09 + c * 3) * (5 + c * 10) +
+                   Math.sin(x * 0.17 + 1.2)   * (2 + c * 4);
+      pts.push(x + ',' + y.toFixed(1));
+    }
+    var path = mk('path');
+    path.setAttribute('d', 'M ' + pts.join(' L '));
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', c > 0.7 ? '#E8B84B' : '#4AADAD');
+    path.setAttribute('stroke-width', '1.2');
+    path.setAttribute('stroke-opacity', '0.7');
+    wv.appendChild(path);
+  }
+
+  // ── DAILY MODE ─────────────────────────────────────────
+  function dailyUpdate() {
+    if (transActive || RM) return;
+    // Drift temple coherence
+    for (var i = 0; i < T.length; i++) {
+      T[i].c = Math.max(0.05, Math.min(0.95, T[i].c + (Math.random() - 0.5) * 0.05));
+    }
+    // Update connection gradients
+    for (var ci = 0; ci < connGrads.length; ci++) {
+      connGrads[ci].s0.setAttribute('stop-color', cToRgb(T[connGrads[ci].ai].c));
+      connGrads[ci].s1.setAttribute('stop-color', cToRgb(T[connGrads[ci].bi].c));
+    }
+    // Update 12% of hexes
+    var samp = Math.floor(HEXES.length * 0.12);
+    for (var hi = 0; hi < samp; hi++) {
+      var h = HEXES[Math.floor(Math.random() * HEXES.length)];
+      h.c = Math.max(0.04, Math.min(0.95, h.c + (Math.random() - 0.5) * 0.03));
+      var col = cToRgb(h.c);
+      h.el.setAttribute('fill', col); h.el.setAttribute('stroke', col);
+      h.el.setAttribute('fill-opacity', (0.05 + h.c * 0.12).toFixed(3));
+    }
+    // Update coherence labels
+    var cEls = document.querySelectorAll('[data-lgc]');
+    for (var cl = 0; cl < cEls.length; cl++) {
+      var ti = parseInt(cEls[cl].getAttribute('data-lgc'), 10);
+      cEls[cl].textContent = T[ti].c.toFixed(2);
+    }
+    // Random micro-session pulse
+    if (Math.random() < 0.22) {
+      var acts = [];
+      for (var ti2 = 0; ti2 < T.length; ti2++) {
+        if (T[ti2].st === 'active' || T[ti2].st === 'broadcast') acts.push(ti2);
+      }
+      if (acts.length) microPulse(acts[Math.floor(Math.random() * acts.length)]);
+    }
+  }
+
+  function microPulse(tidx) {
+    var t = T[tidx];
+    var p = mk('circle');
+    p.setAttribute('cx', String(t.sx)); p.setAttribute('cy', String(t.sy));
+    p.setAttribute('r', '8'); p.setAttribute('fill', 'none');
+    p.setAttribute('stroke', t.st === 'broadcast' ? '#F5D47A' : '#5CC5C5');
+    p.setAttribute('stroke-width', '1');
+    p.style.animation = 'microPulse 2.2s ease-out forwards';
+    transL.appendChild(p);
+    setTimeout(function () { if (p.parentNode) p.parentNode.removeChild(p); }, 2300);
+  }
+
+  // ── HUD UPDATES ────────────────────────────────────────
+  function hudUpdate() {
+    heartLinks = Math.max(30000, heartLinks + Math.floor((Math.random() - 0.44) * 8));
+    var hlEl = document.getElementById('lg-hl');
+    if (hlEl) hlEl.textContent = heartLinks.toLocaleString();
+
+    fieldInt = Math.max(88, Math.min(99.4, fieldInt + (Math.random() - 0.5) * 0.35));
+    var fiEl = document.getElementById('lg-fi');
+    if (fiEl) fiEl.textContent = fieldInt.toFixed(1);
+
+    if (!transActive) {
+      bcastSecs = Math.max(0, bcastSecs - 1);
+      if (bcastSecs <= 0) bcastSecs = 43;
+      var nb = document.getElementById('lg-nbc');
+      if (nb) {
+        var m = Math.floor(bcastSecs / 60), s = bcastSecs % 60;
+        nb.textContent = (m > 0 ? '0' + m + ':' : '00:') + (s < 10 ? '0' + s : s);
+      }
+    }
+
+    var pct = (heartLinks / 10000000 * 100);
+    var pEl = document.getElementById('lg-lrm-pct');
+    if (pEl) pEl.textContent = pct.toFixed(2);
+    var fEl = document.getElementById('lg-lrm-fill');
+    if (fEl) fEl.style.width = pct.toFixed(5) + '%';
+  }
+
+  // ── TRANSMISSION MODE ──────────────────────────────────
+  var WAVE_DUR = 7000;  // ms for wave to cross the field
+  var TRANS_TOTAL = 14000;
+
+  function triggerTransmission() {
+    if (transActive || RM) return;
+    transActive = true; mode = 'transmission';
+    bcastSecs = 0;
+
+    var mtEl = document.getElementById('lg-mode-text');
+    var mdEl = document.getElementById('lg-mode-dot');
+    var anEl = document.getElementById('lg-mode-announce');
+
+    if (mtEl) mtEl.textContent = 'Global Transmission';
+    if (mdEl) { mdEl.className = 'lg-mode-dot lg-dot-gold'; }
+    if (anEl) {
+      anEl.className = '';
+      void anEl.offsetWidth; // reflow to restart animation
+      anEl.classList.add('lg-announce-active');
+    }
+
+    // Dim non-ATX nodes
+    for (var i = 1; i < nodeEls.length; i++) {
+      nodeEls[i].style.transition = 'opacity 2s ease';
+      nodeEls[i].style.opacity = '0.12';
+    }
+    // Swell ATX
+    var atxEl = nodeEls[0];
+    if (atxEl) {
+      atxEl.style.transition = 'transform 1.2s ease';
+      atxEl.style.transformOrigin = T[0].sx + 'px ' + T[0].sy + 'px';
+      atxEl.style.transform = 'scale(1.5)';
+    }
+
+    // Launch wave after swell
+    setTimeout(function () {
+      transStart = performance.now();
+      // Pre-reset temple waveHit flags
+      for (var ti = 0; ti < T.length; ti++) T[ti]._wh = false;
+      requestAnimationFrame(transWaveStep);
+    }, 1800);
+
+    // Peak announcement
+    setTimeout(function () {
+      if (mtEl) mtEl.textContent = 'Field Coherence 0.97 · Planetary Sync';
+    }, 10000);
+
+    // End
+    setTimeout(endTransmission, TRANS_TOTAL);
+  }
+
+  function transWaveStep(ts) {
+    var elapsed = ts - transStart;
+    var waveR = (elapsed / WAVE_DUR) * W * 1.5;  // wave front radius px
+    var waveW = 200;  // wave band width px
+
+    for (var hi = 0; hi < HEXES.length; hi++) {
+      var h = HEXES[hi];
+      var d = h.dAtx;
+      var inWave    = d < waveR && d > waveR - waveW;
+      var behindWave = d <= waveR - waveW;
+      var targetC;
+      if (inWave) {
+        var wf = 1 - (waveR - d) / waveW;
+        targetC = 0.68 + wf * 0.30;
+      } else if (behindWave) {
+        var decay = Math.max(0, 1 - (elapsed - (d / (W * 1.5)) * WAVE_DUR) / 4000);
+        targetC = h.bc + decay * 0.28;
+      } else {
+        targetC = h.bc;
+      }
+      var col = cToRgb(targetC);
+      h.el.setAttribute('fill', col); h.el.setAttribute('stroke', col);
+      h.el.setAttribute('fill-opacity', (0.04 + targetC * 0.20).toFixed(3));
+      h.el.setAttribute('stroke-opacity', (0.06 + targetC * 0.16).toFixed(3));
+    }
+
+    // Flash temple nodes as wave hits
+    for (var ti = 0; ti < T.length; ti++) {
+      if (!T[ti]._wh && T[ti].dAtx < waveR) {
+        T[ti]._wh = true;
+        if (ti !== 0) {
+          var el = nodeEls[ti];
+          if (el) {
+            el.style.opacity = '1';
+            el.style.filter = 'brightness(2.2) saturate(1.6)';
+            setTimeout((function (e) { return function () { e.style.filter = ''; }; })(el), 1600);
+          }
+        }
+      }
+    }
+
+    if (elapsed < TRANS_TOTAL - 2500) transRAF = requestAnimationFrame(transWaveStep);
+  }
+
+  function endTransmission() {
+    cancelAnimationFrame(transRAF);
+    // Reset nodes
+    for (var i = 0; i < nodeEls.length; i++) {
+      nodeEls[i].style.transition = 'opacity 1.8s ease, transform 1.2s ease';
+      nodeEls[i].style.opacity = '1';
+      nodeEls[i].style.transform = '';
+      nodeEls[i].style.filter = '';
+    }
+    // Reset hexes
+    for (var hi = 0; hi < HEXES.length; hi++) {
+      var h = HEXES[hi]; h.c = h.bc;
+      var col = cToRgb(h.bc);
+      h.el.setAttribute('fill', col); h.el.setAttribute('stroke', col);
+      h.el.setAttribute('fill-opacity', (0.05 + h.bc * 0.12).toFixed(3));
+    }
+    var mtEl = document.getElementById('lg-mode-text');
+    var mdEl = document.getElementById('lg-mode-dot');
+    if (mtEl) mtEl.textContent = 'Daily Field';
+    if (mdEl) mdEl.className = 'lg-mode-dot lg-dot-teal';
+    bcastSecs = 43;
+    mode = 'daily'; transActive = false;
+  }
+
+  // ── BOOT SEQUENCE ──────────────────────────────────────
+  function boot() {
+    var groups = [hexL, leyL, docLineL, hlL, nodeL, docNodeL, labelL];
+    groups.forEach(function (g) {
+      g.style.opacity = '0';
+      g.style.transition = 'opacity 1.2s ease';
+    });
+
+    // Canvas grid draws in
+    requestAnimationFrame(function (t) { requestAnimationFrame(bootCanvas(t)); });
+
+    // Hex field
+    setTimeout(function () { hexL.style.opacity = '1'; }, 700);
+
+    // Ley lines + doc lines animate in
+    setTimeout(function () {
+      leyL.style.opacity = '1';
+      var dls = document.querySelectorAll('[data-dline]');
+      for (var i = 0; i < dls.length; i++) {
+        (function (el, delay) {
+          setTimeout(function () {
+            el.style.transition = 'stroke-dashoffset 1.3s cubic-bezier(0.22,1,0.36,1)';
+            el.setAttribute('stroke-dashoffset', '0');
+          }, delay);
+        })(dls[i], 200 + i * 220);
+      }
+    }, 1100);
+
+    // Nodes + heart links
+    setTimeout(function () { nodeL.style.opacity = '1'; hlL.style.opacity = '1'; }, 1700);
+
+    // Doc nodes + labels
+    setTimeout(function () {
+      docLineL.style.opacity = '1';
+      docNodeL.style.opacity = '1';
+      labelL.style.opacity = '1';
+    }, 2300);
+
+    // HUD
+    setTimeout(function () {
+      var h = document.getElementById('lg-hud');
+      if (h) h.style.opacity = '1';
+    }, 2700);
+
+    // Heart-link count-up
+    setTimeout(function () {
+      var t0 = performance.now(), target = heartLinks;
+      (function countUp(ts) {
+        var p = Math.min(1, (ts - t0) / 1400);
+        var v = Math.floor(target * (1 - Math.pow(1 - p, 3)));
+        var el = document.getElementById('lg-hl');
+        if (el) el.textContent = v.toLocaleString();
+        if (p < 1) requestAnimationFrame(countUp);
+      })(performance.now());
+    }, 3100);
+  }
+
+  function skipBoot() {
+    cAlpha = 1; drawGrid();
+    [hexL, leyL, docLineL, hlL, nodeL, docNodeL, labelL].forEach(function (g) { g.style.opacity = '1'; });
+    var dls = document.querySelectorAll('[data-dline]');
+    for (var i = 0; i < dls.length; i++) dls[i].setAttribute('stroke-dashoffset', '0');
+    var h = document.getElementById('lg-hud');
+    if (h) h.style.opacity = '1';
+  }
+
+  // ── RESIZE ─────────────────────────────────────────────
+  var resizeT = null;
+  function onResize() {
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = W; canvas.height = H;
+    svgEl.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svgEl.setAttribute('width', String(W));
+    svgEl.setAttribute('height', String(H));
+    // Recompute temple screen positions
+    for (var i = 0; i < T.length; i++) {
+      var p = geo(T[i].lat, T[i].lon);
+      T[i].sx = p.x; T[i].sy = p.y;
+    }
+    // Precompute ATX distances for all temples (needed for transmission)
+    var atx = T[0];
+    for (var ti = 0; ti < T.length; ti++) {
+      var dx = T[ti].sx - atx.sx, dy = T[ti].sy - atx.sy;
+      T[ti].dAtx = Math.sqrt(dx * dx + dy * dy);
+    }
+    if (resizeT) clearTimeout(resizeT);
+    resizeT = setTimeout(function () {
+      buildDefs();
+      buildHexes();
+      buildLeyLines();
+      buildDocLines();
+      buildNodes();
+      buildLabels();
+      buildDocNodes();
+      buildHeartLinks();
+      drawGrid();
+      if (RM) skipBoot();
+    }, 150);
+  }
+
+  // ── INIT ───────────────────────────────────────────────
+  function init() {
+    canvas = document.getElementById('lg-canvas');
+    ctx = canvas.getContext('2d');
+    svgEl = document.getElementById('lg-svg');
+
+    // Build SVG structure
+    svgDefs = mk('defs');
+    svgEl.appendChild(svgDefs);
+    hexL       = mk('g'); hexL.setAttribute('id','lg-hex-l');      svgEl.appendChild(hexL);
+    leyL       = mk('g'); leyL.setAttribute('id','lg-ley-l');      svgEl.appendChild(leyL);
+    hlL        = mk('g'); hlL.setAttribute('id','lg-hl-l');        svgEl.appendChild(hlL);
+    docLineL   = mk('g'); docLineL.setAttribute('id','lg-dl-l');   svgEl.appendChild(docLineL);
+    nodeL      = mk('g'); nodeL.setAttribute('id','lg-nd-l');      svgEl.appendChild(nodeL);
+    docNodeL   = mk('g'); docNodeL.setAttribute('id','lg-dn-l');   svgEl.appendChild(docNodeL);
+    labelL     = mk('g'); labelL.setAttribute('id','lg-lb-l');     svgEl.appendChild(labelL);
+    transL     = mk('g'); transL.setAttribute('id','lg-tr-l');     svgEl.appendChild(transL);
+
+    // Initial size + build
+    onResize();
+    window.addEventListener('resize', onResize);
+
+    // Events
+    document.getElementById('lg-trigger-btn').addEventListener('click', function (e) {
+      e.stopPropagation(); triggerTransmission();
+    });
+    document.getElementById('lg-info-close').addEventListener('click', function (e) {
+      e.stopPropagation(); hideInfo();
+    });
+    document.getElementById('lg-root').addEventListener('click', function () {
+      if (infoOpen) hideInfo();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') hideInfo();
+      if ((e.key === 't' || e.key === 'T') && !e.metaKey && !e.ctrlKey) triggerTransmission();
+    });
+
+    // Intervals
+    setInterval(dailyUpdate, 2000);
+    setInterval(hudUpdate, 1000);
+
+    // Auto-transmission every 45s (starts after 20s)
+    setTimeout(function () {
+      setInterval(function () {
+        if (!transActive && mode === 'daily') { bcastSecs = 0; triggerTransmission(); }
+      }, 45000);
+    }, 20000);
+
+    // Boot
+    if (!RM) boot();
+    else skipBoot();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
+</script>
+</body>
+</html>

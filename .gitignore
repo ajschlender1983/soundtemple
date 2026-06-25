@@ -1,0 +1,14 @@
+# Internal docs — NOT part of the public site (roadmap has revenue numbers, brand guides are internal)
+*.md
+
+# Heavy unused media — these videos are not referenced by any page (saves ~370MB)
+*.mp4
+*.mov
+*.webm
+
+# Local tooling / deploy configs not needed on GitHub Pages
+serve.sh
+netlify.toml
+
+# OS cruft
+.DS_Store

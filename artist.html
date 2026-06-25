@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundTemple — Facilitator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #050309;
+    --cream: #F2EAD8;
+    --gold: #C4922A;
+    --gold-light: #E8B84B;
+    --gold-bright: #F5D47A;
+    --teal: #4AADAD;
+    --teal-bright: #5CC5C5;
+    --amethyst: #6B3FA0;
+    --violet-mid: #8B5FCA;
+    --muted: rgba(242,234,216,0.46);
+    --border: rgba(242,234,216,0.09);
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-mono: 'DM Mono', 'Courier New', monospace;
+  }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--void); color: var(--cream); font-family: var(--font-mono); line-height: 1.6; overflow-x: hidden; }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; }
+
+  /* NAV */
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 22px clamp(20px,5vw,56px); position: relative; z-index: 5; }
+  .nav-wm { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--teal-bright); text-decoration: none; }
+  .nav-back { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color .3s ease; }
+  .nav-back:hover { color: var(--cream); }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 clamp(20px,5vw,56px); }
+
+  /* HERO */
+  .hero { display: grid; grid-template-columns: 1fr; gap: clamp(28px,4vw,52px); padding: clamp(24px,4vw,48px) 0 clamp(40px,6vw,72px); align-items: start; }
+  @media (min-width: 820px) { .hero { grid-template-columns: 0.85fr 1.15fr; } }
+  .hero-photo { position: relative; overflow: hidden; border: 1px solid var(--border); aspect-ratio: 3/4; }
+  .hero-photo img { width: 100%; height: 100%; object-fit: cover; }
+  .hero-photo::after { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 120px rgba(5,3,9,0.5); pointer-events: none; }
+
+  .role { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--teal-bright); margin-bottom: 16px; }
+  .name { font-family: var(--font-display); font-weight: 300; font-style: italic; font-size: clamp(2.6rem,6vw,4.4rem); line-height: 1.04; color: var(--cream); margin-bottom: 22px; }
+  .bio { font-family: var(--font-display); font-weight: 300; font-size: clamp(1.15rem,1.8vw,1.5rem); line-height: 1.5; color: rgba(242,234,216,0.82); margin-bottom: 30px; max-width: 56ch; }
+
+  /* LINK PILLS */
+  .links { display: flex; flex-wrap: wrap; gap: 9px; }
+  .pill { display: inline-block; font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--cream); text-decoration: none; border: 1px solid var(--border); padding: 9px 16px; border-radius: 30px; transition: border-color .3s ease, background .3s ease, color .3s ease; }
+  .pill:hover { border-color: rgba(92,197,197,0.6); background: rgba(74,173,173,0.1); color: var(--teal-bright); }
+  .pill.spotify:hover { border-color: rgba(80,210,120,0.6); background: rgba(80,210,120,0.1); color: #6fe39a; }
+
+  /* DETAIL CARDS */
+  .detail-grid { display: grid; grid-template-columns: 1fr; gap: clamp(2px,0.4vw,4px); border-top: 1px solid var(--border); }
+  @media (min-width: 700px) { .detail-grid { grid-template-columns: 1fr 1fr; gap: 0; } }
+  .detail { padding: clamp(26px,3.5vw,40px) clamp(4px,2vw,28px); border-bottom: 1px solid var(--border); }
+  @media (min-width: 700px) { .detail:first-child { border-right: 1px solid var(--border); padding-left: 0; } .detail:last-child { padding-right: 0; } }
+  .detail-label { font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(92,197,197,0.55); margin-bottom: 14px; }
+  .detail-text { font-family: var(--font-display); font-weight: 300; font-size: clamp(1.1rem,1.6vw,1.35rem); line-height: 1.5; color: rgba(242,234,216,0.8); }
+
+  /* SPOTIFY */
+  .spotify-wrap { padding: clamp(40px,6vw,72px) 0 0; }
+  .spotify-wrap iframe { border-radius: 12px; width: 100%; border: 0; }
+
+  /* BOOKING */
+  .booking { margin: clamp(48px,7vw,88px) 0; padding: clamp(32px,5vw,56px); border: 1px solid var(--border); background: linear-gradient(180deg, rgba(42,21,64,0.22) 0%, rgba(5,3,9,0) 100%); }
+  .booking h2 { font-family: var(--font-display); font-weight: 300; font-style: italic; font-size: clamp(1.7rem,3.2vw,2.6rem); color: var(--cream); margin-bottom: 10px; line-height: 1.1; }
+  .booking p.sub { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.08em; line-height: 1.8; color: var(--muted); margin-bottom: 28px; max-width: 52ch; }
+  .field { margin-bottom: 14px; }
+  .field input, .field textarea { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--cream); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; padding: 14px 16px; border-radius: 6px; transition: border-color .3s ease; }
+  .field input::placeholder, .field textarea::placeholder { color: rgba(242,234,216,0.34); }
+  .field input:focus, .field textarea:focus { outline: none; border-color: rgba(92,197,197,0.5); }
+  .field textarea { min-height: 96px; resize: vertical; }
+  .field-row { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  @media (min-width: 560px) { .field-row { grid-template-columns: 1fr 1fr; } }
+  .submit { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--void); background: var(--gold-light); border: 0; padding: 15px 38px; border-radius: 30px; cursor: pointer; transition: background .3s ease, transform .2s ease; }
+  .submit:hover { background: var(--gold-bright); transform: translateY(-1px); }
+  .submit:disabled { opacity: 0.5; cursor: default; transform: none; }
+  .form-status { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; line-height: 1.7; margin-top: 18px; color: var(--teal-bright); }
+
+  /* STATES */
+  #profile { display: none; }
+  .loading, .notfound { text-align: center; padding: clamp(80px,16vw,180px) 24px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; color: var(--muted); }
+  .notfound a { color: var(--teal-bright); }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--border); padding: clamp(24px,4vw,40px) clamp(20px,5vw,56px); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+  footer span, footer a { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: var(--muted); text-decoration: none; text-transform: uppercase; }
+  footer a:hover { color: var(--cream); }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-wm">SoundTemple</a>
+  <a href="landing.html#artists" class="nav-back">← All facilitators</a>
+</nav>
+
+<div id="loading" class="loading">Summoning the profile…</div>
+
+<div id="notfound" class="notfound" style="display:none;">
+  Facilitator not found. <a href="landing.html#artists">Return to the directory →</a>
+</div>
+
+<main id="profile" class="wrap">
+  <section class="hero">
+    <div class="hero-photo"><img id="p-photo" src="" alt=""></div>
+    <div>
+      <p class="role" id="p-role">Facilitator</p>
+      <h1 class="name" id="p-name"></h1>
+      <p class="bio" id="p-bio"></p>
+      <div class="links" id="p-links"></div>
+    </div>
+  </section>
+
+  <div class="detail-grid">
+    <div class="detail">
+      <p class="detail-label">Offerings</p>
+      <p class="detail-text" id="p-offerings"></p>
+    </div>
+    <div class="detail">
+      <p class="detail-label">On Tour</p>
+      <p class="detail-text" id="p-touring"></p>
+    </div>
+  </div>
+
+  <div class="spotify-wrap" id="p-spotify-wrap" style="display:none;">
+    <iframe id="p-spotify" height="352" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" title="Spotify player"></iframe>
+  </div>
+
+  <section class="booking">
+    <h2 id="b-heading">Request a session</h2>
+    <p class="sub">SoundTemple coordinates the booking by hand for now. Send the details and we'll connect you directly with the facilitator.</p>
+    <form name="session-request" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="booking-form">
+      <input type="hidden" name="form-name" value="session-request">
+      <input type="hidden" name="artist" id="form-artist" value="">
+      <p style="display:none;"><label>Leave blank: <input name="bot-field"></label></p>
+      <div class="field-row">
+        <div class="field"><input name="name" required autocomplete="name" placeholder="Your name"></div>
+        <div class="field"><input name="email" type="email" required autocomplete="email" placeholder="Email"></div>
+      </div>
+      <div class="field"><input name="location" placeholder="City / venue (optional)"></div>
+      <div class="field"><textarea name="message" placeholder="What are you dreaming up? Date, type of session, group size…"></textarea></div>
+      <button type="submit" class="submit" id="b-submit">Request session</button>
+      <p class="form-status" id="b-status" style="display:none;"></p>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <span>© 2026 Light Pump Labs · SoundTemple</span>
+  <a href="landing.html#artists">All facilitators →</a>
+</footer>
+
+<script>
+(function () {
+  // Resolve the facilitator id from ?id= or a /a/<id> path
+  function getId() {
+    var q = new URLSearchParams(window.location.search).get('id');
+    if (q) return q;
+    var m = window.location.pathname.match(/\/a\/([^\/?#]+)/);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+
+  function spotifyEmbed(url) {
+    var m = String(url).match(/artist\/([A-Za-z0-9]+)/);
+    return m ? 'https://open.spotify.com/embed/artist/' + m[1] + '?utm_source=soundtemple' : null;
+  }
+
+  var LINK_ORDER = [
+    ['spotify', 'Spotify'],
+    ['website', 'Website'],
+    ['instagram', 'Instagram'],
+    ['youtube', 'YouTube'],
+    ['bandcamp', 'Bandcamp'],
+    ['soundcloud', 'SoundCloud']
+  ];
+
+  var id = getId();
+  var loading = document.getElementById('loading');
+  var notfound = document.getElementById('notfound');
+  var profile = document.getElementById('profile');
+
+  function fail() {
+    loading.style.display = 'none';
+    notfound.style.display = 'block';
+  }
+
+  if (!id) { fail(); return; }
+
+  fetch('artists.json')
+    .then(function (r) { return r.json(); })
+    .then(function (list) {
+      var a = list.filter(function (x) { return x.id === id && !x.hidden; })[0];
+      if (!a) { fail(); return; }
+
+      document.title = 'SoundTemple — ' + a.name;
+      document.getElementById('p-role').textContent = a.tier === 'label' ? 'Partner' : 'Facilitator';
+      document.getElementById('p-name').textContent = a.name;
+      document.getElementById('p-bio').textContent = a.bio || '';
+
+      var photo = document.getElementById('p-photo');
+      photo.src = 'artists/web/' + a.id + '.jpg';
+      photo.alt = a.name;
+
+      document.getElementById('p-offerings').textContent = a.offerings || 'Details coming soon.';
+      document.getElementById('p-touring').textContent = a.touring || 'No public dates listed.';
+
+      // Links
+      var linksEl = document.getElementById('p-links');
+      var links = a.links || {};
+      LINK_ORDER.forEach(function (pair) {
+        var key = pair[0], label = pair[1];
+        if (links[key]) {
+          var el = document.createElement('a');
+          el.className = 'pill' + (key === 'spotify' ? ' spotify' : '');
+          el.href = links[key];
+          el.target = '_blank';
+          el.rel = 'noopener noreferrer';
+          el.textContent = label;
+          linksEl.appendChild(el);
+        }
+      });
+
+      // Spotify embed
+      if (links.spotify) {
+        var embed = spotifyEmbed(links.spotify);
+        if (embed) {
+          document.getElementById('p-spotify').src = embed;
+          document.getElementById('p-spotify-wrap').style.display = 'block';
+        }
+      }
+
+      // Booking
+      document.getElementById('b-heading').textContent = 'Request a session with ' + a.name;
+      document.getElementById('form-artist').value = a.name + ' (' + a.id + ')';
+
+      loading.style.display = 'none';
+      profile.style.display = 'block';
+    })
+    .catch(fail);
+
+  // ── Booking backend config ──────────────────────────────
+  // Fill these two to write requests straight into Supabase.
+  // Until then, the form gracefully falls back to a prefilled email.
+  var SUPABASE_URL = '';            // e.g. https://abcd.supabase.co
+  var SUPABASE_ANON_KEY = '';       // public anon key
+  var SUPABASE_TABLE = 'session_requests';
+  var FALLBACK_EMAIL = 'adam@feelopus.com';
+
+  var form = document.getElementById('booking-form');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var btn = document.getElementById('b-submit');
+    var status = document.getElementById('b-status');
+    var fd = new FormData(form);
+    if (fd.get('bot-field')) return; // honeypot tripped
+    var payload = {
+      artist: fd.get('artist') || '',
+      name: fd.get('name') || '',
+      email: fd.get('email') || '',
+      location: fd.get('location') || '',
+      message: fd.get('message') || ''
+    };
+
+    function ok() {
+      status.style.display = 'block';
+      status.style.color = 'var(--teal-bright)';
+      status.textContent = 'Request sent. We’ll be in touch within a couple of days to coordinate the session.';
+      form.reset();
+      btn.textContent = 'Request sent';
+    }
+
+    if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+      fetch(SUPABASE_URL + '/rest/v1/' + SUPABASE_TABLE, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      }).then(function (r) {
+        if (!r.ok) throw new Error('bad status');
+        ok();
+      }).catch(function () {
+        btn.disabled = false;
+        btn.textContent = 'Request session';
+        status.style.display = 'block';
+        status.style.color = 'var(--gold-light)';
+        status.textContent = 'Something went wrong. Email ' + FALLBACK_EMAIL + ' and we’ll sort it out.';
+      });
+    } else {
+      // No backend wired yet — open a prefilled email so nothing is lost.
+      var subject = 'SoundTemple session request: ' + payload.artist;
+      var body = 'Artist: ' + payload.artist + '\nName: ' + payload.name + '\nEmail: ' + payload.email + '\nLocation: ' + payload.location + '\n\nMessage:\n' + payload.message;
+      window.location.href = 'mailto:' + FALLBACK_EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      ok();
+    }
+  });
+}());
+</script>
+
+</body>
+</html>

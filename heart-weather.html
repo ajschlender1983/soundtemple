@@ -1,0 +1,2646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundTemple — Heart Weather</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Mono:wght@400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════════
+   SOUNDTEMPLE — HEART WEATHER
+   "What if the planet had an HRV monitor?"
+   ═══════════════════════════════════════════════════════ */
+
+:root {
+  --dark: #0D0A1A;
+  --dark-elevated: #140F26;
+  --dark-surface: #1A1332;
+  --violet: #2A1540;
+  --violet-bright: #6B3FA0;
+  --gold: #C4922A;
+  --gold-light: #E8B84B;
+  --gold-bright: #F5D47A;
+  --gold-dark: #7A6520;
+  --teal: #2D7D7D;
+  --teal-light: #4AADAD;
+  --teal-bright: #5CC5C5;
+  --jade-deep: #0D4038;
+  --ivory: #F2EAD8;
+  --ivory-70: rgba(242,234,216,0.7);
+  --ivory-45: rgba(242,234,216,0.45);
+  --ivory-20: rgba(242,234,216,0.2);
+  --font-display: 'Cormorant Garamond', serif;
+  --font-editorial: 'Playfair Display', serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; background: var(--dark); }
+
+body {
+  font-family: var(--font-editorial);
+  background: var(--dark);
+  color: var(--ivory);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── ANIMATIONS ── */
+@keyframes breathe { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+@keyframes breatheSlow { 0%,100% { opacity: 0.25; } 50% { opacity: 0.8; } }
+@keyframes breatheScale { 0%,100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.08); opacity: 1; } }
+@keyframes breatheGold { 0%,100% { opacity: 0.5; } 50% { opacity: 0.9; } }
+@keyframes goldLine { 0%,100% { opacity: 0.3; } 50% { opacity: 0.7; } }
+@keyframes fadeInUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes marqueeBreath { 0%,100% { letter-spacing: 0.08em; } 50% { letter-spacing: 0.12em; } }
+@keyframes nodeBreath { 0%,100% { r: 4; } 50% { r: 5.5; } }
+@keyframes threadPulse { 0%,100% { opacity: 0.12; } 50% { opacity: 0.35; } }
+@keyframes phaseGlow { 0%,100% { opacity: 0.6; } 50% { opacity: 1; } }
+@keyframes leyPulse { 0% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -40; } }
+@keyframes pulseRipple { 0% { r: 8; opacity: 0.3; } 100% { r: 40; opacity: 0; } }
+@keyframes hrvPulse { 0%,100% { opacity: 0.4; } 50% { opacity: 0.9; } }
+@keyframes coherenceGlow { 0%,100% { opacity: 0.04; } 50% { opacity: 0.12; } }
+@keyframes hexWave { 0%,100% { opacity: 0.06; } 50% { opacity: 0.14; } }
+@keyframes dustFloat { 0% { transform: translateY(0) translateX(0); opacity: 0; } 10% { opacity: 0.5; } 90% { opacity: 0.3; } 100% { transform: translateY(-100vh) translateX(30px); opacity: 0; } }
+@keyframes dustFloat2 { 0% { transform: translateY(0) translateX(0); opacity: 0; } 15% { opacity: 0.4; } 85% { opacity: 0.2; } 100% { transform: translateY(-80vh) translateX(-20px); opacity: 0; } }
+
+@keyframes hexBreathe {
+  0%,100% { opacity: var(--hex-base-opacity, 0.08); }
+  50%      { opacity: var(--hex-peak-opacity, 0.22); }
+}
+@keyframes hexBroadcast {
+  0%   { r: 0;   opacity: 0.55; }
+  70%  { opacity: 0.18; }
+  100% { r: 160; opacity: 0; }
+}
+@keyframes broadcastRing {
+  0%   { r: 6;   stroke-width: 2.5; opacity: 0.9; }
+  100% { r: 120; stroke-width: 0.3; opacity: 0;   }
+}
+@keyframes connectionPulse {
+  0%,100% { stroke-opacity: 0.18; }
+  50%      { stroke-opacity: 0.55; }
+}
+
+.coherence-field {
+  position: relative; padding: 100px 24px 80px; overflow: hidden;
+  background: radial-gradient(ellipse 70% 60% at 50% 30%, rgba(13,64,56,0.18) 0%, transparent 60%),
+              radial-gradient(ellipse 50% 40% at 50% 80%, rgba(45,125,125,0.08) 0%, transparent 50%),
+              var(--dark);
+}
+.coherence-field::before {
+  content: ''; position: absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(45,125,125,0.25) 30%,
+    rgba(92,197,197,0.40) 50%, rgba(45,125,125,0.25) 70%, transparent 100%);
+}
+.cf-inner { max-width: 1200px; margin: 0 auto; }
+.cf-header { text-align: center; margin-bottom: 56px; }
+.cf-svg-wrap {
+  width: 100%; border: 1px solid rgba(45,125,125,0.12); border-radius: 4px;
+  background: rgba(13,15,26,0.4); overflow: hidden;
+}
+.cf-svg { width: 100%; height: auto; display: block; }
+.cf-legend {
+  display: flex; justify-content: center; gap: 32px; margin-top: 32px; flex-wrap: wrap;
+}
+.cf-legend-item {
+  display: flex; align-items: center; gap: 8px; font-family: var(--font-mono);
+  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ivory-45);
+}
+.cf-legend-swatch { width: 14px; height: 3px; border-radius: 1px; }
+@media (max-width: 900px) { .coherence-field { padding: 80px 16px 60px; } }
+@media (max-width: 600px) { .coherence-field { padding: 60px 12px 48px; } .cf-legend { gap: 14px; } }
+
+/* ═══════════════════════════════════════════════════════
+   HEADER — The Living Dashboard
+   ═══════════════════════════════════════════════════════ */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  background: linear-gradient(180deg, rgba(13,10,26,0.95) 0%, rgba(13,10,26,0.85) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(196,146,42,0.08);
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--gold) 20%, var(--gold-light) 50%, var(--gold) 80%, transparent 100%);
+  animation: goldLine 6s ease-in-out infinite;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  color: var(--ivory);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.wordmark-mark {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.header-metrics {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex: 1;
+  justify-content: center;
+}
+
+.metric {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metric-value { transition: opacity 0.8s ease; }
+.metric--gold .metric-value { color: var(--gold-light); }
+.metric--teal .metric-value { color: var(--teal-bright); }
+.metric--ivory .metric-value { color: var(--ivory-45); }
+
+.metric-label {
+  color: var(--ivory-20);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.metric-bar {
+  width: 24px;
+  height: 3px;
+  background: rgba(45,125,125,0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.metric-bar-fill {
+  position: absolute;
+  left: 0; top: 0;
+  height: 100%;
+  background: var(--teal-bright);
+  border-radius: 2px;
+  transition: width 1.5s ease;
+  animation: breatheGold 5s ease-in-out infinite;
+}
+
+.temple-dots { display: flex; gap: 3px; align-items: center; }
+
+.temple-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--gold-light);
+}
+
+.header-nav {
+  display: flex;
+  gap: 24px;
+}
+
+.header-nav a {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ivory-45);
+  text-decoration: none;
+  transition: color 0.4s ease;
+  white-space: nowrap;
+}
+
+.header-nav a:hover { color: var(--gold-light); }
+
+/* ═══════════════════════════════════════════════════════
+   HEART WEATHER — The Globe
+   ═══════════════════════════════════════════════════════ */
+
+.heart-weather {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 80% at 50% 50%, rgba(13,10,26,0.0) 30%, rgba(13,10,26,1) 70%),
+    radial-gradient(ellipse 55% 45% at 50% 25%, rgba(107,63,160,0.08) 0%, transparent 70%),
+    var(--dark);
+}
+
+.heart-weather-dust {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.globe-container {
+  position: relative;
+  width: min(70vh, 70vw);
+  height: min(70vh, 70vw);
+  max-width: 700px;
+  max-height: 700px;
+  z-index: 2;
+}
+
+.globe-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.globe-atmosphere {
+  position: absolute;
+  inset: -15%;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    transparent 35%,
+    rgba(45,125,125,0.06) 45%,
+    rgba(45,125,125,0.10) 50%,
+    rgba(107,63,160,0.08) 55%,
+    rgba(107,63,160,0.04) 60%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: breatheSlow 10s ease-in-out infinite;
+}
+
+.globe-shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow:
+    inset -40px -15px 80px rgba(0,0,0,0.6),
+    inset 15px 8px 40px rgba(255,248,231,0.03);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.globe-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.globe-overlay svg {
+  width: 100%;
+  height: 100%;
+}
+
+.globe-interactive {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  border-radius: 50%;
+  cursor: grab;
+}
+
+.globe-interactive:active { cursor: grabbing; }
+
+/* ═══════════════════════════════════════════════════════
+   HEART WEATHER — Hero Text
+   ═══════════════════════════════════════════════════════ */
+
+.hw-hero-text {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 20;
+  pointer-events: none;
+  padding-top: 20px;
+}
+
+.hw-scroll-hint {
+  position: absolute;
+  bottom: 220px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  animation: breatheSlow 4s ease-in-out infinite;
+}
+
+.hw-scroll-line {
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(180deg, transparent, rgba(196,146,42,0.3), transparent);
+}
+
+.hw-scroll-text {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ivory-20);
+  white-space: nowrap;
+}
+
+.hw-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--teal-bright);
+  margin-bottom: 10px;
+  animation: marqueeBreath 8s ease-in-out infinite;
+}
+
+.hw-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(24px, 4vw, 48px);
+  line-height: 1.2;
+  color: var(--ivory);
+  margin-bottom: 6px;
+}
+
+.hw-sub {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: clamp(13px, 1.8vw, 17px);
+  color: var(--ivory-45);
+}
+
+/* ═══════════════════════════════════════════════════════
+   HRV STRIP — Right Edge Coherence Timeline
+   ═══════════════════════════════════════════════════════ */
+
+.hrv-strip {
+  position: fixed;
+  right: 24px;
+  top: 80px;
+  bottom: 80px;
+  width: 40px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.hrv-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ivory-20);
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+}
+
+.hrv-canvas {
+  flex: 1;
+  width: 2px;
+  background: rgba(45,125,125,0.08);
+  border-radius: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hrv-value {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--teal-bright);
+  animation: hrvPulse 4s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════
+   SESSION CARD — Bottom Overlay
+   ═══════════════════════════════════════════════════════ */
+
+.session-card {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  background: linear-gradient(135deg, rgba(20,15,38,0.85) 0%, rgba(26,19,50,0.90) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(196,146,42,0.12);
+  border-radius: 4px;
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  min-width: 480px;
+  max-width: 90vw;
+}
+
+.session-card-live {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.session-card-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #E84B4B;
+  box-shadow: 0 0 8px rgba(232,75,75,0.5);
+  animation: breathe 2s ease-in-out infinite;
+}
+
+.session-card-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--teal-bright);
+}
+
+.session-card-info { flex: 1; }
+
+.session-card-temple {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--ivory);
+  margin-bottom: 2px;
+}
+
+.session-card-meta {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--ivory-45);
+  letter-spacing: 0.06em;
+}
+
+.session-card-meta span { color: var(--gold-light); }
+
+.session-card-coherence { text-align: right; }
+
+.session-card-score {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  color: var(--teal-bright);
+  animation: phaseGlow 4s ease-in-out infinite;
+}
+
+.session-card-phase {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--ivory-20);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.session-card-bar {
+  width: 60px;
+  height: 2px;
+  background: rgba(45,125,125,0.15);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.session-card-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), var(--teal-bright));
+  border-radius: 1px;
+  transition: width 1s ease;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TEMPLE DETAIL — Click Overlay
+   ═══════════════════════════════════════════════════════ */
+
+.temple-detail {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  z-index: 200;
+  background: linear-gradient(135deg, rgba(20,15,38,0.92) 0%, rgba(26,19,50,0.95) 100%);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(196,146,42,0.15);
+  border-radius: 6px;
+  padding: 32px 40px;
+  min-width: 340px;
+  max-width: 420px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.temple-detail.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.temple-detail-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--ivory-45);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.3s ease;
+}
+
+.temple-detail-close:hover { color: var(--gold-light); }
+
+.temple-detail-name {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 28px;
+  color: var(--ivory);
+  margin-bottom: 4px;
+}
+
+.temple-detail-location {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ivory-45);
+  margin-bottom: 20px;
+}
+
+.temple-detail-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.temple-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.temple-stat-value {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  letter-spacing: 0.06em;
+}
+
+.temple-stat-value.gold { color: var(--gold-light); }
+.temple-stat-value.teal { color: var(--teal-bright); }
+
+.temple-stat-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ivory-20);
+}
+
+.temple-detail-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(196,146,42,0.08);
+}
+
+.temple-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.temple-status-dot.active {
+  background: #5CC5C5;
+  box-shadow: 0 0 8px rgba(92,197,197,0.5);
+  animation: breathe 3s ease-in-out infinite;
+}
+
+.temple-status-dot.sleeping {
+  background: var(--jade-deep);
+  opacity: 0.5;
+}
+
+.temple-status-dot.coming {
+  background: var(--ivory-20);
+}
+
+.temple-status-dot.online {
+  background: #5CC5C5;
+  opacity: 0.6;
+}
+
+.temple-status-text {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ivory-45);
+}
+
+.temple-detail-facilitator {
+  margin-top: 12px;
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ivory-45);
+}
+
+.temple-detail-facilitator span { color: var(--gold-light); }
+
+.temple-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(13,10,26,0.6);
+  z-index: 190;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.temple-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════
+   CONTENT SECTIONS BELOW GLOBE
+   ═══════════════════════════════════════════════════════ */
+
+.content-below {
+  position: relative;
+  z-index: 50;
+  background: var(--dark);
+}
+
+.live-feed {
+  position: relative;
+  padding: 100px 24px 80px;
+  text-align: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(45,125,125,0.06) 0%, transparent 50%),
+    var(--dark);
+}
+
+.live-feed::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(45,125,125,0.2) 30%, rgba(45,125,125,0.3) 50%, rgba(45,125,125,0.2) 70%, transparent 100%);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--teal-bright);
+  margin-bottom: 8px;
+  animation: marqueeBreath 8s ease-in-out infinite;
+}
+
+.eyebrow--gold { color: var(--gold-light); }
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(26px, 4vw, 42px);
+  line-height: 1.2;
+  margin-bottom: 12px;
+  color: var(--ivory);
+}
+
+.section-sub {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ivory-45);
+  margin-bottom: 48px;
+}
+
+.feed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.feed-card {
+  background: linear-gradient(135deg, rgba(20,15,38,0.6) 0%, rgba(26,19,50,0.7) 100%);
+  border: 1px solid rgba(196,146,42,0.08);
+  border-radius: 4px;
+  padding: 24px;
+  text-align: left;
+  transition: border-color 0.5s ease;
+}
+
+.feed-card:hover { border-color: rgba(196,146,42,0.2); }
+
+.feed-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.feed-card-temple {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--ivory);
+}
+
+.feed-card-ring { width: 32px; height: 32px; }
+
+.feed-card-meta {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--ivory-45);
+  margin-bottom: 8px;
+}
+
+.feed-card-coherence {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feed-card-score {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--teal-bright);
+}
+
+.feed-card-bar {
+  flex: 1;
+  height: 2px;
+  background: rgba(45,125,125,0.15);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.feed-card-bar-fill {
+  height: 100%;
+  background: var(--teal-bright);
+  border-radius: 1px;
+}
+
+.science {
+  position: relative;
+  padding: 100px 24px;
+  text-align: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 30%, rgba(196,146,42,0.06) 0%, transparent 60%),
+    var(--dark);
+}
+
+.science::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(196,146,42,0.15) 30%, rgba(196,146,42,0.25) 50%, rgba(196,146,42,0.15) 70%, transparent 100%);
+}
+
+.science-pathway { max-width: 700px; margin: 0 auto 60px; }
+.pathway-svg { width: 100%; max-width: 600px; height: auto; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.stat { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+.stat-value {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(32px, 5vw, 48px);
+  color: var(--gold-light);
+  line-height: 1;
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ivory-45);
+  max-width: 180px;
+}
+
+.stat-bar {
+  width: 40px; height: 2px;
+  background: rgba(196,146,42,0.2);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.stat-bar-fill {
+  height: 100%; width: 0%;
+  background: var(--gold);
+  border-radius: 1px;
+  transition: width 2s ease;
+}
+
+.facilitator {
+  position: relative;
+  padding: 100px 24px;
+  text-align: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(107,63,160,0.1) 0%, transparent 50%),
+    linear-gradient(180deg, var(--dark) 0%, #110D22 50%, var(--dark) 100%);
+}
+
+.facilitator::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(107,63,160,0.2) 30%, rgba(107,63,160,0.3) 50%, rgba(107,63,160,0.2) 70%, transparent 100%);
+}
+
+.tiers {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin: 48px 0;
+  flex-wrap: wrap;
+}
+
+.tier { display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 140px; }
+.tier-ring { width: 48px; height: 48px; }
+
+.tier-name {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ivory-45);
+}
+
+.tier-desc {
+  font-family: var(--font-editorial);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ivory-20);
+}
+
+.tier--bronze .tier-name { color: #CD7F32; }
+.tier--silver .tier-name { color: #A8A8B0; }
+.tier--gold .tier-name { color: var(--gold-light); }
+.tier--luminous .tier-name { color: var(--teal-bright); }
+
+.cta-primary {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 14px 40px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  text-decoration: none;
+  border: 1px solid rgba(196,146,42,0.35);
+  border-radius: 2px;
+  transition: all 0.5s ease;
+  background: transparent;
+  cursor: pointer;
+}
+
+.cta-primary:hover {
+  border-color: var(--gold-light);
+  box-shadow: 0 0 30px rgba(196,146,42,0.12), inset 0 0 20px rgba(196,146,42,0.04);
+  color: var(--gold-bright);
+}
+
+.link-subtle {
+  display: inline-block;
+  margin-top: 24px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--teal-light);
+  text-decoration: none;
+  transition: color 0.4s ease;
+}
+
+.link-subtle:hover { color: var(--teal-bright); }
+
+.footer {
+  padding: 48px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(196,146,42,0.08);
+  background: var(--dark);
+}
+
+.footer-left, .footer-right {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--ivory-20);
+}
+
+.footer-links { display: flex; gap: 24px; }
+
+.footer-links a {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ivory-20);
+  text-decoration: none;
+  transition: color 0.4s ease;
+}
+
+.footer-links a:hover { color: var(--gold-light); }
+.footer-right span { color: var(--gold); }
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 900px) {
+  .header-metrics { display: none; }
+  .header-nav { gap: 16px; }
+  .header-nav a { font-size: 9px; letter-spacing: 0.1em; }
+  .globe-container { width: min(85vw, 85vh); height: min(85vw, 85vh); }
+  .session-card { min-width: auto; flex-direction: column; gap: 12px; text-align: center; padding: 14px 20px; }
+  .session-card-coherence { text-align: center; }
+  .hrv-strip { right: 8px; width: 28px; }
+  .stats-grid { grid-template-columns: 1fr; gap: 48px; }
+  .tiers { flex-direction: column; align-items: center; gap: 32px; }
+  .footer { flex-direction: column; gap: 16px; text-align: center; }
+  .feed-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .header { padding: 0 16px; }
+  .header-nav { gap: 12px; }
+  .header-nav a { font-size: 8px; }
+  .globe-container { width: min(92vw, 80vh); height: min(92vw, 80vh); }
+  .hw-hero-text { top: 72px; }
+  .hw-scroll-hint { display: none; }
+  .hrv-strip { display: none; }
+  .session-card { bottom: 12px; padding: 12px 16px; }
+  .temple-detail { min-width: 280px; padding: 24px; }
+}
+@media (max-width: 400px) {
+  .temple-detail { min-width: 90vw; padding: 20px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     HEADER — The Living Dashboard
+     ═══════════════════════════════════════════════════════ -->
+
+<header class="header" role="banner">
+  <div class="header-left">
+    <a href="#" class="wordmark">
+      <svg class="wordmark-mark" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="wmGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7A6520"/>
+            <stop offset="35%" stop-color="#E8B84B"/>
+            <stop offset="65%" stop-color="#F5D47A"/>
+            <stop offset="100%" stop-color="#7A6520"/>
+          </linearGradient>
+          <radialGradient id="wmJade" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#5CC5C5" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#2D7D7D" stop-opacity="0.1"/>
+          </radialGradient>
+        </defs>
+        <circle cx="18" cy="18" r="14" fill="none" stroke="url(#wmGold)" stroke-width="0.8" style="animation: breathe 6s ease-in-out infinite"/>
+        <circle cx="18" cy="18" r="6" fill="url(#wmJade)" style="animation: breatheScale 5s ease-in-out infinite"/>
+        <circle cx="18" cy="18" r="2.5" fill="#2D7D7D" style="animation: breathe 5s ease-in-out infinite"/>
+        <circle cx="18" cy="4" r="1.5" fill="url(#wmGold)" style="animation: breathe 4s ease-in-out infinite"/>
+        <circle cx="30.1" cy="11" r="1.5" fill="url(#wmGold)" style="animation: breathe 4s ease-in-out infinite; animation-delay:-0.7s"/>
+        <circle cx="30.1" cy="25" r="1.5" fill="url(#wmGold)" style="animation: breathe 4s ease-in-out infinite; animation-delay:-1.4s"/>
+        <circle cx="18" cy="32" r="1.5" fill="url(#wmGold)" style="animation: breathe 4s ease-in-out infinite; animation-delay:-2.1s"/>
+        <circle cx="5.9" cy="25" r="1.5" fill="url(#wmGold)" style="animation: breathe 4s ease-in-out infinite; animation-delay:-2.8s"/>
+        <circle cx="5.9" cy="11" r="1.5" fill="url(#wmGold)" style="animation: breathe 4s ease-in-out infinite; animation-delay:-3.5s"/>
+      </svg>
+      SoundTemple
+    </a>
+  </div>
+
+  <div class="header-metrics" aria-label="Live system metrics">
+    <div class="metric metric--ivory">
+      <span class="metric-value" id="metric-sessions">247</span>
+      <span class="metric-label">active sessions</span>
+    </div>
+    <div class="metric metric--gold">
+      <span class="metric-value" id="metric-bodies">1,842</span>
+      <span class="metric-label">bodies on beds</span>
+    </div>
+    <div class="metric metric--teal">
+      <span class="metric-value" id="metric-coherence">0.73</span>
+      <span class="metric-label">global coherence</span>
+      <div class="metric-bar">
+        <div class="metric-bar-fill" id="metric-coherence-bar" style="width:73%"></div>
+      </div>
+    </div>
+    <div class="metric metric--gold">
+      <span class="metric-value" id="metric-temples">12</span>
+      <span class="metric-label">temples online</span>
+      <div class="temple-dots" id="temple-dots-container"></div>
+    </div>
+  </div>
+
+  <nav class="header-nav" role="navigation">
+    <a href="#live-feed">Sessions</a>
+    <a href="#science">Science</a>
+    <a href="#facilitators">Facilitators</a>
+  </nav>
+</header>
+
+<!-- ═══════════════════════════════════════════════════════
+     HEART WEATHER — The Living Planetary Pulse
+     ═══════════════════════════════════════════════════════ -->
+
+<section class="heart-weather" id="heart-weather">
+  <div class="heart-weather-dust" id="hw-dust"></div>
+
+  <div class="globe-container" id="globe-container">
+    <canvas class="globe-canvas" id="globe-canvas"></canvas>
+    <div class="globe-atmosphere"></div>
+    <div class="globe-shadow"></div>
+    <div class="globe-overlay" id="globe-overlay">
+      <svg id="globe-svg" viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="goldOrb" cx="35%" cy="28%" r="58%">
+            <stop offset="0%" stop-color="#FFF8E1" stop-opacity="0.95"/>
+            <stop offset="30%" stop-color="#F5D47A" stop-opacity="0.9"/>
+            <stop offset="60%" stop-color="#E8B84B" stop-opacity="0.85"/>
+            <stop offset="100%" stop-color="#C4922A" stop-opacity="0.8"/>
+          </radialGradient>
+          <radialGradient id="jadeOrb" cx="35%" cy="28%" r="58%">
+            <stop offset="0%" stop-color="#D0FFF0" stop-opacity="0.7"/>
+            <stop offset="40%" stop-color="#5CC5C5" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="#0D4038" stop-opacity="0.5"/>
+          </radialGradient>
+          <radialGradient id="coherenceZone" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#4AADAD" stop-opacity="0.15"/>
+            <stop offset="50%" stop-color="#2D7D7D" stop-opacity="0.06"/>
+            <stop offset="100%" stop-color="#2D7D7D" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="nodeGlow">
+            <feGaussianBlur stdDeviation="3" result="glow"/>
+            <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="leyGlow">
+            <feGaussianBlur stdDeviation="2" result="glow"/>
+            <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g id="hex-grid"></g>
+        <g id="coherence-zones"></g>
+        <g id="ley-lines"></g>
+        <g id="flow-particles"></g>
+        <g id="pulse-ripples"></g>
+        <g id="temple-nodes"></g>
+        <g id="temple-labels"></g>
+      </svg>
+    </div>
+    <div class="globe-interactive" id="globe-interactive"></div>
+  </div>
+
+  <div class="hw-hero-text">
+    <p class="hw-eyebrow">Heart Weather</p>
+    <h1 class="hw-title">The living pulse of global coherence</h1>
+    <p class="hw-sub">Every temple is a node. Every session is a signal. Every body is a frequency.</p>
+  </div>
+
+  <div class="hw-scroll-hint">
+    <div class="hw-scroll-line"></div>
+    <span class="hw-scroll-text">Scroll to explore</span>
+  </div>
+</section>
+
+<!-- HRV Strip -->
+<div class="hrv-strip" id="hrv-strip">
+  <span class="hrv-label">Coherence</span>
+  <canvas class="hrv-canvas" id="hrv-canvas" width="2" height="400"></canvas>
+  <span class="hrv-value" id="hrv-value">0.73</span>
+</div>
+
+<!-- Session Card -->
+<div class="session-card" id="session-card">
+  <div class="session-card-live">
+    <span class="session-card-dot"></span>
+    <span class="session-card-label">Live</span>
+  </div>
+  <div class="session-card-info">
+    <div class="session-card-temple">Bathhouse ATX</div>
+    <div class="session-card-meta">6 bodies · Guided by Maya Chen · <span>Gold Tier</span></div>
+  </div>
+  <div class="session-card-coherence">
+    <div class="session-card-score" id="session-coherence">0.78</div>
+    <div class="session-card-phase" id="session-phase">Depth</div>
+    <div class="session-card-bar">
+      <div class="session-card-bar-fill" id="session-bar-fill" style="width: 68%"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Temple Detail Overlay -->
+<div class="temple-backdrop" id="temple-backdrop"></div>
+<div class="temple-detail" id="temple-detail">
+  <button class="temple-detail-close" id="temple-detail-close">&times;</button>
+  <div class="temple-detail-name" id="td-name">Bathhouse ATX</div>
+  <div class="temple-detail-location" id="td-location">Austin, TX</div>
+  <div class="temple-detail-stats">
+    <div class="temple-stat-item">
+      <div class="temple-stat-value teal" id="td-coherence">0.78</div>
+      <div class="temple-stat-label">Coherence</div>
+    </div>
+    <div class="temple-stat-item">
+      <div class="temple-stat-value gold" id="td-sessions">14</div>
+      <div class="temple-stat-label">Sessions Today</div>
+    </div>
+    <div class="temple-stat-item">
+      <div class="temple-stat-value gold" id="td-bodies">87</div>
+      <div class="temple-stat-label">Bodies Today</div>
+    </div>
+    <div class="temple-stat-item">
+      <div class="temple-stat-value teal" id="td-phase">Depth</div>
+      <div class="temple-stat-label">Current Phase</div>
+    </div>
+  </div>
+  <div class="temple-detail-status">
+    <span class="temple-status-dot active" id="td-status-dot"></span>
+    <span class="temple-status-text" id="td-status-text">Live session in progress</span>
+  </div>
+  <div class="temple-detail-facilitator" id="td-facilitator"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     CONTENT BELOW THE GLOBE
+     ═══════════════════════════════════════════════════════ -->
+
+<div class="content-below">
+
+  <section class="coherence-field reveal" id="coherence-field">
+    <div class="cf-inner">
+      <div class="cf-header reveal">
+        <p class="eyebrow">The Coherence Field</p>
+        <h2 style="font-family:var(--font-display);font-weight:300;font-style:italic;font-size:clamp(1.8rem,3.5vw,3rem);color:var(--ivory);margin-bottom:16px;">How temples entangle</h2>
+        <p style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;color:var(--ivory-45);max-width:520px;margin:0 auto;line-height:1.8;">Each hexagon is a field region. Brightness = coherence strength. Pulse speed = HRV index. The broadcast source radiates the signal. Nodes average into gradients where fields meet.</p>
+      </div>
+      <div class="cf-svg-wrap reveal" style="transition-delay:0.15s">
+        <svg id="cf-svg" class="cf-svg" viewBox="0 0 1200 580"
+             xmlns="http://www.w3.org/2000/svg"
+             aria-label="Hexagonal coherence field network" role="img">
+          <defs>
+            <radialGradient id="cf-broadcast-glow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%"  stop-color="#F5D47A" stop-opacity="0.55"/>
+              <stop offset="40%" stop-color="#E8B84B" stop-opacity="0.20"/>
+              <stop offset="100%" stop-color="#C4922A" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="cf-node-jade" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#8abfa8"/>
+              <stop offset="50%" stop-color="#2D7D7D"/>
+              <stop offset="100%" stop-color="#0D4038"/>
+            </radialGradient>
+            <radialGradient id="cf-node-teal" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#D0FFF0"/>
+              <stop offset="40%" stop-color="#5CC5C5"/>
+              <stop offset="100%" stop-color="#2D7D7D"/>
+            </radialGradient>
+            <radialGradient id="cf-node-gold" cx="35%" cy="28%" r="65%">
+              <stop offset="0%" stop-color="#FFF8E1"/>
+              <stop offset="30%" stop-color="#F5D47A"/>
+              <stop offset="100%" stop-color="#C4922A"/>
+            </radialGradient>
+            <filter id="cf-node-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="6" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="cf-hex-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="2.5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <g id="cf-hex-layer"></g>
+          <g id="cf-connection-layer"></g>
+          <g id="cf-broadcast-layer"></g>
+          <g id="cf-node-layer"></g>
+          <g id="cf-label-layer"></g>
+        </svg>
+      </div>
+      <div class="cf-legend reveal" style="transition-delay:0.3s">
+        <div class="cf-legend-item">
+          <div class="cf-legend-swatch" style="background:#0D4038"></div>
+          <span>Low coherence</span>
+        </div>
+        <div class="cf-legend-item">
+          <div class="cf-legend-swatch" style="background:#4AADAD"></div>
+          <span>Active session</span>
+        </div>
+        <div class="cf-legend-item">
+          <div class="cf-legend-swatch" style="background:linear-gradient(to right,#E8B84B,#F5D47A)"></div>
+          <span>Broadcast source</span>
+        </div>
+        <div class="cf-legend-item">
+          <div class="cf-legend-swatch" style="background:linear-gradient(to right,#4AADAD,#E8B84B)"></div>
+          <span>Entangled connection</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="live-feed" id="live-feed">
+    <div class="reveal">
+      <p class="eyebrow">Across the Grid</p>
+      <h2 class="section-title">Sessions happening now</h2>
+      <p class="section-sub">The coherence field is always building. Find your node.</p>
+    </div>
+    <div class="feed-grid reveal" style="transition-delay: 0.2s" id="feed-grid"></div>
+    <a href="#" class="link-subtle reveal" style="transition-delay: 0.4s">View all sessions &rarr;</a>
+  </section>
+
+  <section class="science" id="science">
+    <div class="reveal">
+      <p class="eyebrow eyebrow--gold">The Science</p>
+      <h2 class="section-title">What happens on the bed</h2>
+      <p class="section-sub" style="margin: 0 auto 48px;">Low-frequency vibration (30&ndash;120 Hz) enters through skin, bone, and fascia. The vagus nerve responds. The nervous system recalibrates. This is not belief-dependent. It is physics.</p>
+    </div>
+    <div class="science-pathway reveal" style="transition-delay: 0.15s">
+      <svg class="pathway-svg" viewBox="0 0 600 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pathGold" x1="0%" y1="50%" x2="100%" y2="50%">
+            <stop offset="0%" stop-color="#7A6520"/>
+            <stop offset="50%" stop-color="#E8B84B"/>
+            <stop offset="100%" stop-color="#7A6520"/>
+          </linearGradient>
+        </defs>
+        <line x1="40" y1="60" x2="560" y2="60" stroke="rgba(196,146,42,0.15)" stroke-width="1"/>
+        <circle r="3" fill="#E8B84B" opacity="0.7">
+          <animateMotion dur="4s" repeatCount="indefinite" path="M40,60 L560,60"/>
+          <animate attributeName="opacity" values="0.3;0.8;0.3" dur="4s" repeatCount="indefinite"/>
+        </circle>
+        <g>
+          <circle cx="80" cy="60" r="16" fill="none" stroke="#C4922A" stroke-width="0.6" style="animation: breathe 5s ease-in-out infinite"/>
+          <circle cx="80" cy="60" r="3" fill="#E8B84B" opacity="0.6"/>
+          <text x="80" y="100" text-anchor="middle" fill="rgba(242,234,216,0.5)" font-family="DM Mono, monospace" font-size="8" letter-spacing="0.1em">VIBRATION</text>
+        </g>
+        <g>
+          <circle cx="220" cy="60" r="16" fill="none" stroke="#C4922A" stroke-width="0.6" style="animation: breathe 5s ease-in-out infinite; animation-delay:-1.2s"/>
+          <circle cx="220" cy="60" r="3" fill="#E8B84B" opacity="0.6"/>
+          <text x="220" y="100" text-anchor="middle" fill="rgba(242,234,216,0.5)" font-family="DM Mono, monospace" font-size="8" letter-spacing="0.1em">VAGUS NERVE</text>
+        </g>
+        <g>
+          <circle cx="380" cy="60" r="16" fill="none" stroke="#4AADAD" stroke-width="0.6" style="animation: breathe 5s ease-in-out infinite; animation-delay:-2.4s"/>
+          <circle cx="380" cy="60" r="3" fill="#5CC5C5" opacity="0.6"/>
+          <text x="380" y="100" text-anchor="middle" fill="rgba(242,234,216,0.5)" font-family="DM Mono, monospace" font-size="8" letter-spacing="0.1em">REGULATION</text>
+        </g>
+        <g>
+          <circle cx="520" cy="60" r="16" fill="none" stroke="#4AADAD" stroke-width="0.6" style="animation: breathe 5s ease-in-out infinite; animation-delay:-3.6s"/>
+          <circle cx="520" cy="60" r="3" fill="#5CC5C5" opacity="0.6"/>
+          <text x="520" y="100" text-anchor="middle" fill="rgba(242,234,216,0.5)" font-family="DM Mono, monospace" font-size="8" letter-spacing="0.1em">COHERENCE</text>
+        </g>
+      </svg>
+    </div>
+    <div class="stats-grid reveal" style="transition-delay: 0.3s">
+      <div class="stat">
+        <div class="stat-value" data-count="47" data-suffix="%">0%</div>
+        <div class="stat-bar"><div class="stat-bar-fill" data-width="47"></div></div>
+        <div class="stat-label">Cortisol reduction in single session</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" data-count="2.3" data-suffix="x" data-decimals="1">0x</div>
+        <div class="stat-bar"><div class="stat-bar-fill" data-width="76"></div></div>
+        <div class="stat-label">HRV improvement over baseline</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" data-count="89" data-suffix="%">0%</div>
+        <div class="stat-bar"><div class="stat-bar-fill" data-width="89"></div></div>
+        <div class="stat-label">Report deep state within 90 seconds</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="facilitator" id="facilitators">
+    <div class="reveal">
+      <p class="eyebrow" style="color: var(--violet-bright);">The Facilitation Path</p>
+      <h2 class="section-title">Become a facilitator</h2>
+      <p class="section-sub" style="margin: 0 auto;">Hold space for the shift. Guide groups into coherence. Build your practice inside the SoundTemple network.</p>
+    </div>
+    <div class="tiers reveal" style="transition-delay: 0.2s">
+      <div class="tier tier--bronze">
+        <svg class="tier-ring" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="20" fill="none" stroke="#CD7F32" stroke-width="1" opacity="0.5" style="animation: breathe 5s ease-in-out infinite"/>
+          <circle cx="24" cy="24" r="4" fill="#CD7F32" opacity="0.4" style="animation: breatheScale 5s ease-in-out infinite"/>
+        </svg>
+        <div class="tier-name">Bronze</div>
+        <div class="tier-desc">Apprentice</div>
+      </div>
+      <div class="tier tier--silver">
+        <svg class="tier-ring" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="20" fill="none" stroke="#A8A8B0" stroke-width="1" opacity="0.5" style="animation: breathe 5s ease-in-out infinite"/>
+          <circle cx="24" cy="24" r="4" fill="#A8A8B0" opacity="0.4" style="animation: breatheScale 5s ease-in-out infinite"/>
+          <circle cx="24" cy="4" r="1.5" fill="#A8A8B0" opacity="0.5" style="animation: breathe 4s ease-in-out infinite"/>
+          <circle cx="41.3" cy="34" r="1.5" fill="#A8A8B0" opacity="0.5" style="animation: breathe 4s ease-in-out infinite; animation-delay:-1.3s"/>
+          <circle cx="6.7" cy="34" r="1.5" fill="#A8A8B0" opacity="0.5" style="animation: breathe 4s ease-in-out infinite; animation-delay:-2.6s"/>
+        </svg>
+        <div class="tier-name">Silver</div>
+        <div class="tier-desc">Practitioner</div>
+      </div>
+      <div class="tier tier--gold">
+        <svg class="tier-ring" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="20" fill="none" stroke="#E8B84B" stroke-width="1" opacity="0.6" style="animation: breathe 5s ease-in-out infinite"/>
+          <circle cx="24" cy="24" r="5" fill="#C4922A" opacity="0.4" style="animation: breatheScale 5s ease-in-out infinite"/>
+          <circle cx="24" cy="4" r="1.5" fill="#E8B84B" opacity="0.6" style="animation: breathe 4s ease-in-out infinite"/>
+          <circle cx="41.3" cy="14" r="1.5" fill="#E8B84B" opacity="0.6" style="animation: breathe 4s ease-in-out infinite; animation-delay:-0.7s"/>
+          <circle cx="41.3" cy="34" r="1.5" fill="#E8B84B" opacity="0.6" style="animation: breathe 4s ease-in-out infinite; animation-delay:-1.4s"/>
+          <circle cx="24" cy="44" r="1.5" fill="#E8B84B" opacity="0.6" style="animation: breathe 4s ease-in-out infinite; animation-delay:-2.1s"/>
+          <circle cx="6.7" cy="34" r="1.5" fill="#E8B84B" opacity="0.6" style="animation: breathe 4s ease-in-out infinite; animation-delay:-2.8s"/>
+          <circle cx="6.7" cy="14" r="1.5" fill="#E8B84B" opacity="0.6" style="animation: breathe 4s ease-in-out infinite; animation-delay:-3.5s"/>
+        </svg>
+        <div class="tier-name">Gold</div>
+        <div class="tier-desc">Master</div>
+      </div>
+      <div class="tier tier--luminous">
+        <svg class="tier-ring" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="20" fill="none" stroke="#5CC5C5" stroke-width="1" opacity="0.5" style="animation: breathe 5s ease-in-out infinite"/>
+          <circle cx="24" cy="24" r="8" fill="#2D7D7D" opacity="0.15" style="animation: breatheScale 4s ease-in-out infinite"/>
+          <circle cx="24" cy="24" r="4" fill="#5CC5C5" opacity="0.5" style="animation: breatheScale 5s ease-in-out infinite"/>
+          <circle cx="24" cy="4" r="1.5" fill="#5CC5C5" opacity="0.5" style="animation: breathe 4s ease-in-out infinite"/>
+          <circle cx="37.8" cy="7.8" r="1.5" fill="#5CC5C5" opacity="0.5" style="animation: breathe 4s ease-in-out infinite; animation-delay:-0.45s"/>
+          <circle cx="44" cy="20.2" r="1.5" fill="#5CC5C5" opacity="0.5" style="animation: breathe 4s ease-in-out infinite; animation-delay:-0.9s"/>
+          <circle cx="42.4" cy="34.5" r="1.5" fill="#5CC5C5" opacity="0.5" style="animation: breathe 4s ease-in-out infinite; animation-delay:-1.35s"/>
+          <circle cx="33.4" cy="42.7" r="1.5" fill="#5CC5C5" opacity="0.5" style="animation: breathe 4s ease-in-out infinite; animation-delay:-1.8s"/>
+          <circle cx="14.6" cy="42.7" r="1.5" fill="#5CC5C5" opacity="0.5" style="animation: breathe 4s ease-in-out infinite; animation-delay:-2.25s"/>
+          <circle cx="5.6" cy="34.5" r="1.5" fill="#5CC5C5" opacity="0.5" style="animation: breathe 4s ease-in-out infinite; animation-delay:-2.7s"/>
+          <circle cx="4" cy="20.2" r="1.5" fill="#5CC5C5" opacity="0.5" style="animation: breathe 4s ease-in-out infinite; animation-delay:-3.15s"/>
+          <circle cx="10.2" cy="7.8" r="1.5" fill="#5CC5C5" opacity="0.5" style="animation: breathe 4s ease-in-out infinite; animation-delay:-3.6s"/>
+        </svg>
+        <div class="tier-name">Luminous</div>
+        <div class="tier-desc">Architect</div>
+      </div>
+    </div>
+    <a href="#" class="cta-primary reveal" style="transition-delay: 0.4s">Apply Now</a>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-left">&copy; 2026 Light Pump Labs</div>
+    <div class="footer-links">
+      <a href="landing.html">← The Story</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="footer-right">A movement towards global coherence</div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT — Heart Weather Engine
+     ═══════════════════════════════════════════════════════ -->
+<script>
+(function() {
+  'use strict';
+
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NS = 'http://www.w3.org/2000/svg';
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function rand(min, max) { return min + Math.random() * (max - min); }
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+  function toRad(d) { return d * Math.PI / 180; }
+
+  // ════════════════════════════════════════════════════════
+  // TEMPLE DATA
+  // ════════════════════════════════════════════════════════
+
+  var temples = [
+    { name: 'Bathhouse ATX', city: 'Austin, TX', lat: 30.27, lon: -97.74, status: 'active', coherence: 0.78, sessionsToday: 14, bodiesToday: 87, phase: 'Depth', facilitator: 'Maya Chen', tier: 'Gold', bodies: 6 },
+    { name: 'Red Rock Temple', city: 'Sedona, AZ', lat: 34.87, lon: -111.76, status: 'online', coherence: 0.62, sessionsToday: 8, bodiesToday: 45, phase: 'Return', facilitator: 'River Stone', tier: 'Silver', bodies: 4 },
+    { name: 'Cenote Temple', city: 'Tulum, MX', lat: 20.21, lon: -87.46, status: 'online', coherence: 0.55, sessionsToday: 6, bodiesToday: 32, phase: 'Arrival', facilitator: 'Sofia Reyes', tier: 'Bronze', bodies: 3 },
+    { name: 'Ubud Temple', city: 'Bali, ID', lat: -8.41, lon: 115.19, status: 'sleeping', coherence: 0.41, sessionsToday: 11, bodiesToday: 63, phase: '\u2014', facilitator: 'Wayan Surya', tier: 'Luminous', bodies: 0 },
+    { name: 'Sierra Temple', city: 'Tahoe, CA', lat: 39.10, lon: -120.04, status: 'coming', coherence: 0, sessionsToday: 0, bodiesToday: 0, phase: '\u2014', facilitator: '\u2014', tier: '\u2014', bodies: 0 }
+  ];
+
+  // ════════════════════════════════════════════════════════
+  // LAYER 1: THE GLOBE — Canvas Earth Rendering
+  // ════════════════════════════════════════════════════════
+
+  var canvas = document.getElementById('globe-canvas');
+  var ctx = canvas.getContext('2d');
+  var container = document.getElementById('globe-container');
+
+  var globeSize = 700;
+  var globeRadius = 320;
+  var rotation = -1.5;
+  var isDragging = false;
+  var dragStartX = 0;
+  var dragStartRotation = 0;
+
+  var earthImg = null;
+  var earthLoaded = false;
+  var earthData = null;
+
+  function initCanvas() {
+    var rect = container.getBoundingClientRect();
+    globeSize = Math.min(rect.width, rect.height);
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = globeSize * dpr;
+    canvas.height = globeSize * dpr;
+    canvas.style.width = globeSize + 'px';
+    canvas.style.height = globeSize + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    globeRadius = globeSize * 0.46;
+  }
+
+  function loadEarthTexture() {
+    earthImg = new Image();
+    earthImg.crossOrigin = 'anonymous';
+    earthImg.onload = function() {
+      earthLoaded = true;
+      var offscreen = document.createElement('canvas');
+      offscreen.width = earthImg.width;
+      offscreen.height = earthImg.height;
+      var octx = offscreen.getContext('2d');
+      octx.drawImage(earthImg, 0, 0);
+      earthData = octx.getImageData(0, 0, earthImg.width, earthImg.height);
+    };
+    earthImg.onerror = function() { earthLoaded = false; };
+    earthImg.src = 'https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57752/land_shallow_topo_2048.jpg';
+  }
+
+  function sampleEarth(u, v) {
+    if (!earthData) return [15, 25, 60];
+    var w = earthData.width;
+    var h = earthData.height;
+    var px = Math.floor(u * w) % w;
+    var py = clamp(Math.floor(v * h), 0, h - 1);
+    px = ((px % w) + w) % w;
+    var idx = (py * w + px) * 4;
+    return [earthData.data[idx], earthData.data[idx + 1], earthData.data[idx + 2]];
+  }
+
+  function renderGlobe() {
+    var cx = globeSize / 2;
+    var cy = globeSize / 2;
+    var r = globeRadius;
+    ctx.clearRect(0, 0, globeSize, globeSize);
+
+    if (!earthLoaded) {
+      renderFallbackGlobe(cx, cy, r);
+      return;
+    }
+
+    var imgData = ctx.createImageData(globeSize, globeSize);
+    var data = imgData.data;
+    var r2 = r * r;
+    // Step size for performance — render every 2nd pixel and fill
+    var step = 2;
+
+    for (var py = 0; py < globeSize; py += step) {
+      var dy = py - cy;
+      if (Math.abs(dy) > r) continue;
+      var maxDx = Math.sqrt(r2 - dy * dy);
+
+      for (var px = Math.floor(cx - maxDx); px <= Math.ceil(cx + maxDx); px += step) {
+        if (px < 0 || px >= globeSize) continue;
+        var dx = px - cx;
+        var dist2 = dx * dx + dy * dy;
+        if (dist2 > r2) continue;
+
+        var dz = Math.sqrt(r2 - dist2);
+        var lat = Math.asin(-dy / r);
+        var lon = Math.atan2(dx, dz) + rotation;
+
+        var u = ((lon / (2 * Math.PI)) + 0.5) % 1;
+        var v = ((-lat / Math.PI) + 0.5);
+
+        var color = sampleEarth(u, v);
+
+        var sunLon = rotation + Math.PI * 0.3;
+        var normalDotSun = Math.cos(lat) * Math.cos(lon - sunLon);
+        var lightFactor = clamp(normalDotSun * 0.7 + 0.5, 0.12, 1.0);
+        var nightTint = clamp(1 - lightFactor * 1.5, 0, 0.4);
+        var edgeFactor = dz / r;
+        var edgeDark = 0.3 + 0.7 * edgeFactor;
+
+        var cr = Math.floor(color[0] * lightFactor * edgeDark + 30 * nightTint);
+        var cg = Math.floor(color[1] * lightFactor * edgeDark + 15 * nightTint);
+        var cb = Math.floor(color[2] * lightFactor * edgeDark + 45 * nightTint);
+
+        // Fill step x step block
+        for (var sy = 0; sy < step && py + sy < globeSize; sy++) {
+          for (var sx = 0; sx < step && px + sx < globeSize; sx++) {
+            var idx = ((py + sy) * globeSize + (px + sx)) * 4;
+            data[idx] = cr;
+            data[idx + 1] = cg;
+            data[idx + 2] = cb;
+            data[idx + 3] = 255;
+          }
+        }
+      }
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+  }
+
+  function renderFallbackGlobe(cx, cy, r) {
+    var grad = ctx.createRadialGradient(cx - r * 0.2, cy - r * 0.15, r * 0.1, cx, cy, r);
+    grad.addColorStop(0, '#1a2040');
+    grad.addColorStop(0.5, '#0f1428');
+    grad.addColorStop(1, '#080a15');
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    ctx.strokeStyle = 'rgba(45,125,125,0.08)';
+    ctx.lineWidth = 0.5;
+    for (var lat = -60; lat <= 60; lat += 30) {
+      var y = cy - r * Math.sin(toRad(lat));
+      var latR = r * Math.cos(toRad(lat));
+      ctx.beginPath();
+      ctx.ellipse(cx, y, latR, latR * 0.15, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    for (var lon = 0; lon < 180; lon += 30) {
+      var angle = toRad(lon) + rotation;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, r * Math.abs(Math.sin(angle)), r, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+
+  // ════════════════════════════════════════════════════════
+  // GEOGRAPHIC PROJECTION
+  // ════════════════════════════════════════════════════════
+
+  function geoToScreen(lat, lon) {
+    var r = globeRadius;
+    var cx = globeSize / 2;
+    var cy = globeSize / 2;
+    var latRad = toRad(lat);
+    var lonRad = toRad(lon);
+    var x3d = r * Math.cos(latRad) * Math.sin(lonRad - rotation);
+    var y3d = -r * Math.sin(latRad);
+    var z3d = r * Math.cos(latRad) * Math.cos(lonRad - rotation);
+    var visible = z3d > 0;
+    var svgScale = 700 / globeSize;
+    return {
+      x: (cx + x3d) * svgScale,
+      y: (cy + y3d) * svgScale,
+      visible: visible,
+      depth: z3d / r
+    };
+  }
+
+  // ════════════════════════════════════════════════════════
+  // LAYER 2: HEXAGONAL COHERENCE GRID
+  // ════════════════════════════════════════════════════════
+
+  var hexGrid = document.getElementById('hex-grid');
+  var hexCells = [];
+
+  function initHexGrid() {
+    for (var lat = -75; lat <= 75; lat += 18) {
+      var latRad = toRad(lat);
+      var lonStep = 18 / Math.max(Math.cos(latRad), 0.3);
+      for (var lon = -180; lon < 180; lon += lonStep) {
+        hexCells.push({ lat: lat, lon: lon });
+      }
+    }
+  }
+
+  function renderHexGrid() {
+    while (hexGrid.firstChild) hexGrid.removeChild(hexGrid.firstChild);
+    var hexR = 22;
+
+    for (var i = 0; i < hexCells.length; i++) {
+      var cell = hexCells[i];
+      var pos = geoToScreen(cell.lat, cell.lon);
+      if (!pos.visible || pos.depth < 0.1) continue;
+
+      var scale = 0.3 + pos.depth * 0.7;
+      var opacity = 0.03 + pos.depth * 0.07;
+
+      var weatherBoost = 0;
+      for (var t = 0; t < temples.length; t++) {
+        if (temples[t].status === 'active' || temples[t].status === 'online') {
+          var dist = Math.sqrt(Math.pow(cell.lat - temples[t].lat, 2) + Math.pow(cell.lon - temples[t].lon, 2));
+          if (dist < 30) {
+            weatherBoost = Math.max(weatherBoost, (1 - dist / 30) * temples[t].coherence);
+          }
+        }
+      }
+
+      var finalOpacity = opacity + weatherBoost * 0.12;
+      var hex = document.createElementNS(NS, 'polygon');
+      var points = [];
+      for (var a = 0; a < 6; a++) {
+        var angle = (Math.PI / 3) * a - Math.PI / 6;
+        var hx = pos.x + hexR * scale * Math.cos(angle);
+        var hy = pos.y + hexR * scale * Math.sin(angle) * (0.6 + pos.depth * 0.4);
+        points.push(hx.toFixed(1) + ',' + hy.toFixed(1));
+      }
+      hex.setAttribute('points', points.join(' '));
+      hex.setAttribute('fill', 'none');
+      hex.setAttribute('stroke', weatherBoost > 0.2 ? '#5CC5C5' : '#4AADAD');
+      hex.setAttribute('stroke-width', (0.3 * scale).toFixed(2));
+      hex.setAttribute('opacity', finalOpacity.toFixed(3));
+
+      if (weatherBoost > 0.3) {
+        hex.style.animation = 'hexWave ' + (6 + (i % 4) * 2) + 's ease-in-out infinite';
+        hex.style.animationDelay = -(i % 8) * 1.2 + 's';
+      }
+      hexGrid.appendChild(hex);
+    }
+  }
+
+  // ════════════════════════════════════════════════════════
+  // LAYER 3: TEMPLE NODES
+  // ════════════════════════════════════════════════════════
+
+  var templeNodesG = document.getElementById('temple-nodes');
+  var templeLabelsG = document.getElementById('temple-labels');
+
+  function renderTempleNodes() {
+    while (templeNodesG.firstChild) templeNodesG.removeChild(templeNodesG.firstChild);
+    while (templeLabelsG.firstChild) templeLabelsG.removeChild(templeLabelsG.firstChild);
+
+    for (var i = 0; i < temples.length; i++) {
+      var temple = temples[i];
+      var pos = geoToScreen(temple.lat, temple.lon);
+      if (!pos.visible || pos.depth < 0.05) continue;
+
+      var scale = 0.5 + pos.depth * 0.5;
+      var isNightSide = pos.depth < 0.3;
+      var orbFill = (isNightSide && temple.status !== 'active') ? 'url(#jadeOrb)' : 'url(#goldOrb)';
+
+      // Coherence zone
+      if (temple.status === 'active' || temple.status === 'online') {
+        var zone = document.createElementNS(NS, 'circle');
+        zone.setAttribute('cx', pos.x.toFixed(1));
+        zone.setAttribute('cy', pos.y.toFixed(1));
+        zone.setAttribute('r', (20 + temple.coherence * 30) * scale);
+        zone.setAttribute('fill', 'url(#coherenceZone)');
+        zone.setAttribute('opacity', (0.3 + temple.coherence * 0.4).toFixed(2));
+        zone.style.animation = 'coherenceGlow ' + (4 + i) + 's ease-in-out infinite';
+        zone.style.animationDelay = -i * 1.5 + 's';
+        templeNodesG.appendChild(zone);
+      }
+
+      // Glow
+      var glow = document.createElementNS(NS, 'circle');
+      glow.setAttribute('cx', pos.x.toFixed(1));
+      glow.setAttribute('cy', pos.y.toFixed(1));
+      glow.setAttribute('r', (12 * scale).toFixed(1));
+      glow.setAttribute('fill', temple.status === 'active' ? '#E8B84B' : (isNightSide ? '#2D7D7D' : '#C4922A'));
+      glow.setAttribute('opacity', '0.06');
+      glow.setAttribute('filter', 'url(#nodeGlow)');
+      glow.style.animation = 'breathe ' + (5 + i * 0.5) + 's ease-in-out infinite';
+      glow.style.animationDelay = -i * 0.8 + 's';
+      templeNodesG.appendChild(glow);
+
+      // Orb
+      var orb = document.createElementNS(NS, 'circle');
+      orb.setAttribute('cx', pos.x.toFixed(1));
+      orb.setAttribute('cy', pos.y.toFixed(1));
+      orb.setAttribute('r', (6 * scale).toFixed(1));
+      orb.setAttribute('fill', orbFill);
+      if (temple.status !== 'coming') {
+        orb.style.animation = 'nodeBreath ' + (4 + i * 0.3) + 's ease-in-out infinite';
+        orb.style.animationDelay = -i * 0.7 + 's';
+      } else {
+        orb.setAttribute('opacity', '0.3');
+      }
+      templeNodesG.appendChild(orb);
+
+      // Specular highlight
+      var hl = document.createElementNS(NS, 'circle');
+      hl.setAttribute('cx', (pos.x - 1.5 * scale).toFixed(1));
+      hl.setAttribute('cy', (pos.y - 1.5 * scale).toFixed(1));
+      hl.setAttribute('r', (2 * scale).toFixed(1));
+      hl.setAttribute('fill', 'white');
+      hl.setAttribute('opacity', (0.2 * pos.depth).toFixed(2));
+      templeNodesG.appendChild(hl);
+
+      // Pulse ripple for active
+      if (temple.status === 'active') {
+        var ripple = document.createElementNS(NS, 'circle');
+        ripple.setAttribute('cx', pos.x.toFixed(1));
+        ripple.setAttribute('cy', pos.y.toFixed(1));
+        ripple.setAttribute('r', '8');
+        ripple.setAttribute('fill', 'none');
+        ripple.setAttribute('stroke', '#E8B84B');
+        ripple.setAttribute('stroke-width', '0.5');
+        ripple.setAttribute('opacity', '0.3');
+        ripple.style.animation = 'pulseRipple ' + (3 + i) + 's ease-out infinite';
+        ripple.style.animationDelay = -i * 0.5 + 's';
+        templeNodesG.appendChild(ripple);
+      }
+
+      // Label
+      if (pos.depth > 0.4) {
+        var label = document.createElementNS(NS, 'text');
+        label.setAttribute('x', (pos.x + 10 * scale).toFixed(1));
+        label.setAttribute('y', (pos.y + 3).toFixed(1));
+        label.setAttribute('fill', temple.status === 'active' ? '#E8B84B' : 'rgba(242,234,216,0.35)');
+        label.setAttribute('font-family', 'DM Mono, monospace');
+        label.setAttribute('font-size', (8 * scale).toFixed(1));
+        label.setAttribute('letter-spacing', '0.08em');
+        label.setAttribute('opacity', (0.4 + pos.depth * 0.5).toFixed(2));
+        label.textContent = temple.name;
+        templeLabelsG.appendChild(label);
+
+        if (temple.status === 'active' || temple.status === 'online') {
+          var cLabel = document.createElementNS(NS, 'text');
+          cLabel.setAttribute('x', (pos.x + 10 * scale).toFixed(1));
+          cLabel.setAttribute('y', (pos.y + 13).toFixed(1));
+          cLabel.setAttribute('fill', '#5CC5C5');
+          cLabel.setAttribute('font-family', 'DM Mono, monospace');
+          cLabel.setAttribute('font-size', (7 * scale).toFixed(1));
+          cLabel.setAttribute('letter-spacing', '0.06em');
+          cLabel.setAttribute('opacity', (0.3 + pos.depth * 0.4).toFixed(2));
+          cLabel.textContent = temple.coherence.toFixed(2);
+          templeLabelsG.appendChild(cLabel);
+        }
+      }
+
+      temple._screenX = pos.x;
+      temple._screenY = pos.y;
+      temple._visible = pos.visible && pos.depth > 0.1;
+      temple._scale = scale;
+    }
+  }
+
+  // ════════════════════════════════════════════════════════
+  // LAYER 4: LEY LINES
+  // ════════════════════════════════════════════════════════
+
+  var leyLinesG = document.getElementById('ley-lines');
+  var flowParticlesG = document.getElementById('flow-particles');
+
+  var leyConnections = [
+    [0, 1], [0, 2], [1, 4], [2, 3], [0, 4], [1, 2]
+  ];
+
+  function renderLeyLines() {
+    while (leyLinesG.firstChild) leyLinesG.removeChild(leyLinesG.firstChild);
+    while (flowParticlesG.firstChild) flowParticlesG.removeChild(flowParticlesG.firstChild);
+
+    for (var idx = 0; idx < leyConnections.length; idx++) {
+      var ai = leyConnections[idx][0];
+      var bi = leyConnections[idx][1];
+      var a = temples[ai];
+      var b = temples[bi];
+      var posA = geoToScreen(a.lat, a.lon);
+      var posB = geoToScreen(b.lat, b.lon);
+
+      if (!posA.visible && !posB.visible) continue;
+      var avgDepth = (posA.depth + posB.depth) / 2;
+      if (avgDepth < 0.1) continue;
+
+      var midLat = (a.lat + b.lat) / 2;
+      var midLon = (a.lon + b.lon) / 2;
+      var midPos = geoToScreen(midLat, midLon);
+
+      var curveMidX = midPos.x + (midPos.depth > 0.5 ? 0 : (posA.x - posB.x) * 0.1);
+      var curveMidY = midPos.y - avgDepth * 15;
+
+      var isPrimary = idx < 4;
+      var opacity = (avgDepth * (isPrimary ? 0.5 : 0.25)).toFixed(3);
+
+      var pathD = 'M' + posA.x.toFixed(1) + ',' + posA.y.toFixed(1) + ' Q' + curveMidX.toFixed(1) + ',' + curveMidY.toFixed(1) + ' ' + posB.x.toFixed(1) + ',' + posB.y.toFixed(1);
+
+      // Glow
+      var glowLine = document.createElementNS(NS, 'path');
+      glowLine.setAttribute('d', pathD);
+      glowLine.setAttribute('fill', 'none');
+      glowLine.setAttribute('stroke', '#E8B84B');
+      glowLine.setAttribute('stroke-width', isPrimary ? '3' : '2');
+      glowLine.setAttribute('opacity', (parseFloat(opacity) * 0.08).toFixed(4));
+      glowLine.setAttribute('filter', 'url(#leyGlow)');
+      leyLinesG.appendChild(glowLine);
+
+      // Line
+      var line = document.createElementNS(NS, 'path');
+      line.setAttribute('d', pathD);
+      line.setAttribute('fill', 'none');
+      line.setAttribute('stroke', isPrimary ? '#E8B84B' : '#C4922A');
+      line.setAttribute('stroke-width', isPrimary ? '0.6' : '0.3');
+      line.setAttribute('stroke-dasharray', isPrimary ? '4 6' : '3 8');
+      line.setAttribute('opacity', opacity);
+      line.style.animation = 'leyPulse ' + (10 + idx * 2) + 's linear infinite';
+      leyLinesG.appendChild(line);
+
+      // Flow particles
+      if (a.status === 'active' || b.status === 'active') {
+        for (var p = 0; p < 2; p++) {
+          var particle = document.createElementNS(NS, 'circle');
+          particle.setAttribute('r', (1.5 * avgDepth).toFixed(1));
+          particle.setAttribute('fill', '#F5D47A');
+          particle.setAttribute('opacity', '0');
+
+          var animMotion = document.createElementNS(NS, 'animateMotion');
+          animMotion.setAttribute('dur', (6 + idx * 1.5) + 's');
+          animMotion.setAttribute('repeatCount', 'indefinite');
+          animMotion.setAttribute('path', pathD);
+          animMotion.setAttribute('begin', (p * 3) + 's');
+          particle.appendChild(animMotion);
+
+          var animOpacity = document.createElementNS(NS, 'animate');
+          animOpacity.setAttribute('attributeName', 'opacity');
+          animOpacity.setAttribute('values', '0;0.7;0.5;0');
+          animOpacity.setAttribute('dur', (6 + idx * 1.5) + 's');
+          animOpacity.setAttribute('repeatCount', 'indefinite');
+          animOpacity.setAttribute('begin', (p * 3) + 's');
+          particle.appendChild(animOpacity);
+
+          flowParticlesG.appendChild(particle);
+        }
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════════════
+  // LAYER 6: LIVING DASHBOARD
+  // ════════════════════════════════════════════════════════
+
+  var metricsData = {
+    sessions: { el: document.getElementById('metric-sessions'), base: 247, variance: 5 },
+    bodies: { el: document.getElementById('metric-bodies'), base: 1842, variance: 12 },
+    coherence: { el: document.getElementById('metric-coherence'), base: 0.73, variance: 0.04, decimals: 2 },
+    temples: { el: document.getElementById('metric-temples'), base: 12, variance: 1 }
+  };
+
+  var globalCoherence = 0.73;
+
+  function formatNumber(n) {
+    return n >= 1000 ? n.toLocaleString() : n.toString();
+  }
+
+  function updateMetrics() {
+    var keys = Object.keys(metricsData);
+    for (var k = 0; k < keys.length; k++) {
+      var m = metricsData[keys[k]];
+      var delta = (Math.random() - 0.5) * 2 * m.variance;
+      var val = m.base + delta;
+      if (m.decimals) {
+        m.el.textContent = val.toFixed(m.decimals);
+      } else {
+        m.el.textContent = formatNumber(Math.round(val));
+      }
+      m.el.style.opacity = (0.7 + Math.random() * 0.3).toString();
+    }
+
+    globalCoherence = parseFloat(metricsData.coherence.el.textContent);
+    document.getElementById('metric-coherence-bar').style.width = (globalCoherence * 100).toFixed(0) + '%';
+
+    for (var t = 0; t < temples.length; t++) {
+      if (temples[t].status === 'active' || temples[t].status === 'online') {
+        temples[t].coherence += (Math.random() - 0.48) * 0.03;
+        temples[t].coherence = clamp(temples[t].coherence, 0.3, 0.95);
+      }
+    }
+
+    var activeTemple = null;
+    for (var i = 0; i < temples.length; i++) {
+      if (temples[i].status === 'active') { activeTemple = temples[i]; break; }
+    }
+    if (activeTemple) {
+      document.getElementById('session-coherence').textContent = activeTemple.coherence.toFixed(2);
+    }
+  }
+
+  setInterval(updateMetrics, 4000);
+
+  // ════════════════════════════════════════════════════════
+  // HRV STRIP
+  // ════════════════════════════════════════════════════════
+
+  var hrvCanvas = document.getElementById('hrv-canvas');
+  var hrvCtx = hrvCanvas.getContext('2d');
+  var hrvHistory = [];
+  var HRV_MAX_POINTS = 100;
+
+  function updateHRV() {
+    hrvHistory.push(globalCoherence);
+    if (hrvHistory.length > HRV_MAX_POINTS) hrvHistory.shift();
+
+    var h = hrvCanvas.height;
+    hrvCtx.clearRect(0, 0, 2, h);
+    hrvCtx.beginPath();
+    hrvCtx.strokeStyle = '#5CC5C5';
+    hrvCtx.lineWidth = 1;
+
+    for (var i = 0; i < hrvHistory.length; i++) {
+      var segY = h - (i / HRV_MAX_POINTS) * h;
+      var xOffset = (hrvHistory[i] - 0.5) * 2;
+      if (i === 0) hrvCtx.moveTo(1 + xOffset, segY);
+      else hrvCtx.lineTo(1 + xOffset, segY);
+    }
+    hrvCtx.stroke();
+
+    document.getElementById('hrv-value').textContent = globalCoherence.toFixed(2);
+  }
+
+  setInterval(updateHRV, 2000);
+
+  // ════════════════════════════════════════════════════════
+  // LAYER 7: INTERACTION
+  // ════════════════════════════════════════════════════════
+
+  var interactive = document.getElementById('globe-interactive');
+
+  interactive.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragStartRotation = rotation;
+    e.preventDefault();
+  });
+
+  window.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    rotation = dragStartRotation + (e.clientX - dragStartX) * 0.005;
+  });
+
+  window.addEventListener('mouseup', function() { isDragging = false; });
+
+  interactive.addEventListener('touchstart', function(e) {
+    isDragging = true;
+    dragStartX = e.touches[0].clientX;
+    dragStartRotation = rotation;
+  }, { passive: true });
+
+  window.addEventListener('touchmove', function(e) {
+    if (!isDragging) return;
+    rotation = dragStartRotation + (e.touches[0].clientX - dragStartX) * 0.005;
+  });
+
+  window.addEventListener('touchend', function() { isDragging = false; });
+
+  // Temple click
+  interactive.addEventListener('click', function(e) {
+    var rect = container.getBoundingClientRect();
+    var svgScale = 700 / rect.width;
+    var clickX = (e.clientX - rect.left) * svgScale;
+    var clickY = (e.clientY - rect.top) * svgScale;
+
+    var closest = null;
+    var closestDist = Infinity;
+
+    for (var i = 0; i < temples.length; i++) {
+      if (!temples[i]._visible) continue;
+      var dist = Math.sqrt(Math.pow(clickX - temples[i]._screenX, 2) + Math.pow(clickY - temples[i]._screenY, 2));
+      if (dist < 25 && dist < closestDist) {
+        closest = temples[i];
+        closestDist = dist;
+      }
+    }
+
+    if (closest) showTempleDetail(closest);
+  });
+
+  function showTempleDetail(temple) {
+    document.getElementById('td-name').textContent = temple.name;
+    document.getElementById('td-location').textContent = temple.city + ' \u00B7 ' + Math.abs(temple.lat).toFixed(2) + '\u00B0' + (temple.lat >= 0 ? 'N' : 'S') + ', ' + Math.abs(temple.lon).toFixed(2) + '\u00B0' + (temple.lon >= 0 ? 'E' : 'W');
+    document.getElementById('td-coherence').textContent = temple.coherence.toFixed(2);
+    document.getElementById('td-sessions').textContent = temple.sessionsToday;
+    document.getElementById('td-bodies').textContent = temple.bodiesToday;
+    document.getElementById('td-phase').textContent = temple.phase;
+
+    var statusDot = document.getElementById('td-status-dot');
+    statusDot.className = 'temple-status-dot ' + temple.status;
+
+    var statusTexts = {
+      active: 'Live session in progress',
+      online: 'Temple online \u00B7 awaiting next session',
+      sleeping: 'Night side \u00B7 resting',
+      coming: 'Coming soon'
+    };
+    document.getElementById('td-status-text').textContent = statusTexts[temple.status] || '';
+
+    var facEl = document.getElementById('td-facilitator');
+    if (temple.facilitator !== '\u2014') {
+      facEl.textContent = '';
+      facEl.appendChild(document.createTextNode('Guided by ' + temple.facilitator + ' \u00B7 '));
+      var span = document.createElement('span');
+      span.textContent = temple.tier + ' Tier';
+      facEl.appendChild(span);
+      facEl.style.display = '';
+    } else {
+      facEl.style.display = 'none';
+    }
+
+    document.getElementById('temple-detail').classList.add('visible');
+    document.getElementById('temple-backdrop').classList.add('visible');
+  }
+
+  function closeTempleDetail() {
+    document.getElementById('temple-detail').classList.remove('visible');
+    document.getElementById('temple-backdrop').classList.remove('visible');
+  }
+
+  document.getElementById('temple-detail-close').addEventListener('click', closeTempleDetail);
+  document.getElementById('temple-backdrop').addEventListener('click', closeTempleDetail);
+  document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeTempleDetail(); });
+
+  // ════════════════════════════════════════════════════════
+  // LIVE SESSIONS FEED
+  // ════════════════════════════════════════════════════════
+
+  function buildFeedCards() {
+    var grid = document.getElementById('feed-grid');
+
+    for (var i = 0; i < temples.length; i++) {
+      var temple = temples[i];
+      if (temple.status !== 'active' && temple.status !== 'online') continue;
+
+      var isLive = temple.status === 'active';
+      var nodeCount = isLive ? temple.bodies : Math.floor(Math.random() * 4) + 2;
+
+      var card = document.createElement('div');
+      card.className = 'feed-card';
+
+      // Header
+      var header = document.createElement('div');
+      header.className = 'feed-card-header';
+
+      var templeName = document.createElement('div');
+      templeName.className = 'feed-card-temple';
+      templeName.textContent = temple.name;
+      header.appendChild(templeName);
+
+      var ringSvg = document.createElementNS(NS, 'svg');
+      ringSvg.setAttribute('class', 'feed-card-ring');
+      ringSvg.setAttribute('viewBox', '0 0 32 32');
+      var ringCircle = document.createElementNS(NS, 'circle');
+      ringCircle.setAttribute('cx', '16');
+      ringCircle.setAttribute('cy', '16');
+      ringCircle.setAttribute('r', '13');
+      ringCircle.setAttribute('fill', 'none');
+      ringCircle.setAttribute('stroke', isLive ? '#E8B84B' : '#4AADAD');
+      ringCircle.setAttribute('stroke-width', '0.6');
+      ringCircle.setAttribute('opacity', '0.5');
+      ringCircle.style.animation = 'breathe ' + (5 + i) + 's ease-in-out infinite';
+      ringSvg.appendChild(ringCircle);
+      var coreCircle = document.createElementNS(NS, 'circle');
+      coreCircle.setAttribute('cx', '16');
+      coreCircle.setAttribute('cy', '16');
+      coreCircle.setAttribute('r', '3');
+      coreCircle.setAttribute('fill', isLive ? '#C4922A' : '#2D7D7D');
+      coreCircle.setAttribute('opacity', '0.4');
+      coreCircle.style.animation = 'breatheScale ' + (4 + i) + 's ease-in-out infinite';
+      ringSvg.appendChild(coreCircle);
+      header.appendChild(ringSvg);
+
+      card.appendChild(header);
+
+      // Meta
+      var meta = document.createElement('div');
+      meta.className = 'feed-card-meta';
+      meta.textContent = temple.city + ' \u00B7 ' + nodeCount + ' bodies \u00B7 ' + (isLive ? 'Live' : 'Next session soon');
+      card.appendChild(meta);
+
+      // Coherence
+      var cohDiv = document.createElement('div');
+      cohDiv.className = 'feed-card-coherence';
+      var score = document.createElement('span');
+      score.className = 'feed-card-score';
+      score.textContent = temple.coherence.toFixed(2);
+      cohDiv.appendChild(score);
+      var barDiv = document.createElement('div');
+      barDiv.className = 'feed-card-bar';
+      var barFill = document.createElement('div');
+      barFill.className = 'feed-card-bar-fill';
+      barFill.style.width = (temple.coherence * 100).toFixed(0) + '%';
+      barDiv.appendChild(barFill);
+      cohDiv.appendChild(barDiv);
+      card.appendChild(cohDiv);
+
+      grid.appendChild(card);
+    }
+  }
+
+  // ════════════════════════════════════════════════════════
+  // DUST PARTICLES
+  // ════════════════════════════════════════════════════════
+
+  function createDust() {
+    if (reducedMotion) return;
+    var dustContainer = document.getElementById('hw-dust');
+    for (var i = 0; i < 25; i++) {
+      var d = document.createElement('div');
+      var size = 1 + Math.random() * 2;
+      var anim = Math.random() > 0.5 ? 'dustFloat' : 'dustFloat2';
+      var dur = 15 + Math.random() * 25;
+      var delay = -Math.random() * 30;
+      var color = Math.random() > 0.3 ? '#E8B84B' : '#F5D47A';
+      d.style.cssText = 'position:absolute;width:' + size + 'px;height:' + size + 'px;background:' + color + ';border-radius:50%;left:' + (Math.random()*100) + '%;top:' + (60+Math.random()*40) + '%;opacity:0;pointer-events:none;animation:' + anim + ' ' + dur + 's linear infinite;animation-delay:' + delay + 's;';
+      dustContainer.appendChild(d);
+    }
+  }
+
+  // ════════════════════════════════════════════════════════
+  // TEMPLE DOTS (Header)
+  // ════════════════════════════════════════════════════════
+
+  function createTempleDots() {
+    var dotsContainer = document.getElementById('temple-dots-container');
+    for (var i = 0; i < 12; i++) {
+      var dot = document.createElement('span');
+      dot.className = 'temple-dot';
+      dot.style.animation = 'breathe ' + (3 + Math.random() * 3) + 's ease-in-out infinite';
+      dot.style.animationDelay = (-i * 0.4) + 's';
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  // ════════════════════════════════════════════════════════
+  // STAT COUNTER
+  // ════════════════════════════════════════════════════════
+
+  function animateStats() {
+    var statEls = document.querySelectorAll('.stat-value[data-count]');
+    for (var s = 0; s < statEls.length; s++) {
+      (function(el) {
+        var target = parseFloat(el.dataset.count);
+        var suffix = el.dataset.suffix || '';
+        var decimals = parseInt(el.dataset.decimals) || 0;
+        var start = performance.now();
+        function step(now) {
+          var progress = Math.min((now - start) / 2000, 1);
+          var ease = 1 - Math.pow(1 - progress, 3);
+          el.textContent = (decimals ? (target * ease).toFixed(decimals) : Math.round(target * ease)) + suffix;
+          if (progress < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      })(statEls[s]);
+    }
+    var barEls = document.querySelectorAll('.stat-bar-fill[data-width]');
+    for (var b = 0; b < barEls.length; b++) {
+      barEls[b].style.width = barEls[b].dataset.width + '%';
+    }
+  }
+
+  // ════════════════════════════════════════════════════════
+  // INTERSECTION OBSERVER
+  // ════════════════════════════════════════════════════════
+
+  var observer = new IntersectionObserver(function(entries) {
+    for (var e = 0; e < entries.length; e++) {
+      if (entries[e].isIntersecting) {
+        entries[e].target.classList.add('visible');
+        if (entries[e].target.closest('.science') && entries[e].target.querySelector('.stat-value')) {
+          animateStats();
+        }
+        if (entries[e].target.id === 'coherence-field') {
+          initCoherenceField();
+        }
+        observer.unobserve(entries[e].target);
+      }
+    }
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  var reveals = document.querySelectorAll('.reveal');
+  for (var r = 0; r < reveals.length; r++) observer.observe(reveals[r]);
+
+  // Smooth scroll
+  var navLinks = document.querySelectorAll('.header-nav a[href^="#"]');
+  for (var n = 0; n < navLinks.length; n++) {
+    navLinks[n].addEventListener('click', function(e) {
+      e.preventDefault();
+      var target = document.querySelector(this.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  // ════════════════════════════════════════════════════════
+  // SESSION PHASE SIMULATION
+  // ════════════════════════════════════════════════════════
+
+  var phases = ['Arrival', 'Descent', 'Depth', 'Emergence', 'Return'];
+  var phaseIdx = 2;
+  var phaseProgress = 68;
+
+  setInterval(function() {
+    phaseProgress += 0.5;
+    if (phaseProgress > 100) {
+      phaseProgress = 0;
+      phaseIdx = (phaseIdx + 1) % phases.length;
+      document.getElementById('session-phase').textContent = phases[phaseIdx];
+      for (var i = 0; i < temples.length; i++) {
+        if (temples[i].status === 'active') { temples[i].phase = phases[phaseIdx]; break; }
+      }
+    }
+    document.getElementById('session-bar-fill').style.width = phaseProgress.toFixed(0) + '%';
+  }, 1000);
+
+  // ════════════════════════════════════════════════════════
+  // MAIN ANIMATION LOOP
+  // ════════════════════════════════════════════════════════
+
+  var frameCount = 0;
+  var SVG_UPDATE_INTERVAL = 3;
+
+  function animate() {
+    if (!isDragging && !reducedMotion) {
+      rotation += 0.0007;
+    }
+    renderGlobe();
+
+    if (frameCount % SVG_UPDATE_INTERVAL === 0) {
+      renderHexGrid();
+      renderTempleNodes();
+      renderLeyLines();
+    }
+
+    frameCount++;
+    requestAnimationFrame(animate);
+  }
+
+  // ════════════════════════════════════════════════════════
+  // INITIALIZATION
+  // ════════════════════════════════════════════════════════
+
+  function init() {
+    initCanvas();
+    initHexGrid();
+    loadEarthTexture();
+    createDust();
+    createTempleDots();
+    buildFeedCards();
+
+    window.addEventListener('resize', initCanvas);
+
+    if (reducedMotion) {
+      renderFallbackGlobe(globeSize / 2, globeSize / 2, globeRadius);
+      renderHexGrid();
+      renderTempleNodes();
+      renderLeyLines();
+    } else {
+      requestAnimationFrame(animate);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // ════════════════════════════════════════════════════════
+  // COHERENCE FIELD — Hexagonal Network Visualization
+  // ════════════════════════════════════════════════════════
+
+  var cfInitialized = false;
+  var cfHexes = [];
+  var cfTemples = [
+    { name: 'Bathhouse ATX',   cx: 520, cy: 400, status: 'broadcast', coherence: 0.92 },
+    { name: 'Red Rock Sedona', cx: 740, cy: 240, status: 'active',    coherence: 0.78 },
+    { name: 'Cenote Tulum',    cx: 280, cy: 320, status: 'active',    coherence: 0.71 },
+    { name: 'Ubud Bali',       cx: 980, cy: 180, status: 'online',    coherence: 0.45 },
+    { name: 'Sierra Tahoe',    cx: 380, cy: 160, status: 'online',    coherence: 0.52 }
+  ];
+  var cfConnectionDefs = [
+    { from: 0, to: 1, id: 'cf-conn-0-1' },
+    { from: 0, to: 2, id: 'cf-conn-0-2' },
+    { from: 0, to: 3, id: 'cf-conn-0-3' },
+    { from: 0, to: 4, id: 'cf-conn-0-4' },
+    { from: 1, to: 2, id: 'cf-conn-1-2' }
+  ];
+  var cfConnGradStops = [];
+  var CF_SVG_NS = 'http://www.w3.org/2000/svg';
+
+  function cfMkEl(tag) { return document.createElementNS(CF_SVG_NS, tag); }
+
+  function cfLerp(a, b, t) { return a + (b - a) * t; }
+
+  function cfCoherenceToColor(c) {
+    var r, g, b, t;
+    if (c < 0.35) {
+      t = c / 0.35;
+      r = Math.round(cfLerp(0x0D, 0x2D, t));
+      g = Math.round(cfLerp(0x40, 0x7D, t));
+      b = Math.round(cfLerp(0x38, 0x7D, t));
+    } else if (c < 0.70) {
+      t = (c - 0.35) / 0.35;
+      r = Math.round(cfLerp(0x2D, 0x4A, t));
+      g = Math.round(cfLerp(0x7D, 0xAD, t));
+      b = Math.round(cfLerp(0x7D, 0xAD, t));
+    } else {
+      t = (c - 0.70) / 0.30;
+      r = Math.round(cfLerp(0x4A, 0xE8, t));
+      g = Math.round(cfLerp(0xAD, 0xB8, t));
+      b = Math.round(cfLerp(0xAD, 0x4B, t));
+    }
+    return 'rgb(' + r + ',' + g + ',' + b + ')';
+  }
+
+  function cfHexPoints(cx, cy, R) {
+    var pts = [];
+    for (var i = 0; i < 6; i++) {
+      var angle = Math.PI / 3 * i + Math.PI / 6;
+      pts.push((cx + R * Math.cos(angle)).toFixed(1) + ',' + (cy + R * Math.sin(angle)).toFixed(1));
+    }
+    return pts.join(' ');
+  }
+
+  function cfTempleInfluence(x, y) {
+    var best = 0;
+    for (var i = 0; i < cfTemples.length; i++) {
+      var t = cfTemples[i];
+      if (t.status === 'online') continue;
+      var dx = x - t.cx, dy = y - t.cy;
+      var dist = Math.sqrt(dx * dx + dy * dy);
+      var strength = t.status === 'broadcast' ? 1.0 : 0.72;
+      var inf = strength * Math.max(0, 1 - dist / 420);
+      if (inf > best) best = inf;
+    }
+    return Math.max(0.05, Math.min(0.95, best * 0.88 + 0.05));
+  }
+
+  function initCoherenceField() {
+    if (cfInitialized) return;
+    cfInitialized = true;
+
+    var R = 36;
+    var colW = R * Math.sqrt(3);
+    var rowH = R * 1.5;
+    var W = 1200, H = 580;
+
+    var hexLayer  = document.getElementById('cf-hex-layer');
+    var connLayer = document.getElementById('cf-connection-layer');
+    var broadLayer= document.getElementById('cf-broadcast-layer');
+    var nodeLayer = document.getElementById('cf-node-layer');
+    var labelLayer= document.getElementById('cf-label-layer');
+    var cfDefs    = document.querySelector('#cf-svg defs');
+    if (!hexLayer) return;
+
+    // Hex grid
+    var cols = Math.ceil(W / colW) + 2;
+    var rows = Math.ceil(H / rowH) + 2;
+    for (var row = -1; row < rows; row++) {
+      for (var col = -1; col < cols; col++) {
+        var hx = col * colW + (row % 2 !== 0 ? colW / 2 : 0);
+        var hy = row * rowH;
+        if (hx < -R * 2 || hx > W + R * 2 || hy < -R * 2 || hy > H + R * 2) continue;
+        var c = cfTempleInfluence(hx, hy);
+        var color = cfCoherenceToColor(c);
+        var dur = (10 + Math.random() * 12).toFixed(1);
+        var dly = '-' + (Math.random() * 18).toFixed(1) + 's';
+        var poly = cfMkEl('polygon');
+        poly.setAttribute('points', cfHexPoints(hx, hy, R - 1.5));
+        poly.setAttribute('fill', color);
+        poly.setAttribute('stroke', color);
+        poly.setAttribute('stroke-width', '0.5');
+        poly.setAttribute('fill-opacity', (0.07 + c * 0.13).toFixed(3));
+        poly.setAttribute('stroke-opacity', (0.10 + c * 0.16).toFixed(3));
+        poly.style.cssText = '--hex-base-opacity:' + (0.05 + c * 0.09).toFixed(3) + ';--hex-peak-opacity:' + (0.13 + c * 0.20).toFixed(3) + ';animation:hexBreathe ' + dur + 's ease-in-out ' + dly + ' infinite;';
+        hexLayer.appendChild(poly);
+        cfHexes.push({ cx: hx, cy: hy, coherence: c, el: poly });
+      }
+    }
+
+    // Connection gradients + lines
+    for (var ci = 0; ci < cfConnectionDefs.length; ci++) {
+      var cd = cfConnectionDefs[ci];
+      var ta = cfTemples[cd.from], tb = cfTemples[cd.to];
+      var gId = cd.id + '-grad';
+      var grad = cfMkEl('linearGradient');
+      grad.setAttribute('id', gId);
+      grad.setAttribute('gradientUnits', 'userSpaceOnUse');
+      grad.setAttribute('x1', String(ta.cx)); grad.setAttribute('y1', String(ta.cy));
+      grad.setAttribute('x2', String(tb.cx)); grad.setAttribute('y2', String(tb.cy));
+      var s0 = cfMkEl('stop');
+      s0.setAttribute('offset', '0%');
+      s0.setAttribute('stop-color', cfCoherenceToColor(ta.coherence));
+      var s1 = cfMkEl('stop');
+      s1.setAttribute('offset', '100%');
+      s1.setAttribute('stop-color', cfCoherenceToColor(tb.coherence));
+      grad.appendChild(s0); grad.appendChild(s1);
+      cfDefs.appendChild(grad);
+      var ln = cfMkEl('line');
+      ln.setAttribute('x1', String(ta.cx)); ln.setAttribute('y1', String(ta.cy));
+      ln.setAttribute('x2', String(tb.cx)); ln.setAttribute('y2', String(tb.cy));
+      ln.setAttribute('stroke', 'url(#' + gId + ')');
+      ln.setAttribute('stroke-width', '1.4');
+      ln.setAttribute('stroke-opacity', '0.38');
+      ln.style.animation = 'connectionPulse ' + (4 + Math.random() * 4).toFixed(1) + 's ease-in-out infinite';
+      connLayer.appendChild(ln);
+      cfConnGradStops.push({ s0: s0, s1: s1, fromIdx: cd.from, toIdx: cd.to });
+    }
+
+    // Broadcast source (ATX)
+    var bc = cfTemples[0];
+    var bglow = cfMkEl('circle');
+    bglow.setAttribute('cx', String(bc.cx)); bglow.setAttribute('cy', String(bc.cy));
+    bglow.setAttribute('r', '90');
+    bglow.setAttribute('fill', 'url(#cf-broadcast-glow)');
+    broadLayer.appendChild(bglow);
+    for (var ri = 0; ri < 3; ri++) {
+      var ring = cfMkEl('circle');
+      ring.setAttribute('cx', String(bc.cx)); ring.setAttribute('cy', String(bc.cy));
+      ring.setAttribute('r', '6');
+      ring.setAttribute('fill', 'none');
+      ring.setAttribute('stroke', '#F5D47A');
+      ring.setAttribute('stroke-width', '2');
+      ring.style.animation = 'broadcastRing ' + (4 + ri * 1.6).toFixed(1) + 's ease-out -' + (ri * 1.8).toFixed(1) + 's infinite';
+      broadLayer.appendChild(ring);
+    }
+    var innerOrb = cfMkEl('circle');
+    innerOrb.setAttribute('cx', String(bc.cx)); innerOrb.setAttribute('cy', String(bc.cy));
+    innerOrb.setAttribute('r', '12');
+    innerOrb.setAttribute('fill', 'url(#cf-node-gold)');
+    innerOrb.setAttribute('filter', 'url(#cf-node-glow)');
+    broadLayer.appendChild(innerOrb);
+    var specular = cfMkEl('circle');
+    specular.setAttribute('cx', String(bc.cx - 4)); specular.setAttribute('cy', String(bc.cy - 4));
+    specular.setAttribute('r', '3');
+    specular.setAttribute('fill', 'rgba(255,255,255,0.55)');
+    broadLayer.appendChild(specular);
+
+    // Temple nodes
+    for (var ti = 1; ti < cfTemples.length; ti++) {
+      var t = cfTemples[ti];
+      var isActive = t.status === 'active';
+      var zone = cfMkEl('circle');
+      zone.setAttribute('cx', String(t.cx)); zone.setAttribute('cy', String(t.cy));
+      zone.setAttribute('r', isActive ? '64' : '40');
+      zone.setAttribute('fill', isActive ? '#4AADAD' : '#2D7D7D');
+      zone.setAttribute('fill-opacity', isActive ? '0.08' : '0.04');
+      zone.setAttribute('stroke', isActive ? '#5CC5C5' : '#2D7D7D');
+      zone.setAttribute('stroke-width', '0.5');
+      zone.setAttribute('stroke-opacity', '0.22');
+      nodeLayer.appendChild(zone);
+      var orb = cfMkEl('circle');
+      orb.setAttribute('cx', String(t.cx)); orb.setAttribute('cy', String(t.cy));
+      orb.setAttribute('r', isActive ? '9' : '6');
+      orb.setAttribute('fill', isActive ? 'url(#cf-node-teal)' : 'url(#cf-node-jade)');
+      orb.setAttribute('filter', 'url(#cf-node-glow)');
+      nodeLayer.appendChild(orb);
+      var nodeRing = cfMkEl('circle');
+      nodeRing.setAttribute('cx', String(t.cx)); nodeRing.setAttribute('cy', String(t.cy));
+      nodeRing.setAttribute('r', isActive ? '14' : '10');
+      nodeRing.setAttribute('fill', 'none');
+      nodeRing.setAttribute('stroke', isActive ? '#5CC5C5' : '#4AADAD');
+      nodeRing.setAttribute('stroke-width', '0.6');
+      nodeRing.setAttribute('stroke-opacity', '0.4');
+      nodeLayer.appendChild(nodeRing);
+    }
+
+    // Labels
+    for (var li = 0; li < cfTemples.length; li++) {
+      var t = cfTemples[li];
+      var isBc = t.status === 'broadcast';
+      var g = cfMkEl('g');
+      var nameEl = cfMkEl('text');
+      nameEl.setAttribute('x', String(t.cx));
+      nameEl.setAttribute('y', String(t.cy + (isBc ? 30 : 22)));
+      nameEl.setAttribute('text-anchor', 'middle');
+      nameEl.setAttribute('font-family', "'DM Mono', monospace");
+      nameEl.setAttribute('font-size', '8');
+      nameEl.setAttribute('letter-spacing', '0.12em');
+      nameEl.setAttribute('fill', isBc ? '#F5D47A' : 'rgba(242,234,216,0.65)');
+      nameEl.textContent = t.name.toUpperCase();
+      g.appendChild(nameEl);
+      var cohEl = cfMkEl('text');
+      cohEl.setAttribute('x', String(t.cx));
+      cohEl.setAttribute('y', String(t.cy + (isBc ? 42 : 33)));
+      cohEl.setAttribute('text-anchor', 'middle');
+      cohEl.setAttribute('font-family', "'DM Mono', monospace");
+      cohEl.setAttribute('font-size', '7');
+      cohEl.setAttribute('fill', 'rgba(92,197,197,0.55)');
+      cohEl.setAttribute('data-cf-coh', String(li));
+      cohEl.textContent = t.coherence.toFixed(2);
+      g.appendChild(cohEl);
+      labelLayer.appendChild(g);
+    }
+
+    if (!reducedMotion) {
+      setInterval(updateCoherenceField, 2000);
+    }
+  }
+
+  function updateCoherenceField() {
+    var cfSvg = document.getElementById('cf-svg');
+    if (!cfSvg) return;
+    var rect = cfSvg.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+    // Drift temple coherence
+    for (var ti = 0; ti < cfTemples.length; ti++) {
+      cfTemples[ti].coherence = Math.max(0.05, Math.min(0.95, cfTemples[ti].coherence + (Math.random() - 0.5) * 0.08));
+    }
+
+    // Update gradient stops
+    for (var ci = 0; ci < cfConnGradStops.length; ci++) {
+      var cg = cfConnGradStops[ci];
+      cg.s0.setAttribute('stop-color', cfCoherenceToColor(cfTemples[cg.fromIdx].coherence));
+      cg.s1.setAttribute('stop-color', cfCoherenceToColor(cfTemples[cg.toIdx].coherence));
+    }
+
+    // Drift a random 20% of hexes
+    var sample = Math.floor(cfHexes.length * 0.2);
+    for (var hi = 0; hi < sample; hi++) {
+      var h = cfHexes[Math.floor(Math.random() * cfHexes.length)];
+      h.coherence = Math.max(0.05, Math.min(0.95, h.coherence + (Math.random() - 0.5) * 0.04));
+      var color = cfCoherenceToColor(h.coherence);
+      h.el.setAttribute('fill', color);
+      h.el.setAttribute('stroke', color);
+      h.el.setAttribute('fill-opacity', (0.07 + h.coherence * 0.13).toFixed(3));
+      h.el.setAttribute('stroke-opacity', (0.10 + h.coherence * 0.16).toFixed(3));
+    }
+
+    // Update label coherence readouts
+    var cohLabels = document.querySelectorAll('[data-cf-coh]');
+    for (var cl = 0; cl < cohLabels.length; cl++) {
+      var idx = parseInt(cohLabels[cl].getAttribute('data-cf-coh'), 10);
+      cohLabels[cl].textContent = cfTemples[idx].coherence.toFixed(2);
+    }
+  }
+
+})();
+</script>
+</body>
+</html>

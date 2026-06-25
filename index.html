@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundTemple — Index</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --void:        #05030C;
+  --cream:       #F2EAD8;
+  --gold:        #C4922A;
+  --gold-light:  #E8B84B;
+  --teal:        #4AADAD;
+  --teal-bright: #5CC5C5;
+  --violet:      #6B3FA0;
+  --violet-mid:  #8B5FCA;
+  --muted:       rgba(242,234,216,0.45);
+  --border:      rgba(242,234,216,0.07);
+  --font-serif:  'Cormorant Garamond', Georgia, serif;
+  --font-mono:   'DM Mono', monospace;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--void);
+  color: var(--cream);
+  font-family: var(--font-mono);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ─────────────────────────────── */
+header {
+  padding: clamp(40px, 7vw, 72px) clamp(28px, 7vw, 80px) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.wordmark {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--teal-bright);
+}
+
+.headline {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  line-height: 1.1;
+  color: var(--cream);
+}
+
+.sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  line-height: 1.9;
+  color: var(--muted);
+  max-width: 420px;
+}
+
+/* ── DIVIDER ─────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: clamp(32px, 5vw, 52px) clamp(28px, 7vw, 80px) 0;
+}
+
+/* ── DOCUMENT LIST ───────────────────────── */
+.doc-list {
+  flex: 1;
+  padding: 0 clamp(28px, 7vw, 80px) clamp(64px, 9vw, 96px);
+  margin-top: clamp(2px, 0.5vw, 6px);
+  list-style: none;
+}
+
+.doc-item {
+  border-bottom: 1px solid var(--border);
+}
+
+.doc-link {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: 24px;
+  padding: clamp(22px, 3vw, 32px) 0;
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.doc-link::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+  opacity: 0.2;
+}
+.doc-link:hover::after { transform: scaleX(1); }
+
+/* Number */
+.doc-num {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  padding-top: 3px;
+  flex-shrink: 0;
+}
+
+/* Main text */
+.doc-body { display: flex; flex-direction: column; gap: 5px; }
+
+.doc-title {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  line-height: 1.15;
+  transition: color 0.3s ease;
+}
+
+.doc-desc {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.07em;
+  line-height: 1.8;
+  color: var(--muted);
+  max-width: 520px;
+  transition: color 0.3s ease;
+}
+
+/* Arrow */
+.doc-arrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: transform 0.3s ease, color 0.3s ease;
+  padding-left: 16px;
+}
+
+/* Hover states per accent */
+.doc-link.accent-violet:hover { color: var(--violet-mid); }
+.doc-link.accent-teal:hover   { color: var(--teal-bright); }
+.doc-link.accent-gold:hover   { color: var(--gold-light); }
+
+.doc-link:hover .doc-arrow {
+  transform: translateX(6px);
+  color: inherit;
+}
+.doc-link:hover .doc-desc { color: rgba(242,234,216,0.65); }
+
+/* ── FOOTER ─────────────────────────────── */
+footer {
+  padding: clamp(20px, 3vw, 32px) clamp(28px, 7vw, 80px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.foot-l, .foot-r {
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+}
+
+/* ── RESPONSIVE ──────────────────────────── */
+@media (max-width: 600px) {
+  .doc-link {
+    grid-template-columns: 32px 1fr;
+    gap: 14px;
+  }
+  .doc-arrow { display: none; }
+  footer { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <span class="wordmark">SoundTemple</span>
+  <h1 class="headline">Five documents.<br>One movement.</h1>
+  <p class="sub">The full picture of what SoundTemple is, how it looks, and how to enter it — from the first felt resonance to the planetary grid.</p>
+</header>
+
+<div class="divider"></div>
+
+<ul class="doc-list">
+
+  <li class="doc-item">
+    <a href="landing.html" class="doc-link accent-violet">
+      <span class="doc-num">01</span>
+      <div class="doc-body">
+        <span class="doc-title">The Landing</span>
+        <span class="doc-desc">The primary narrative — what SoundTemple is, how it works, who it's for, and the three doors to enter.</span>
+      </div>
+      <span class="doc-arrow">→</span>
+    </a>
+  </li>
+
+  <li class="doc-item">
+    <a href="brand-showcase.html" class="doc-link accent-teal">
+      <span class="doc-num">02</span>
+      <div class="doc-body">
+        <span class="doc-title">Brand Showcase</span>
+        <span class="doc-desc">Color system, typography, photography direction, and the sonic arc — the complete visual and voice language.</span>
+      </div>
+      <span class="doc-arrow">→</span>
+    </a>
+  </li>
+
+  <li class="doc-item">
+    <a href="look-book.html" class="doc-link accent-gold">
+      <span class="doc-num">03</span>
+      <div class="doc-body">
+        <span class="doc-title">Look Book</span>
+        <span class="doc-desc">The visual world — images, materials, environments, and emotional states the brand inhabits.</span>
+      </div>
+      <span class="doc-arrow">→</span>
+    </a>
+  </li>
+
+  <li class="doc-item">
+    <a href="heart-weather.html" class="doc-link accent-teal">
+      <span class="doc-num">04</span>
+      <div class="doc-body">
+        <span class="doc-title">Heart Weather</span>
+        <span class="doc-desc">A real-time dashboard showing active sessions, bodies on beds, and global coherence — the nervous system of the movement made visible.</span>
+      </div>
+      <span class="doc-arrow">→</span>
+    </a>
+  </li>
+
+  <li class="doc-item">
+    <a href="logo-explorations.html" class="doc-link accent-gold">
+      <span class="doc-num">05</span>
+      <div class="doc-body">
+        <span class="doc-title">Logo Explorations</span>
+        <span class="doc-desc">Logo concepts and coherence field system marks — the graphic language that anchors the brand across every touchpoint.</span>
+      </div>
+      <span class="doc-arrow">→</span>
+    </a>
+  </li>
+
+</ul>
+
+<footer>
+  <span class="foot-l">© 2026 Light Pump Labs · SoundTemple</span>
+  <span class="foot-r">A movement towards global coherence</span>
+</footer>
+
+</body>
+</html>

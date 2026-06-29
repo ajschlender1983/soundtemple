@@ -215,6 +215,17 @@
     SPRITES.push(cv);
   }
   function spriteFor(c){return SPRITES[Math.max(0,Math.min(BUCKETS-1,Math.round(c*(BUCKETS-1))))];}
+  // wide aura sprites — hollow center (energy peaks outward), drawn with 'screen' blend so clusters pool, not blow out
+  var AURA=[],ASPR=256;
+  for(var ab=0;ab<BUCKETS;ab++){
+    var acv=document.createElement('canvas');acv.width=acv.height=ASPR;
+    var ag=acv.getContext('2d');var argb=coherenceRGB(ab/(BUCKETS-1));
+    var arg=ag.createRadialGradient(ASPR/2,ASPR/2,0,ASPR/2,ASPR/2,ASPR/2);
+    arg.addColorStop(0.00,rgba(argb,0.0));arg.addColorStop(0.30,rgba(argb,0.06));
+    arg.addColorStop(0.62,rgba(argb,0.11));arg.addColorStop(1.00,rgba(argb,0.0));
+    ag.fillStyle=arg;ag.fillRect(0,0,ASPR,ASPR);AURA.push(acv);
+  }
+  function auraFor(c){return AURA[Math.max(0,Math.min(BUCKETS-1,Math.round(c*(BUCKETS-1))))];}
 
   var CARTO='https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png';
   var map=new maplibregl.Map({
@@ -227,6 +238,14 @@
     pitchWithRotate:false,renderWorldCopies:false
   });
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),'bottom-left');
+  map.on('moveend',function(){fieldDirty=true;});
+  map.on('zoomend',function(){fieldDirty=true;});
+  // embed mode (used by the landing-page hero): cleaner chrome, no scroll-zoom hijack
+  var EMBED=/[?&]embed=1/.test(location.search);
+  if(EMBED){ try{map.scrollZoom.disable();}catch(e){}
+    var _tb=document.querySelector('.topbar'); if(_tb)_tb.style.display='none';
+    var _ly=document.getElementById('layers'); if(_ly)_ly.style.display='none';
+    var _cr=document.getElementById('crumb'); if(_cr)_cr.style.display='none'; }
 
   var fx=document.getElementById('fx'),fctx=fx.getContext('2d'),DPR=Math.min(2,window.devicePixelRatio||1);
   function sizeFX(){fx.width=fx.clientWidth*DPR;fx.height=fx.clientHeight*DPR;fctx.setTransform(DPR,0,0,DPR,0,0);}
@@ -248,7 +267,7 @@
   }).catch(function(e){console.error('data load failed',e);});
 
   var booted=false;
-  map.on('resize',sizeFX);
+  map.on('resize',function(){sizeFX();fieldDirty=true;});
   function boot(){
     if(booted)return;booted=true;
     sizeFX();
@@ -288,38 +307,98 @@
     return LOC.map(function(l){return{type:'loc',ref:l,lng:l.lon,lat:l.lat,c:l.coherence,big:true};});
   }
 
+  // ── hex heat field (interlocking, undulating, coherence-driven; "data is the mask") ──
+  var hexes=null,fieldDirty=true,HEXR_BASE=30,SIGMA=92;
+  function buildHexField(){
+    var z=map.getZoom();var R=HEXR_BASE*Math.max(1,Math.min(2.2,1+(z-3.4)*0.18));
+    var W=fx.clientWidth,H=fx.clientHeight;
+    var pts=[];for(var i=0;i<LOC.length;i++){var p=map.project([LOC[i].lon,LOC[i].lat]);pts.push({x:p.x,y:p.y,c:LOC[i].coherence});}
+    var hcw=1.5*R,hrh=Math.sqrt(3)*R,cols=Math.ceil(W/hcw)+2,rows=Math.ceil(H/hrh)+2,s2=2*SIGMA*SIGMA,lim=s2*9,arr=[];
+    for(var col=-1;col<cols;col++)for(var row=-1;row<rows;row++){
+      var cx=col*hcw,cy=row*hrh+((col&1)?hrh/2:0),w=0,wc=0;
+      for(var k=0;k<pts.length;k++){var dx=cx-pts[k].x,dy=cy-pts[k].y,d2=dx*dx+dy*dy;if(d2>lim)continue;var e=Math.exp(-d2/s2);w+=e;wc+=e*pts[k].c;}
+      if(w<0.012)continue; // ocean / empty → no hex (the node distribution is the landmask)
+      arr.push({x:cx,y:cy,R:R,coh:wc/w,a:Math.min(0.06,Math.pow(Math.min(1,w),0.8)*0.07),ph:cx*0.012+cy*0.012});
+    }
+    hexes=arr;fieldDirty=false;
+  }
+  function drawHexField(T,calm){
+    if(!hexes)return;fctx.globalCompositeOperation='source-over';fctx.lineWidth=1;
+    for(var i=0;i<hexes.length;i++){var h=hexes[i];
+      var u=REDUCED?0.7:Math.max(0,Math.min(1,0.5+0.5*Math.sin(T*(2*Math.PI/11)+h.ph)+0.22*Math.sin(T*0.21+h.x*0.004)));
+      var a=h.a*(0.5+0.5*u)*calm;if(a<0.004)continue;
+      var r=h.R*(0.95+0.05*u),rgb=coherenceRGB(h.coh);
+      fctx.strokeStyle=rgba(rgb,a);fctx.beginPath();
+      for(var v=0;v<6;v++){var ang=v*Math.PI/3,px=h.x+r*Math.cos(ang),py=h.y+r*Math.sin(ang);if(v===0)fctx.moveTo(px,py);else fctx.lineTo(px,py);}
+      fctx.closePath();fctx.stroke();
+    }
+  }
+  function drawTempleMark(f,z,calm){
+    var c=f.c,breath=f.bright,rgb=coherenceRGB(c);
+    var ringR=(7+Math.min(10,(z-3.4)*1.6))*(0.9+0.2*breath);
+    fctx.strokeStyle='rgba(5,3,12,0.55)';fctx.lineWidth=2.6;fctx.beginPath();fctx.arc(f.x,f.y,ringR*0.5,0,7);fctx.stroke();
+    fctx.strokeStyle=rgba(rgb,0.88);fctx.lineWidth=1.4;fctx.beginPath();fctx.arc(f.x,f.y,ringR,0,7);fctx.stroke();
+    fctx.lineWidth=1;fctx.strokeStyle=rgba(rgb,0.5*calm+0.1);
+    for(var t=0;t<6;t++){var a=t*Math.PI/3;fctx.beginPath();fctx.moveTo(f.x+Math.cos(a)*ringR,f.y+Math.sin(a)*ringR);fctx.lineTo(f.x+Math.cos(a)*(ringR+2.4),f.y+Math.sin(a)*(ringR+2.4));fctx.stroke();}
+    fctx.fillStyle=c>0.7?'#E8B84B':'#5CC5C5';fctx.beginPath();fctx.arc(f.x,f.y,2.6,0,7);fctx.fill();
+  }
+  function drawTempleLabels(fr,z){
+    var T=[];for(var i=0;i<fr.length;i++)if(fr[i].type==='loc')T.push(fr[i]);
+    T.sort(function(a,b){return b.c-a.c;});T=T.slice(0,16);
+    fctx.globalCompositeOperation='source-over';fctx.textBaseline='top';
+    for(var i=0;i<T.length;i++){var f=T[i];
+      fctx.font="italic 12px 'Cormorant Garamond', serif";fctx.shadowColor='rgba(5,3,12,0.92)';fctx.shadowBlur=8;
+      fctx.fillStyle='rgba(242,234,216,0.82)';fctx.fillText(f.s.ref.name,f.x+11,f.y+6);
+      if(z>=8){fctx.shadowBlur=4;fctx.font="9px 'DM Mono', monospace";fctx.fillStyle='rgba(242,234,216,0.46)';fctx.fillText(f.s.ref.city+' · '+f.c.toFixed(2),f.x+11,f.y+22);}
+    }
+    fctx.shadowBlur=0;
+  }
+
   function loop(now){
     requestAnimationFrame(loop);
     if(!map)return;
     var _t=map.project([-96,38.5]); if(!_t||!isFinite(_t.x))return; // wait only until projection is ready (independent of tile/style load)
     var W=fx.clientWidth,H=fx.clientHeight;
     fctx.clearRect(0,0,W,H);
-    if(layer==='circadian') drawCircadian(W,H);
-    var set=activeSet();rendered=[];
     var T=(now-t0)/1000;
     var moving=map.isMoving&&map.isMoving();
+    var calm=(moving&&!REDUCED)?0.6:1;
+    if((fieldDirty||!hexes)&&LOC.length&&!moving) buildHexField();
+    drawHexField(T,calm);                                  // 1) hex heat field (bottom, source-over)
+    if(layer==='circadian'){fctx.globalCompositeOperation='source-over';drawCircadian(W,H);} // 2) circadian wash
     var waveFront=null;
     if(introWaveStart){var e=(now-introWaveStart)/2600;if(e>=1.15)introWaveStart=0;else waveFront=e*1.25-0.1;}
-    fctx.globalCompositeOperation='lighter';
-    for(var i=0;i<set.length;i++){
-      var s=set[i];var p=map.project([s.lng,s.lat]);
-      if(p.x<-60||p.x>W+60||p.y<-60||p.y>H+60)continue;
+    // build per-node frame data (project once)
+    var set=activeSet();rendered=[];var fr=[];
+    for(var i=0;i<set.length;i++){var s=set[i];var p=map.project([s.lng,s.lat]);
+      if(p.x<-90||p.x>W+90||p.y<-90||p.y>H+90)continue;
       var period=s.type==='user'?s.ref.breathRate:(6+s.c*6);
       var phase=s.type==='user'?s.ref.phaseOffset:(i%7);
       var breath=REDUCED?0.7:(0.5+0.5*Math.sin(T*(2*Math.PI/period)+phase));
       if(moving&&!REDUCED) breath=0.45;
+      var auraBreath=REDUCED?0.7:(0.5+0.25*Math.sin(T*(2*Math.PI/period)+phase-0.6));
       var base=s.big?(10+s.c*22+(s.ref.userCount||0)*0.06):(3.2+s.c*5.5);
-      var rad=base*(0.72+0.5*breath);
-      var bright=0.5+0.5*breath;
+      var rad=base*(0.72+0.5*breath),bright=0.5+0.5*breath;
       if(waveFront!=null){var dx=p.x/W-waveFront;var near=Math.exp(-(dx*dx)/0.006);bright=Math.min(1,bright+near*1.1);rad*=1+near*0.6;}
-      var spr=spriteFor(s.c);var d=rad*2;
-      fctx.globalAlpha=Math.min(1,(s.big?0.5:0.32)+bright*0.5);
-      fctx.drawImage(spr,p.x-rad,p.y-rad,d,d);
-      fctx.globalAlpha=Math.min(1,bright*(s.big?0.9:0.6));
-      var rgb=coherenceRGB(s.c);fctx.fillStyle=rgba(rgb,1);
-      fctx.beginPath();fctx.arc(p.x,p.y,s.big?2.6:1.5,0,7);fctx.fill();
-      rendered.push({x:p.x,y:p.y,r:rad,hit:Math.max(s.big?16:10,rad),s:s});
+      fr.push({s:s,x:p.x,y:p.y,c:s.c,big:s.big,type:s.type,base:base,rad:rad,bright:bright,auraBreath:auraBreath});
+      rendered.push({x:p.x,y:p.y,r:rad,hit:Math.max(s.big?18:10,rad),s:s});
     }
+    // 3) wide auras — 'screen' so clusters pool into rich color, not white mud
+    fctx.globalCompositeOperation='screen';
+    for(var i=0;i<fr.length;i++){var f=fr[i];var mult=f.big?3.4:2.6;var ar=f.base*mult*(0.88+0.24*f.auraBreath);
+      fctx.globalAlpha=Math.min(0.13,(f.big?0.11:0.07)*(0.7+0.6*f.auraBreath))*calm;
+      fctx.drawImage(auraFor(f.c),f.x-ar,f.y-ar,ar*2,ar*2);}
+    // 4) midglow (lighter) + user cores
+    fctx.globalCompositeOperation='lighter';
+    for(var i=0;i<fr.length;i++){var f=fr[i];var d=f.rad*2;
+      fctx.globalAlpha=Math.min(1,(f.big?0.5:0.32)+f.bright*0.5);
+      fctx.drawImage(spriteFor(f.c),f.x-f.rad,f.y-f.rad,d,d);
+      if(f.type==='user'){fctx.globalAlpha=Math.min(1,f.bright*0.6);var rgb=coherenceRGB(f.c);fctx.fillStyle=rgba(rgb,1);fctx.beginPath();fctx.arc(f.x,f.y,1.5,0,7);fctx.fill();}}
+    // 5) temple marks (source-over, crisp) + labels
+    fctx.globalCompositeOperation='source-over';fctx.globalAlpha=1;
+    var z=map.getZoom();
+    for(var i=0;i<fr.length;i++){if(fr[i].type==='loc')drawTempleMark(fr[i],z,calm);}
+    if(z>=6) drawTempleLabels(fr,z);
     fctx.globalCompositeOperation='source-over';fctx.globalAlpha=1;
   }
 

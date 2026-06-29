@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SoundTemple — A Movement Towards Global Coherence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    /* === RESET === */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #050309; color: #F2EAD8; font-family: 'Cormorant Garamond', Georgia, serif; overflow-x: hidden; }
+    img { display: block; max-width: 100%; }
+
+    /* === CSS VARIABLES === */
+    :root {
+      --void: #050309;
+      --jade-dark: #0D4038;
+      --teal: #4AADAD;
+      --teal-bright: #5CC5C5;
+      --amethyst: #6B3FA0;
+      --violet-mid: #8B5FCA;
+      --gold-warm: #C4922A;
+      --gold-light: #F5D47A;
+      --gold-bright: #E8B84B;
+      --cream: #F2EAD8;
+      --text-muted: rgba(242,234,216,0.52);
+      --border-subtle: rgba(242,234,216,0.08);
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'DM Mono', 'Courier New', monospace;
+    }
+
+    /* === KEYFRAMES === */
+    @keyframes breathe {
+      0%, 100% { opacity: 0.65; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.025); }
+    }
+    @keyframes breatheSlow {
+      0%, 100% { opacity: 0.35; transform: scale(1); }
+      50% { opacity: 0.65; transform: scale(1.005); }
+    }
+    @keyframes goldPulse {
+      0%, 100% { opacity: 0.72; }
+      50% { opacity: 1; }
+    }
+    @keyframes nodeGlow {
+      0%, 100% { opacity: 0.75; filter: blur(0px); }
+      50% { opacity: 1; filter: blur(0.5px); }
+    }
+    @keyframes ringBreathe {
+      0%, 100% { transform: scale(0.96); opacity: 0.55; }
+      50% { transform: scale(1.04); opacity: 0.85; }
+    }
+    @keyframes leyPulse {
+      0% { stroke-dashoffset: 400; opacity: 0.15; }
+      40% { opacity: 0.65; }
+      100% { stroke-dashoffset: 0; opacity: 0.15; }
+    }
+    @keyframes pulseRing {
+      0% { transform: scale(0.8); opacity: 0.7; }
+      100% { transform: scale(2.8); opacity: 0; }
+    }
+    @keyframes wordmarkExpand {
+      0%   { letter-spacing: -0.05em; text-shadow: 0 0 12px rgba(92,197,197,0.9); opacity: 0; }
+      6%   { opacity: 0.7; }
+      58%  { letter-spacing: 0.62em; text-shadow: 0 0 7px rgba(92,197,197,0.45); opacity: 0.88; }
+      70%  { letter-spacing: 0.65em; text-shadow: 0 0 30px rgba(92,197,197,0.65), 0 0 72px rgba(92,197,197,0.18), 0 0 4px rgba(255,255,255,0.1); opacity: 1; }
+      87%  { letter-spacing: 0.65em; text-shadow: 0 0 5px rgba(92,197,197,0.12); opacity: 0.62; }
+      100% { letter-spacing: 0.65em; text-shadow: none; opacity: 0.55; }
+    }
+    .wm {
+      animation: wordmarkExpand 2.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+      animation-play-state: paused;
+    }
+    .wm.wm-play { animation-play-state: running; }
+
+    /* === SCROLL REVEAL === */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.9s ease, transform 0.9s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .rd1 { transition-delay: 0.15s; }
+    .rd2 { transition-delay: 0.30s; }
+    .rd3 { transition-delay: 0.45s; }
+    .rd4 { transition-delay: 0.60s; }
+
+    /* === REDUCED MOTION === */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .reveal { opacity: 1; transform: none; }
+      .word-item { opacity: 1; transform: none; }
+    }
+
+    /* === SHIMMER === */
+    @keyframes shimmer {
+      0%   { transform: translateX(-160%); }
+      100% { transform: translateX(360%); }
+    }
+    .wm-shimmer-ready { position: relative; overflow: hidden; display: inline-block; }
+    .wm-shimmer-ready::after {
+      content: '';
+      position: absolute; top: -4px; left: 0; bottom: -4px;
+      width: 55%;
+      background: linear-gradient(90deg, transparent 0%, rgba(245,212,122,0.38) 50%, transparent 100%);
+      transform: translateX(-160%);
+      animation: shimmer 1.4s ease forwards;
+      animation-play-state: paused;
+      pointer-events: none;
+    }
+    .wm-shimmer-ready.wm-shine::after { animation-play-state: running; }
+
+    /* === WORD REVEAL === */
+    .word-item {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .word-item.wi-vis { opacity: 1; transform: translateY(0); }
+
+    /* === COHERENCE PULSE (one-time ripple on section enter) === */
+    @keyframes coherence-enter {
+      0%   { r: 0;   opacity: 0.5; }
+      100% { r: 240; opacity: 0; }
+    }
+
+    /* === VALUE CARD PHASE HOVER GLOW === */
+    .value-card .value-bar { transition: box-shadow 0.35s ease; }
+    .vc-jade:hover   { background: rgba(255,255,255,0.07) !important; box-shadow: 0 0 44px rgba(92,197,197,0.28) !important; }
+    .vc-jade:hover   .value-bar { box-shadow: 3px 0 20px rgba(92,197,197,0.55); }
+    .vc-teal:hover   { background: rgba(255,255,255,0.07) !important; box-shadow: 0 0 36px rgba(74,173,173,0.24) !important; }
+    .vc-teal:hover   .value-bar { box-shadow: 3px 0 16px rgba(74,173,173,0.5); }
+    .vc-violet:hover { background: rgba(255,255,255,0.07) !important; box-shadow: 0 0 40px rgba(107,63,160,0.32) !important; }
+    .vc-violet:hover .value-bar { box-shadow: 3px 0 16px rgba(107,63,160,0.5); }
+    .vc-gold:hover   { background: rgba(196,146,42,0.14) !important; box-shadow: 0 0 56px rgba(196,146,42,0.38) !important; }
+    .vc-gold:hover   .value-bar { box-shadow: 3px 0 22px rgba(196,146,42,0.6); }
+    .vc-muted:hover  { background: rgba(255,255,255,0.06) !important; box-shadow: 0 0 28px rgba(92,197,197,0.12) !important; }
+    .vc-muted:hover  .value-bar { box-shadow: 3px 0 10px rgba(92,197,197,0.3); }
+
+    /* === TOUCH-TO-MOVE (§9 closing hero) === */
+    @keyframes ttm-close {
+      0%   { transform: scale(1) translate(0,0); }
+      25%  { transform: scale(1.07) translate(-1.2%, -1.5%); }
+      50%  { transform: scale(1.09) translate(1%, 0.7%); }
+      75%  { transform: scale(1.07) translate(-0.6%, 1.2%); }
+      100% { transform: scale(1) translate(0,0); }
+    }
+    .ttm-close-wrap {
+      position: absolute; inset: 0; cursor: grab; overflow: hidden;
+    }
+    .ttm-close-wrap.active { cursor: grabbing; }
+    .ttm-close-wrap img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 30%;
+      transition: transform 0.6s ease;
+    }
+    .ttm-close-wrap.active img {
+      animation: ttm-close 16s ease-in-out infinite;
+      transition: none;
+    }
+    .ttm-badge-close {
+      position: absolute; bottom: clamp(16px,3vw,28px); right: clamp(16px,3vw,28px);
+      font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.28em;
+      color: rgba(242,234,216,0.38); text-transform: uppercase;
+      pointer-events: none; z-index: 5;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+    .ttm-close-wrap.active .ttm-badge-close { opacity: 0; transform: translateY(4px); }
+
+    /* === AMBIENT BREATHING MEMBRANE === */
+    .amb-membrane {
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    }
+
+    /* === THREAD DIVIDER === */
+    .thread {
+      display: flex;
+      align-items: center;
+      padding: clamp(28px, 5vw, 52px) clamp(24px, 6vw, 80px);
+    }
+    .thread::before, .thread::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(196,146,42,0.3), transparent);
+    }
+    .thread-gem {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: rgba(196,146,42,0.45);
+      padding: 0 14px;
+    }
+
+    /* === TYPOGRAPHY === */
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: var(--teal-bright);
+      margin-bottom: 16px;
+    }
+    .pull-quote {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-style: italic;
+      color: var(--cream);
+      line-height: 1.25;
+    }
+    .body-copy {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: clamp(15px, 1.7vw, 19px);
+      line-height: 1.7;
+      color: var(--text-muted);
+    }
+
+    /* === LAYOUT GRIDS === */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 6vw, 80px);
+      align-items: center;
+    }
+    .value-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: clamp(12px, 2vw, 20px);
+    }
+    .path-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .pathway-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: clamp(16px, 2.5vw, 28px);
+    }
+
+    /* === VALUE CARD === */
+    .value-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 6px;
+      padding: clamp(20px, 3vw, 32px) clamp(16px, 2.5vw, 28px) clamp(20px, 3vw, 32px) calc(clamp(16px, 2.5vw, 28px) + 18px);
+      position: relative;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .value-card:hover { transform: translateY(-2px); }
+    .value-bar {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      border-radius: 6px 0 0 6px;
+    }
+    .value-name {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .value-body {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-style: italic;
+      font-size: clamp(13px, 1.4vw, 15px);
+      line-height: 1.55;
+      color: var(--text-muted);
+    }
+
+    /* === PATH PANEL === */
+    .path-panel {
+      position: relative;
+      padding: clamp(48px, 7vw, 80px) clamp(32px, 5vw, 56px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 62vh;
+      overflow: hidden;
+    }
+    .path-panel-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .path-cta {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      padding: 12px 28px;
+      border-radius: 40px;
+      text-decoration: none;
+      transition: background 0.4s ease;
+      position: relative;
+      z-index: 1;
+      width: fit-content;
+    }
+
+    /* === METRIC BAR === */
+    .metric-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      overflow: hidden;
+      max-width: 900px;
+      margin: 0 auto clamp(32px, 5vw, 48px);
+    }
+    .metric-cell {
+      background: rgba(5,3,9,0.82);
+      padding: clamp(20px, 3vw, 32px) clamp(16px, 2vw, 24px);
+      text-align: center;
+    }
+    .metric-num {
+      font-family: var(--font-mono);
+      font-size: clamp(2rem, 4vw, 3rem);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .metric-label {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 900px) {
+      .value-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .two-col { grid-template-columns: 1fr; }
+      .value-grid { grid-template-columns: 1fr; }
+      .path-grid { grid-template-columns: 1fr; }
+      .pathway-row { grid-template-columns: 1fr; }
+      .metric-bar { grid-template-columns: repeat(2, 1fr); }
+      .path-panel { min-height: 50vh; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     §0 — HEART WEATHER (live coherence map hero)
+     ══════════════════════════════════════════════ -->
+<section style="position:relative;width:100%;height:94vh;min-height:540px;overflow:hidden;background:var(--void);border-bottom:1px solid rgba(255,255,255,0.06);">
+  <iframe src="heart-weather.html?embed=1" title="Heart Weather — the country, breathing" loading="eager" tabindex="-1"
+          style="position:absolute;inset:0;width:100%;height:100%;border:0;display:block;pointer-events:none;"></iframe>
+  <!-- full-cover link: the hero is a living preview; click anywhere to enter the full interactive map -->
+  <a href="heart-weather.html" aria-label="Open the full Heart Weather map"
+     style="position:absolute;inset:0;z-index:2;display:block;"></a>
+  <!-- hero label (top-left) -->
+  <div style="position:absolute;top:clamp(20px,3vw,30px);left:clamp(16px,3vw,40px);z-index:3;pointer-events:none;">
+    <p style="font-family:var(--font-mono);font-size:8px;letter-spacing:0.32em;text-transform:uppercase;color:var(--teal-bright);">Heart Weather</p>
+    <p style="font-family:var(--font-display);font-weight:300;font-style:italic;font-size:clamp(1.5rem,3.2vw,2.4rem);color:var(--cream);margin-top:6px;line-height:1.05;">The country, breathing.</p>
+  </div>
+  <!-- open full map (top-right) -->
+  <a href="heart-weather.html" style="position:absolute;top:clamp(20px,3vw,30px);right:clamp(16px,3vw,40px);z-index:3;
+     font-family:var(--font-mono);font-size:7px;letter-spacing:0.24em;text-transform:uppercase;color:var(--teal-bright);text-decoration:none;
+     background:rgba(13,10,26,0.62);border:1px solid rgba(242,234,216,0.14);border-radius:22px;padding:9px 16px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);">Open full map ↗</a>
+  <!-- scroll cue (bottom-right, clear of the map's centered layer control) -->
+  <div style="position:absolute;bottom:18px;right:clamp(16px,3vw,40px);z-index:3;pointer-events:none;text-align:center;">
+    <div style="width:4px;height:4px;border-radius:50%;background:var(--teal-bright);margin:0 auto 8px;animation:breathe 4s ease-in-out infinite;"></div>
+    <span style="font-family:var(--font-mono);font-size:6px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(242,234,216,0.5);">Scroll</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     §1 — THE ARRIVAL
+     ══════════════════════════════════════════════ -->
+<section style="position: relative; width: 100%; height: 100vh; overflow: hidden;">
+  <img src="SoundTemple%20Content/e8410898-2001-4647-9417-592066abc552.jpg"
+       style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 38%;"
+       alt="A body in the emergence state — the moment of arrival"/>
+  <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(5,3,9,0.92) 0%, rgba(42,21,64,0.5) 55%, rgba(5,3,9,0.72) 100%);"></div>
+
+  <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: clamp(24px,4vw,56px);">
+    <!-- Top: wordmark fires immediately -->
+    <div>
+      <p class="wm wm-play" style="font-family: var(--font-mono); font-size: 9px; color: var(--teal-bright); text-transform: uppercase;">SOUNDTEMPLE</p>
+    </div>
+    <!-- Center: the human-first copy -->
+    <div style="max-width: 620px;">
+      <p data-wrev class="reveal" style="font-family: var(--font-display); font-weight: 300; font-style: italic; font-size: clamp(1.8rem,4vw,3.4rem); color: var(--cream); line-height: 1.3;">
+        There are moments when your nervous system knows before your mind does.
+      </p>
+    </div>
+    <!-- Bottom: scroll indicator -->
+    <div class="reveal rd1" style="align-self: center; text-align: center; padding-bottom: 4px;">
+      <span style="display: block; width: 6px; height: 6px; border-radius: 50%; background: var(--teal-bright); margin: 0 auto 6px; animation: breathe 4s ease-in-out infinite;"></span>
+      <span style="font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.35em; color: rgba(92,197,197,0.55); text-transform: uppercase;">scroll</span>
+    </div>
+  </div>
+</section>
+
+<div class="thread"><span class="thread-gem">◇</span></div>
+
+<!-- ══════════════════════════════════════════════
+     §2 — THE INSTRUMENT
+     ══════════════════════════════════════════════ -->
+<section style="background: var(--void); padding: clamp(48px,8vw,96px) clamp(24px,6vw,80px);">
+  <div class="two-col">
+    <!-- Left: image -->
+    <div class="reveal" style="height: 72vh; overflow: hidden; border-radius: 6px; min-height: 400px;">
+      <img src="SoundTemple%20Content/7a5caac8-601d-4c64-83e3-55eb313675aa.jpg"
+           style="width: 100%; height: 100%; object-fit: cover; object-position: center 25%;"
+           alt="Body in transmission — the electric moment of vibration"/>
+    </div>
+    <!-- Right: text -->
+    <div>
+      <p class="eyebrow reveal">The Instrument</p>
+      <p class="pull-quote reveal rd1" style="font-size: clamp(1.7rem,2.8vw,2.8rem); margin-bottom: clamp(20px,3vw,32px);">You are inside the instrument.<br>Not on it. <em>Inside</em> it.</p>
+      <p class="body-copy reveal rd2" style="margin-bottom: clamp(16px,2.5vw,24px);">The Opus SoundBed delivers vibration through bone, not air. Your entire skeletal structure becomes a resonating chamber. The instrument plays you from the inside out.</p>
+      <!-- Pull-quote stat block -->
+      <div class="reveal rd3" style="border-left: 2px solid rgba(74,173,173,0.45); padding-left: 1.5rem; margin-bottom: clamp(20px,3vw,28px);">
+        <p style="font-family: var(--font-mono); font-size: clamp(12px,1.3vw,14px); color: var(--gold-bright); line-height: 2; animation: goldPulse 8s ease-in-out infinite;">
+          47% cortisol reduction<br>
+          2.3× HRV improvement<br>
+          89% report deep state within 90 seconds
+        </p>
+      </div>
+      <!-- Soundwave: physics made visible -->
+      <div aria-hidden="true" style="margin: clamp(6px,1vw,12px) 0 clamp(14px,2vw,20px); pointer-events: none; overflow: hidden;">
+        <svg viewBox="0 0 400 40" width="100%" height="40" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="lp-sw-fade" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stop-color="#4AADAD" stop-opacity="0"/>
+              <stop offset="15%"  stop-color="#4AADAD" stop-opacity="0.22"/>
+              <stop offset="50%"  stop-color="#E8B84B" stop-opacity="0.28"/>
+              <stop offset="85%"  stop-color="#4AADAD" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#4AADAD" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- Primary wave -->
+          <path d="M0,20 C25,6 50,34 75,20 C100,6 125,34 150,20 C175,6 200,34 225,20 C250,6 275,34 300,20 C325,6 350,34 375,20 C400,6 400,20 400,20"
+                fill="none" stroke="url(#lp-sw-fade)" stroke-width="1.4"
+                stroke-dasharray="420" stroke-dashoffset="420"
+                style="animation: leyPulse 6s linear infinite; opacity: 0.6;"/>
+          <!-- Second harmonic -->
+          <path d="M0,20 C12.5,13 25,27 37.5,20 C50,13 62.5,27 75,20 C87.5,13 100,27 112.5,20 C125,13 137.5,27 150,20 C162.5,13 175,27 187.5,20 C200,13 212.5,27 225,20 C237.5,13 250,27 262.5,20 C275,13 287.5,27 300,20 C312.5,13 325,27 337.5,20 C350,13 362.5,27 375,20 C400,20 400,20 400,20"
+                fill="none" stroke="#4AADAD" stroke-width="0.8"
+                stroke-dasharray="440" stroke-dashoffset="440"
+                style="animation: leyPulse 8s linear infinite; animation-delay:-2s; opacity: 0.28;"/>
+          <!-- Third harmonic (gold) -->
+          <path d="M0,20 C6,17 12,23 18,20 C24,17 30,23 36,20 C42,17 48,23 54,20 C60,17 66,23 72,20 C78,17 84,23 90,20 C96,17 102,23 108,20 C114,17 120,23 126,20 C132,17 138,23 144,20 C150,17 156,23 162,20 C168,17 174,23 180,20 C186,17 192,23 198,20 C204,17 210,23 216,20 C222,17 228,23 234,20 C240,17 246,23 252,20 C258,17 264,23 270,20 C276,17 282,23 288,20 C294,17 300,23 306,20 C312,17 318,23 324,20 C330,17 336,23 342,20 C348,17 354,23 360,20 C366,17 372,23 378,20 C384,17 390,23 396,20 C400,20 400,20 400,20"
+                fill="none" stroke="#E8B84B" stroke-width="0.6"
+                stroke-dasharray="460" stroke-dashoffset="460"
+                style="animation: leyPulse 10s linear infinite; animation-delay:-3.5s; opacity: 0.18;"/>
+        </svg>
+      </div>
+      <p class="body-copy reveal rd4" style="font-style: italic; color: rgba(242,234,216,0.62);">This is not belief-dependent. It is physics.</p>
+    </div>
+  </div>
+</section>
+
+<div class="thread" style="background: rgba(42,21,64,0.3);"><span class="thread-gem">◇</span></div>
+
+<!-- ══════════════════════════════════════════════
+     §3 — THE MISSION
+     ══════════════════════════════════════════════ -->
+<section data-coherence-pulse="#8B5FCA" style="background: rgba(42,21,64,0.25); padding: clamp(64px,10vw,120px) clamp(24px,6vw,80px); text-align: center; position: relative; overflow: hidden;">
+  <!-- Breathing violet membrane -->
+  <div class="amb-membrane" aria-hidden="true" style="background: radial-gradient(ellipse at 50% 50%, rgba(107,63,160,0.10) 0%, transparent 70%); animation: breatheSlow 14s ease-in-out infinite;"></div>
+  <!-- Background ley line constellation -->
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0.11;">
+    <svg viewBox="0 0 1200 400" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="lp-bgley" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="#2D7D7D" stop-opacity="0.5"/>
+          <stop offset="50%"  stop-color="#6B3FA0" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#E8B84B" stop-opacity="1"/>
+        </linearGradient>
+      </defs>
+      <line x1="100" y1="200" x2="400" y2="200" stroke="url(#lp-bgley)" stroke-width="0.8"
+            stroke-dasharray="300" stroke-dashoffset="300"
+            style="animation: leyPulse 9s linear infinite;"/>
+      <line x1="400" y1="200" x2="700" y2="200" stroke="url(#lp-bgley)" stroke-width="0.8"
+            stroke-dasharray="300" stroke-dashoffset="300"
+            style="animation: leyPulse 9s linear infinite; animation-delay:-3s;"/>
+      <line x1="700" y1="200" x2="1100" y2="200" stroke="url(#lp-bgley)" stroke-width="0.8"
+            stroke-dasharray="400" stroke-dashoffset="400"
+            style="animation: leyPulse 9s linear infinite; animation-delay:-6s;"/>
+      <circle cx="100"  cy="200" r="7"  fill="#2D7D7D" opacity="0.7" style="animation: nodeGlow 8s ease-in-out infinite;"/>
+      <circle cx="400"  cy="200" r="11" fill="#4AADAD" opacity="0.6" style="animation: nodeGlow 8s ease-in-out infinite; animation-delay:-2s;"/>
+      <circle cx="700"  cy="200" r="15" fill="#6B3FA0" opacity="0.5" style="animation: nodeGlow 8s ease-in-out infinite; animation-delay:-4s;"/>
+      <circle cx="1100" cy="200" r="22" fill="#E8B84B" opacity="0.5" style="animation: nodeGlow 8s ease-in-out infinite; animation-delay:-6s;"/>
+      <circle cx="1100" cy="200" r="33" fill="none" stroke="#E8B84B" stroke-width="0.5" opacity="0.3" style="animation: ringBreathe 6s ease-in-out infinite;"/>
+    </svg>
+  </div>
+  <!-- Hex grid background texture -->
+  <div aria-hidden="true" style="position: absolute; inset: 0; opacity: 0.07; pointer-events: none;">
+    <svg viewBox="0 0 800 400" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern id="lp-hex-bg" x="0" y="0" width="60" height="52" patternUnits="userSpaceOnUse">
+          <polygon points="30,2 58,17 58,47 30,62 2,47 2,17" fill="none" stroke="#4AADAD" stroke-width="0.7"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#lp-hex-bg)"/>
+    </svg>
+  </div>
+
+  <div style="position: relative; z-index: 1; max-width: 900px; margin: 0 auto;">
+    <p class="eyebrow reveal">The Mission</p>
+    <p data-wrev class="pull-quote reveal rd1" style="font-size: clamp(1.8rem,3.5vw,3.2rem); max-width: 720px; margin: 0 auto clamp(16px,2.5vw,24px);">
+      We are not building wellness centers. We are building coherence infrastructure.
+    </p>
+    <p class="body-copy reveal rd2" style="max-width: 480px; margin: 0 auto clamp(40px,6vw,64px); font-style: italic; font-size: clamp(1rem,1.5vw,1.2rem);">A movement towards global coherence.</p>
+
+    <!-- Scale spine: One Body → One Room → One City → One Planet -->
+    <div class="reveal rd3">
+      <svg viewBox="0 0 800 96" width="100%" height="96" aria-hidden="true" style="overflow: visible; display: block;">
+        <defs>
+          <radialGradient id="lp-jade-n" cx="35%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#8abfa8"/>
+            <stop offset="50%" stop-color="#2D7D7D"/>
+            <stop offset="100%" stop-color="#0D4038"/>
+          </radialGradient>
+          <radialGradient id="lp-gold-n" cx="35%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#FFF8E1"/>
+            <stop offset="40%" stop-color="#F5D47A"/>
+            <stop offset="100%" stop-color="#C4922A"/>
+          </radialGradient>
+          <linearGradient id="lp-spine" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%"   stop-color="#2D7D7D" stop-opacity="0.3"/>
+            <stop offset="35%"  stop-color="#4AADAD" stop-opacity="0.65"/>
+            <stop offset="65%"  stop-color="#6B3FA0" stop-opacity="0.75"/>
+            <stop offset="100%" stop-color="#E8B84B" stop-opacity="0.95"/>
+          </linearGradient>
+        </defs>
+        <!-- Spine line -->
+        <line x1="80" y1="45" x2="720" y2="45" stroke="url(#lp-spine)" stroke-width="1.2"/>
+        <!-- Chevrons -->
+        <text x="207" y="50" text-anchor="middle" font-family="'DM Mono',monospace" font-size="12" fill="rgba(242,234,216,0.22)">›</text>
+        <text x="400" y="50" text-anchor="middle" font-family="'DM Mono',monospace" font-size="12" fill="rgba(242,234,216,0.3)">›</text>
+        <text x="593" y="50" text-anchor="middle" font-family="'DM Mono',monospace" font-size="12" fill="rgba(242,234,216,0.22)">›</text>
+        <!-- Node 1: One Body (small jade) -->
+        <circle cx="80" cy="45" r="8" fill="url(#lp-jade-n)" style="animation: nodeGlow 8s ease-in-out infinite;"/>
+        <text x="80" y="72" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7" fill="rgba(92,197,197,0.7)" letter-spacing="1.5">ONE BODY</text>
+        <!-- Node 2: One Room (medium jade) -->
+        <circle cx="293" cy="45" r="12" fill="url(#lp-jade-n)" style="animation: nodeGlow 8s ease-in-out infinite; animation-delay:-2s;"/>
+        <text x="293" y="72" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7" fill="rgba(92,197,197,0.7)" letter-spacing="1.5">ONE ROOM</text>
+        <!-- Node 3: One City (medium-large, transitioning) -->
+        <circle cx="507" cy="45" r="16" fill="url(#lp-gold-n)" opacity="0.78" style="animation: nodeGlow 8s ease-in-out infinite; animation-delay:-4s;"/>
+        <text x="507" y="72" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7" fill="rgba(232,184,75,0.7)" letter-spacing="1.5">ONE CITY</text>
+        <!-- Node 4: One Planet (large gold + ring) -->
+        <circle cx="720" cy="45" r="24" fill="url(#lp-gold-n)" style="animation: nodeGlow 8s ease-in-out infinite; animation-delay:-6s;"/>
+        <circle cx="720" cy="45" r="34" fill="none" stroke="#E8B84B" stroke-width="0.8" opacity="0.22" style="animation: ringBreathe 6s ease-in-out infinite;"/>
+        <text x="720" y="80" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7" fill="rgba(232,184,75,0.8)" letter-spacing="1.5">ONE PLANET</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="thread"><span class="thread-gem">◇</span></div>
+
+<!-- ══════════════════════════════════════════════
+     §4 — THE VALUES
+     ══════════════════════════════════════════════ -->
+<section style="background: var(--void); padding: clamp(64px,10vw,120px) clamp(24px,6vw,80px); position: relative; overflow: hidden;">
+  <!-- Subtle photo texture behind value cards -->
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: 0; pointer-events: none;">
+    <img src="SoundTemple%20Content/d2772df1-5b9e-4638-bdd5-b5ea9bd8dfc6.jpg"
+         style="width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: 0.08;" alt=""/>
+    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,3,9,0.82) 0%, rgba(5,3,9,0.55) 50%, rgba(5,3,9,0.82) 100%);"></div>
+  </div>
+  <div style="text-align: center; margin-bottom: clamp(40px,6vw,64px); position: relative; z-index: 1;">
+    <p class="eyebrow reveal">What We Believe</p>
+    <p class="pull-quote reveal rd1" style="font-size: clamp(1.6rem,2.8vw,2.6rem);">Five principles. One movement.</p>
+  </div>
+
+  <div class="value-grid" style="position: relative; z-index: 1;">
+    <!-- 1: Frequency Before Belief — jade -->
+    <div class="value-card vc-jade reveal rd1" style="box-shadow: 0 0 28px rgba(13,64,56,0.22);">
+      <div class="value-bar" style="background: linear-gradient(to bottom, #5CC5C5, #0D4038);"></div>
+      <p class="value-name" style="color: var(--teal-bright);">Frequency<br>Before Belief</p>
+      <p class="value-body">The body doesn't need to be convinced. It needs to be vibrated.</p>
+    </div>
+
+    <!-- 2: The Room Remembers — teal -->
+    <div class="value-card vc-teal reveal rd2" style="box-shadow: 0 0 24px rgba(45,125,125,0.16);">
+      <div class="value-bar" style="background: linear-gradient(to bottom, #4AADAD, #2D7D7D);"></div>
+      <p class="value-name" style="color: var(--teal);">The Room<br>Remembers</p>
+      <p class="value-body">Space is not neutral. We architect consciousness.</p>
+    </div>
+
+    <!-- 3: Every Node Matters — violet -->
+    <div class="value-card vc-violet reveal rd2" style="box-shadow: 0 0 24px rgba(107,63,160,0.2);">
+      <div class="value-bar" style="background: linear-gradient(to bottom, #8B5FCA, #6B3FA0);"></div>
+      <p class="value-name" style="color: var(--violet-mid);">Every Node<br>Matters</p>
+      <p class="value-body">One nervous system in coherence changes the field of the room.</p>
+    </div>
+
+    <!-- 4: Abundance Is Not Scarce — gold (the pivot point) -->
+    <div class="value-card vc-gold reveal rd3" style="background: rgba(196,146,42,0.08); border-color: rgba(196,146,42,0.22); box-shadow: 0 0 44px rgba(196,146,42,0.22);">
+      <div class="value-bar" style="background: linear-gradient(to bottom, #F5D47A, #C4922A);"></div>
+      <p class="value-name" style="color: var(--gold-light); animation: goldPulse 8s ease-in-out infinite;">Abundance<br>Is Not Scarce</p>
+      <p class="value-body" style="color: rgba(242,234,216,0.68);">We expand access by training more people to hold the field.</p>
+    </div>
+
+    <!-- 5: Nothing Snaps. Everything Breathes. — muted jade -->
+    <div class="value-card vc-muted reveal rd4" style="opacity: 0.76;">
+      <div class="value-bar" style="background: linear-gradient(to bottom, rgba(92,197,197,0.45), rgba(13,64,56,0.3));"></div>
+      <p class="value-name" style="color: rgba(92,197,197,0.62); font-size: 7px; letter-spacing: 0.24em;">Nothing Snaps.<br>Everything Breathes.</p>
+      <p class="value-body">The pace of this movement is the pace of a deep, regulated breath.</p>
+    </div>
+  </div>
+</section>
+
+<div class="thread" style="background: rgba(42,21,64,0.3);"><span class="thread-gem">◇</span></div>
+
+<!-- ══════════════════════════════════════════════
+     §5 — THE GRID
+     ══════════════════════════════════════════════ -->
+<section data-coherence-pulse="#4AADAD" style="background: linear-gradient(180deg, rgba(42,21,64,0.28) 0%, var(--void) 100%); padding: clamp(64px,10vw,120px) clamp(24px,6vw,80px); position: relative; overflow: hidden;">
+  <!-- Breathing teal membrane -->
+  <div class="amb-membrane" aria-hidden="true" style="background: radial-gradient(ellipse at 50% 50%, rgba(45,125,125,0.08) 0%, transparent 70%); animation: breatheSlow 14s ease-in-out infinite; animation-delay:-5s;"></div>
+  <div class="two-col" style="position: relative; z-index: 1;">
+    <!-- Left: copy -->
+    <div>
+      <p class="eyebrow reveal">The Grid</p>
+      <p class="pull-quote reveal rd1" style="font-size: clamp(1.6rem,2.8vw,2.5rem); margin-bottom: clamp(20px,3vw,28px);">Every temple is a<br>broadcasting station.<br><em>Every session sends a signal.</em></p>
+      <p class="body-copy reveal rd2" style="margin-bottom: clamp(14px,2vw,20px);">When a SoundTemple facilitator activates a room, they don't just serve the people in it. They contribute to a coherence field that compounds across every active node on the planet.</p>
+      <p class="reveal rd3" style="font-family: var(--font-display); font-weight: 300; font-style: italic; font-size: clamp(1.5rem,2.8vw,2.4rem); color: var(--cream); line-height: 1.25; margin-bottom: clamp(20px,3vw,32px); animation: breathe 8s ease-in-out infinite;">12 active temples. 1,200+ bodies. One planetary field.</p>
+      <div class="reveal rd3">
+        <p style="font-family: var(--font-display); font-weight: 300; font-style: italic; font-size: clamp(1.1rem,1.8vw,1.5rem); color: var(--teal-bright); margin-bottom: 18px; animation: breathe 10s ease-in-out infinite; animation-delay:-2s;">This is Heart Weather.</p>
+        <a href="index.html" style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--teal-bright); text-decoration: none; border-bottom: 1px solid rgba(92,197,197,0.35); padding-bottom: 2px;">Open Heart Weather →</a>
+      </div>
+    </div>
+
+    <!-- Right: broadcast grid SVG -->
+    <div class="reveal rd2">
+      <svg viewBox="0 0 500 340" width="100%" aria-hidden="true" style="display: block; overflow: visible;">
+        <defs>
+          <radialGradient id="lp-g-jade" cx="35%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#8abfa8"/>
+            <stop offset="50%" stop-color="#2D7D7D"/>
+            <stop offset="100%" stop-color="#0D4038"/>
+          </radialGradient>
+          <radialGradient id="lp-g-origin" cx="35%" cy="28%" r="65%">
+            <stop offset="0%" stop-color="#FFF8E1"/>
+            <stop offset="30%" stop-color="#F5D47A"/>
+            <stop offset="100%" stop-color="#C4922A"/>
+          </radialGradient>
+        </defs>
+        <!-- Hex grid texture (very faint) -->
+        <g opacity="0.055">
+          <polygon points="80,30  120,30  140,64  120,98  80,98  60,64"  fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="160,30 200,30 220,64 200,98 160,98 140,64" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="240,30 280,30 300,64 280,98 240,98 220,64" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="320,30 360,30 380,64 360,98 320,98 300,64" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="400,30 440,30 460,64 440,98 400,98 380,64" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="80,98  120,98  140,132 120,166 80,166 60,132" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="160,98 200,98 220,132 200,166 160,166 140,132" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="240,98 280,98 300,132 280,166 240,166 220,132" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="320,98 360,98 380,132 360,166 320,166 300,132" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="400,98 440,98 460,132 440,166 400,166 380,132" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="80,166 120,166 140,200 120,234 80,234 60,200" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="160,166 200,166 220,200 200,234 160,234 140,200" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="240,166 280,166 300,200 280,234 240,234 220,200" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="320,166 360,166 380,200 360,234 320,234 300,200" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+          <polygon points="400,166 440,166 460,200 440,234 400,234 380,200" fill="none" stroke="#4AADAD" stroke-width="0.8"/>
+        </g>
+        <!-- Ley lines (Bathhouse ATX at 185,235 → other temples) -->
+        <path d="M185,235 Q200,170 295,118" fill="none" stroke="#E8B84B" stroke-width="1" stroke-dasharray="240" stroke-dashoffset="240" opacity="0" style="animation: leyPulse 8s linear infinite; animation-delay:0s;"/>
+        <path d="M185,235 Q120,175 78,138" fill="none" stroke="#E8B84B" stroke-width="1" stroke-dasharray="220" stroke-dashoffset="220" opacity="0" style="animation: leyPulse 8s linear infinite; animation-delay:-2.5s;"/>
+        <path d="M185,235 Q310,200 418,108" fill="none" stroke="#E8B84B" stroke-width="1" stroke-dasharray="280" stroke-dashoffset="280" opacity="0" style="animation: leyPulse 10s linear infinite; animation-delay:-1.2s;"/>
+        <path d="M185,235 Q155,130 78,88"  fill="none" stroke="#E8B84B" stroke-width="1" stroke-dasharray="220" stroke-dashoffset="220" opacity="0" style="animation: leyPulse 11s linear infinite; animation-delay:-3.5s;"/>
+        <!-- Pulse rings from origin -->
+        <circle cx="185" cy="235" r="18" fill="none" stroke="#E8B84B" stroke-width="1" opacity="0" style="animation: pulseRing 5s ease-out infinite;"/>
+        <circle cx="185" cy="235" r="18" fill="none" stroke="#E8B84B" stroke-width="0.8" opacity="0" style="animation: pulseRing 5s ease-out infinite; animation-delay:-2.5s;"/>
+        <!-- ORIGIN: Bathhouse ATX (larger gold node) -->
+        <circle cx="185" cy="235" r="14" fill="url(#lp-g-origin)" style="animation: nodeGlow 4s ease-in-out infinite;"/>
+        <circle cx="185" cy="235" r="20" fill="none" stroke="#E8B84B" stroke-width="0.6" opacity="0.3" style="animation: ringBreathe 4s ease-in-out infinite;"/>
+        <text x="185" y="260" text-anchor="middle" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(245,212,122,0.9)" letter-spacing="1">BATHHOUSE ATX</text>
+        <text x="185" y="225" text-anchor="middle" font-family="'DM Mono',monospace" font-size="5.5" fill="rgba(245,212,122,0.58)">ORIGIN</text>
+        <!-- Sedona -->
+        <circle cx="295" cy="112" r="8" fill="url(#lp-g-jade)" style="animation: nodeGlow 6s ease-in-out infinite; animation-delay:-1s;"/>
+        <text x="295" y="100" text-anchor="middle" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(92,197,197,0.8)" letter-spacing="1">SEDONA</text>
+        <!-- Tulum -->
+        <circle cx="78" cy="132" r="8" fill="url(#lp-g-jade)" style="animation: nodeGlow 6s ease-in-out infinite; animation-delay:-2s;"/>
+        <text x="78" y="120" text-anchor="middle" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(92,197,197,0.8)" letter-spacing="1">TULUM</text>
+        <!-- Bali -->
+        <circle cx="418" cy="102" r="8" fill="url(#lp-g-jade)" style="animation: nodeGlow 6s ease-in-out infinite; animation-delay:-3s;"/>
+        <text x="418" y="90" text-anchor="middle" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(92,197,197,0.8)" letter-spacing="1">BALI</text>
+        <!-- Tahoe (dimmed — coming soon) -->
+        <circle cx="78" cy="82"  r="8" fill="url(#lp-g-jade)" opacity="0.55" style="animation: nodeGlow 8s ease-in-out infinite; animation-delay:-4s;"/>
+        <text x="78" y="70" text-anchor="middle" font-family="'DM Mono',monospace" font-size="6.5" fill="rgba(92,197,197,0.5)" letter-spacing="1">TAHOE</text>
+        <!-- Grid label -->
+        <text x="250" y="310" text-anchor="middle" font-family="'DM Mono',monospace" font-size="7" fill="rgba(242,234,216,0.18)" letter-spacing="3">THE COHERENCE GRID</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="thread"><span class="thread-gem">◇</span></div>
+
+<!-- ══════════════════════════════════════════════
+     §6 — FREQUENCY OF ABUNDANCE
+     ══════════════════════════════════════════════ -->
+<section style="position: relative; background: var(--void); overflow: hidden; padding: clamp(64px,10vw,120px) clamp(24px,6vw,80px);">
+  <!-- Background: crystal pyramid, faint -->
+  <div style="position: absolute; inset: 0; z-index: 0; pointer-events: none;">
+    <img src="SoundTemple%20Content/ad85d350-42d2-41d4-8586-3b7ac705aaf2.jpg"
+         style="width: 100%; height: 100%; object-fit: cover; object-position: center; opacity: 0.38;"
+         alt=""/>
+    <div style="position: absolute; inset: 0; background: linear-gradient(to right, rgba(5,3,9,0.84) 0%, rgba(5,3,9,0.52) 50%, rgba(5,3,9,0.80) 100%);"></div>
+  </div>
+
+  <div style="position: relative; z-index: 1;">
+    <!-- Main copy split -->
+    <div class="two-col" style="margin-bottom: clamp(56px,8vw,88px);">
+      <!-- Left: manifesto statement -->
+      <div>
+        <p class="eyebrow reveal">Frequency of Abundance</p>
+        <p class="pull-quote reveal rd1" style="font-size: clamp(1.8rem,3vw,3.2rem); color: var(--gold-light); line-height: 1.2; animation: goldPulse 12s ease-in-out infinite;">Abundance is not created.<br>It is restored.</p>
+        <p class="body-copy reveal rd2" style="margin-top: clamp(18px,2.5vw,28px); color: rgba(242,234,216,0.62); font-style: italic;">The bottleneck to human potential has always been the same: a nervous system running on threat that never received the signal it was safe to stop.</p>
+      </div>
+      <!-- Right: explanation -->
+      <div>
+        <p class="body-copy reveal rd2" style="margin-bottom: clamp(14px,2vw,20px);">Under chronic stress, cortisol narrows perception, compresses generosity, and optimizes every decision for survival. This is not a character flaw. It is physiology. The same person operating from a regulated nervous system — measurably higher HRV, vagal tone restored — makes categorically different choices about money, relationships, risk, and what feels possible.</p>
+        <p class="body-copy reveal rd3" style="margin-bottom: clamp(14px,2vw,20px);">This is what we mean by the frequency of abundance. Not a belief. Not an affirmation. A measurable operating state — and a substrate that can be trained, transmitted, and scaled. Change the substrate. Change the output.</p>
+        <div class="reveal rd4">
+          <p class="body-copy" style="border-left: 2px solid rgba(196,146,42,0.4); padding-left: 1.5rem; font-style: italic; color: rgba(242,234,216,0.7);">Train enough people to hold coherence and you have not improved anyone's mood. You have changed what the network is capable of building.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Three propagation pathways -->
+    <div class="pathway-row">
+      <!-- EXPERIENCE -->
+      <div class="reveal rd1" style="background: rgba(13,64,56,0.22); border: 1px solid rgba(92,197,197,0.18); border-top: 2px solid rgba(92,197,197,0.55); border-radius: 6px; padding: clamp(24px,3.5vw,40px) clamp(20px,3vw,32px); text-align: center;">
+        <p style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.35em; color: var(--teal-bright); text-transform: uppercase; margin-bottom: 14px;">Experience</p>
+        <p class="body-copy" style="font-size: clamp(13px,1.4vw,15px); font-style: italic; margin-bottom: 16px;">Be moved.<br>Find a session.</p>
+        <p style="font-family: var(--font-mono); font-size: 7px; color: rgba(92,197,197,0.48); letter-spacing: 0.15em;">Walk in. Lie down.</p>
+      </div>
+      <!-- FACILITATE -->
+      <div class="reveal rd2" style="background: rgba(42,21,64,0.35); border: 1px solid rgba(107,63,160,0.25); border-top: 2px solid rgba(139,95,202,0.65); border-radius: 6px; padding: clamp(24px,3.5vw,40px) clamp(20px,3vw,32px); text-align: center;">
+        <p style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.35em; color: var(--violet-mid); text-transform: uppercase; margin-bottom: 14px;">Facilitate</p>
+        <p class="body-copy" style="font-size: clamp(13px,1.4vw,15px); font-style: italic; margin-bottom: 16px;">Hold the field.<br>Earn as you serve.</p>
+        <p style="font-family: var(--font-mono); font-size: 7px; color: rgba(139,95,202,0.5); letter-spacing: 0.15em;">Practitioner from $2,500</p>
+      </div>
+      <!-- PARTNER -->
+      <div class="reveal rd3" style="background: rgba(196,146,42,0.08); border: 1px solid rgba(196,146,42,0.2); border-top: 2px solid rgba(232,184,75,0.72); border-radius: 6px; padding: clamp(24px,3.5vw,40px) clamp(20px,3vw,32px); text-align: center;">
+        <p style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.35em; color: var(--gold-light); text-transform: uppercase; margin-bottom: 14px; animation: goldPulse 8s ease-in-out infinite;">Partner</p>
+        <p class="body-copy" style="font-size: clamp(13px,1.4vw,15px); font-style: italic; margin-bottom: 16px;">Host a temple.<br>Join the grid.</p>
+        <p style="font-family: var(--font-mono); font-size: 7px; color: rgba(245,212,122,0.42); letter-spacing: 0.15em;">Revenue-share model</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="thread" style="background: rgba(42,21,64,0.3);"><span class="thread-gem">◇</span></div>
+
+<!-- ══════════════════════════════════════════════
+     §7 — THE PATHS (Three Doors)
+     ══════════════════════════════════════════════ -->
+<section style="background: var(--void);">
+  <div style="text-align: center; padding: clamp(48px,7vw,80px) clamp(24px,6vw,80px) clamp(32px,5vw,48px);">
+    <p class="reveal" style="font-family: var(--font-display); font-weight: 300; font-style: italic; font-size: clamp(1.5rem,2.6vw,2.4rem); color: var(--gold-light); margin-bottom: clamp(10px,1.5vw,16px); animation: goldPulse 12s ease-in-out infinite;">There is a place for you in this.</p>
+    <p class="eyebrow reveal rd1">Three Doors</p>
+    <p class="pull-quote reveal rd2" style="font-size: clamp(1.6rem,2.8vw,2.6rem);">Join the movement.<br>Choose your path.</p>
+  </div>
+
+  <div class="path-grid">
+    <!-- Door 1: Find a Session — Jade -->
+    <div class="path-panel reveal rd1" style="background: linear-gradient(180deg, rgba(13,64,56,0.72) 0%, rgba(5,3,9,0.95) 100%); border-right: 1px solid rgba(255,255,255,0.05);">
+      <img class="path-panel-bg" src="SoundTemple%20Content/311136f4-c689-4d84-94db-9f2763f43694.jpg" style="opacity: 0.32;" alt=""/>
+      <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(5,3,9,0.85) 0%, transparent 55%); pointer-events: none;"></div>
+      <div style="position: relative; z-index: 1;">
+        <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true" style="margin-bottom: 18px;">
+          <defs>
+            <radialGradient id="lp-door1-node" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#8abfa8"/>
+              <stop offset="50%" stop-color="#2D7D7D"/>
+              <stop offset="100%" stop-color="#0D4038"/>
+            </radialGradient>
+          </defs>
+          <circle cx="16" cy="16" r="13" fill="url(#lp-door1-node)" style="animation: nodeGlow 6s ease-in-out infinite;"/>
+          <circle cx="16" cy="16" r="13" fill="none" stroke="#5CC5C5" stroke-width="0.6" opacity="0.3" style="animation: ringBreathe 6s ease-in-out infinite;"/>
+        </svg>
+        <p style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.32em; color: var(--teal-bright); text-transform: uppercase; margin-bottom: 14px;">Find a Session</p>
+        <p class="body-copy" style="font-size: clamp(13px,1.4vw,15px); font-style: italic; margin-bottom: 10px;">You've felt something calling.</p>
+        <p class="body-copy" style="font-size: clamp(13px,1.4vw,15px);">Walk in. Lie down.<br>Let the instrument work.</p>
+      </div>
+      <div style="position: relative; z-index: 1;">
+        <a href="#" class="path-cta" style="border: 1px solid rgba(92,197,197,0.45); color: var(--teal-bright);"
+           onmouseover="this.style.background='rgba(92,197,197,0.12)';this.style.boxShadow='0 0 28px rgba(92,197,197,0.35)';this.style.borderColor='rgba(92,197,197,0.75)'"
+           onmouseout="this.style.background='transparent';this.style.boxShadow='none';this.style.borderColor='rgba(92,197,197,0.45)'">Find a Temple</a>
+      </div>
+    </div>
+
+    <!-- Door 2: Become a Facilitator — Teal → Violet -->
+    <div class="path-panel reveal rd2" style="background: linear-gradient(180deg, rgba(45,125,125,0.38) 0%, rgba(42,21,64,0.65) 55%, rgba(5,3,9,0.95) 100%); border-right: 1px solid rgba(255,255,255,0.05);">
+      <img class="path-panel-bg" src="SoundTemple%20Content/7a5caac8-601d-4c64-83e3-55eb313675aa.jpg" style="opacity: 0.28;" alt=""/>
+      <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(5,3,9,0.88) 0%, transparent 55%); pointer-events: none;"></div>
+      <div style="position: relative; z-index: 1;">
+        <!-- Ring-of-nodes icon -->
+        <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true" style="margin-bottom: 18px;">
+          <circle cx="19" cy="7"  r="4.5" fill="#4AADAD" opacity="0.9" style="animation: nodeGlow 5s ease-in-out infinite;"/>
+          <circle cx="30" cy="13" r="4"   fill="#6B3FA0" opacity="0.8" style="animation: nodeGlow 5s ease-in-out infinite; animation-delay:-1s;"/>
+          <circle cx="30" cy="26" r="4"   fill="#6B3FA0" opacity="0.8" style="animation: nodeGlow 5s ease-in-out infinite; animation-delay:-2s;"/>
+          <circle cx="19" cy="32" r="4.5" fill="#4AADAD" opacity="0.9" style="animation: nodeGlow 5s ease-in-out infinite; animation-delay:-3s;"/>
+          <circle cx="8"  cy="26" r="4"   fill="#4AADAD" opacity="0.8" style="animation: nodeGlow 5s ease-in-out infinite; animation-delay:-4s;"/>
+          <circle cx="8"  cy="13" r="4"   fill="#4AADAD" opacity="0.8" style="animation: nodeGlow 5s ease-in-out infinite; animation-delay:-0.5s;"/>
+          <circle cx="19" cy="19" r="3"   fill="#8B5FCA" opacity="0.9" style="animation: nodeGlow 4s ease-in-out infinite;"/>
+        </svg>
+        <p style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.32em; color: var(--violet-mid); text-transform: uppercase; margin-bottom: 14px;">Become a Facilitator</p>
+        <p class="body-copy" style="font-size: clamp(13px,1.4vw,15px); font-style: italic; margin-bottom: 10px;">The planet needs more people who know how to hold the field.</p>
+        <p style="font-family: var(--font-mono); font-size: 7px; color: rgba(139,95,202,0.6); letter-spacing: 0.2em; margin-top: 14px;">Practitioner · Facilitator · Master</p>
+      </div>
+      <div style="position: relative; z-index: 1;">
+        <a href="#" class="path-cta" style="border: 1px solid rgba(139,95,202,0.45); color: var(--violet-mid);"
+           onmouseover="this.style.background='rgba(107,63,160,0.18)';this.style.boxShadow='0 0 28px rgba(107,63,160,0.38)';this.style.borderColor='rgba(139,95,202,0.75)'"
+           onmouseout="this.style.background='transparent';this.style.boxShadow='none';this.style.borderColor='rgba(139,95,202,0.45)'">Apply for Certification</a>
+      </div>
+    </div>
+
+    <!-- Door 3: Partner Your Venue — Gold -->
+    <div class="path-panel reveal rd3" style="background: linear-gradient(180deg, rgba(196,146,42,0.32) 0%, rgba(5,3,9,0.95) 100%);">
+      <img class="path-panel-bg" src="SoundTemple%20Content/ad85d350-42d2-41d4-8586-3b7ac705aaf2.jpg" style="opacity: 0.30;" alt=""/>
+      <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(5,3,9,0.88) 0%, transparent 55%); pointer-events: none;"></div>
+      <div style="position: relative; z-index: 1;">
+        <!-- Pyramid icon -->
+        <svg width="36" height="30" viewBox="0 0 36 30" aria-hidden="true" style="margin-bottom: 18px;">
+          <defs>
+            <linearGradient id="lp-pyr-g" x1="0%" y1="100%" x2="50%" y2="0%">
+              <stop offset="0%" stop-color="#C4922A"/>
+              <stop offset="100%" stop-color="#F5D47A"/>
+            </linearGradient>
+          </defs>
+          <polygon points="18,2 34,28 2,28" fill="none" stroke="url(#lp-pyr-g)" stroke-width="1.8" style="animation: goldPulse 8s ease-in-out infinite;"/>
+          <polygon points="18,8 28,28 8,28"  fill="none" stroke="#E8B84B" stroke-width="0.6" opacity="0.38" style="animation: goldPulse 8s ease-in-out infinite; animation-delay:-2s;"/>
+        </svg>
+        <p style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.32em; color: var(--gold-light); text-transform: uppercase; margin-bottom: 14px; animation: goldPulse 8s ease-in-out infinite;">Partner Your Venue</p>
+        <p class="body-copy" style="font-size: clamp(13px,1.4vw,15px); font-style: italic; margin-bottom: 10px;">Bring the temple to your space.</p>
+        <p class="body-copy" style="font-size: clamp(13px,1.4vw,15px);">Revenue share. Network access.<br>The grid expands.</p>
+        <p style="font-family: var(--font-mono); font-size: 7px; color: rgba(245,212,122,0.5); letter-spacing: 0.2em; margin-top: 14px;">Hotels · Spas · Retreat Centers</p>
+      </div>
+      <div style="position: relative; z-index: 1;">
+        <a href="#" class="path-cta" style="border: 1px solid rgba(196,146,42,0.45); color: var(--gold-light);"
+           onmouseover="this.style.background='rgba(196,146,42,0.14)';this.style.boxShadow='0 0 28px rgba(196,146,42,0.38)';this.style.borderColor='rgba(196,146,42,0.75)'"
+           onmouseout="this.style.background='transparent';this.style.boxShadow='none';this.style.borderColor='rgba(196,146,42,0.45)'">Explore Partnership</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="thread"><span class="thread-gem">◇</span></div>
+
+<!-- ══════════════════════════════════════════════
+     §8 — THE PULSE (Live Right Now)
+     ══════════════════════════════════════════════ -->
+<section data-coherence-pulse="#E8B84B" style="background: var(--void); padding: clamp(64px,10vw,120px) clamp(24px,6vw,80px); text-align: center; position: relative; overflow: hidden;">
+  <!-- Background photo — live session texture -->
+  <div aria-hidden="true" style="position: absolute; inset: 0; z-index: 0; pointer-events: none;">
+    <img src="SoundTemple%20Content/0bdd0e27-82e2-49dc-98d1-739ec953666e.jpg"
+         style="width: 100%; height: 100%; object-fit: cover; object-position: center 30%; opacity: 0.11;" alt=""/>
+    <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, transparent 25%, rgba(5,3,9,0.88) 72%);"></div>
+  </div>
+  <!-- Breathing gold membrane -->
+  <div class="amb-membrane" aria-hidden="true" style="background: radial-gradient(ellipse at 50% 50%, rgba(196,146,42,0.07) 0%, transparent 70%); animation: breatheSlow 14s ease-in-out infinite; animation-delay:-3s;"></div>
+  <p class="eyebrow reveal" style="position: relative; z-index: 1;">The Pulse</p>
+  <p class="pull-quote reveal rd1" style="font-size: clamp(1.6rem,2.8vw,2.4rem); margin: 0 auto clamp(40px,6vw,64px); max-width: 500px; position: relative; z-index: 1;">Live. Right now.<br><em>This is the movement.</em></p>
+
+  <!-- Metric bar — staggered breathe so they never pulse in sync -->
+  <div class="metric-bar reveal rd2" style="position: relative; z-index: 1;">
+    <div class="metric-cell">
+      <span class="metric-num" data-target="1247" style="color: var(--gold-bright); animation: breathe 4s ease-in-out infinite;">1,247</span>
+      <span class="metric-label">Bodies on Beds</span>
+    </div>
+    <div class="metric-cell">
+      <span class="metric-num" data-target="12" style="color: var(--teal-bright); animation: breathe 6s ease-in-out infinite; animation-delay:-1.5s;">12</span>
+      <span class="metric-label">Active Sessions</span>
+    </div>
+    <div class="metric-cell">
+      <span class="metric-num" data-target="0.73" style="color: var(--violet-mid); animation: breathe 8s ease-in-out infinite; animation-delay:-3s;">0.73</span>
+      <span class="metric-label">Global Coherence</span>
+    </div>
+    <div class="metric-cell">
+      <span class="metric-num" data-target="5" style="color: var(--teal); animation: breathe 10s ease-in-out infinite; animation-delay:-5s;">5</span>
+      <span class="metric-label">Temples Online</span>
+    </div>
+  </div>
+
+  <div class="reveal rd3">
+    <a href="index.html" style="display: inline-block; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold-light); border: 1px solid rgba(196,146,42,0.4); padding: 14px 40px; border-radius: 40px; text-decoration: none; transition: background 0.4s ease, border-color 0.4s ease;"
+       onmouseover="this.style.background='rgba(196,146,42,0.12)'; this.style.borderColor='rgba(196,146,42,0.65)'"
+       onmouseout="this.style.background='transparent'; this.style.borderColor='rgba(196,146,42,0.4)'">Open Heart Weather →</a>
+  </div>
+</section>
+
+<div class="thread" style="background: rgba(42,21,64,0.3);"><span class="thread-gem">◇</span></div>
+
+<!-- ══════════════════════════════════════════════
+     §8.5 — FACILITATORS / ARTISTS DIRECTORY
+     ══════════════════════════════════════════════ -->
+<section id="artists" style="background: var(--void); padding: clamp(64px,10vw,120px) clamp(24px,6vw,80px); position: relative; overflow: hidden;">
+  <style>
+    .st-artist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: clamp(10px,1.5vw,18px); }
+    .st-artist-card { position: relative; display: block; text-decoration: none; color: inherit; border: 1px solid var(--border-subtle); overflow: hidden; opacity: 0; transform: translateY(16px); animation: stCardRise .6s ease forwards; background: rgba(255,255,255,0.02); }
+    @keyframes stCardRise { to { opacity: 1; transform: translateY(0); } }
+    .st-card-photo { aspect-ratio: 3/4; overflow: hidden; }
+    .st-card-photo img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s ease, filter 1.2s ease; filter: saturate(0.9) brightness(0.84); }
+    .st-artist-card:hover .st-card-photo img { transform: scale(1.06); filter: saturate(1.05) brightness(1); }
+    .st-card-meta { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 16px 14px; background: linear-gradient(to top, rgba(5,3,9,0.94) 0%, rgba(5,3,9,0.6) 55%, transparent 100%); display: flex; flex-direction: column; gap: 4px; }
+    .st-card-name { font-family: var(--font-display); font-style: italic; font-weight: 300; font-size: 1.18rem; color: var(--cream); line-height: 1.08; }
+    .st-card-role { font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--teal-bright); }
+    @media (prefers-reduced-motion: reduce) { .st-artist-card { opacity: 1; transform: none; animation: none; } }
+  </style>
+  <div style="max-width: 1200px; margin: 0 auto; position: relative; z-index: 1;">
+    <p class="eyebrow reveal" style="text-align: center;">The Facilitators</p>
+    <p class="pull-quote reveal rd1" style="text-align: center; font-size: clamp(1.6rem,2.8vw,2.4rem); margin: 0 auto clamp(14px,2vw,22px); max-width: 600px;">The voices of the temple.<br><em>Find them. Book them.</em></p>
+    <p class="reveal rd1" style="text-align: center; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; line-height: 1.85; color: var(--text-muted); max-width: 560px; margin: 0 auto clamp(40px,6vw,64px);">Sound healers, vocalists, and ceremony-makers who move through the SoundTemple field. Every profile is a doorway to their music, their tour, and a session.</p>
+    <div id="artist-grid" class="st-artist-grid" aria-live="polite"></div>
+  </div>
+  <script>
+    (function () {
+      fetch('artists.json')
+        .then(function (r) { return r.json(); })
+        .then(function (list) {
+          var grid = document.getElementById('artist-grid');
+          if (!grid) return;
+          list.filter(function (a) { return !a.hidden && a.name; }).forEach(function (a, i) {
+            var card = document.createElement('a');
+            card.href = 'artist.html?id=' + encodeURIComponent(a.id);
+            card.className = 'st-artist-card';
+            card.style.animationDelay = (i * 0.035) + 's';
+            var role = a.tier === 'label' ? 'Partner' : 'Facilitator';
+            var photo = document.createElement('div');
+            photo.className = 'st-card-photo';
+            var img = document.createElement('img');
+            img.loading = 'lazy';
+            img.src = 'artists/thumb/' + a.id + '.jpg';
+            img.alt = a.name;
+            photo.appendChild(img);
+            var meta = document.createElement('div');
+            meta.className = 'st-card-meta';
+            var nm = document.createElement('span');
+            nm.className = 'st-card-name';
+            nm.textContent = a.name;
+            var rl = document.createElement('span');
+            rl.className = 'st-card-role';
+            rl.textContent = role;
+            meta.appendChild(nm);
+            meta.appendChild(rl);
+            card.appendChild(photo);
+            card.appendChild(meta);
+            grid.appendChild(card);
+          });
+        })
+        .catch(function () {
+          var grid = document.getElementById('artist-grid');
+          if (grid) {
+            var msg = document.createElement('p');
+            msg.style.cssText = 'grid-column:1/-1;text-align:center;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);';
+            msg.textContent = 'Facilitators loading soon.';
+            grid.appendChild(msg);
+          }
+        });
+    }());
+  </script>
+</section>
+
+<div class="thread" style="background: rgba(42,21,64,0.3);"><span class="thread-gem">◇</span></div>
+
+<!-- ══════════════════════════════════════════════
+     §9 — CLOSING
+     ══════════════════════════════════════════════ -->
+<section style="position: relative; width: 100%; height: 100vh; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+  <div class="ttm-close-wrap"
+       onmousedown="this.classList.add('active')"
+       onmouseup="this.classList.remove('active')"
+       onmouseleave="this.classList.remove('active')"
+       ontouchstart="this.classList.add('active');event.preventDefault()"
+       ontouchend="this.classList.remove('active')">
+    <img src="SoundTemple%20Content/6ed95a4c-345d-40f5-bb30-533d6a4122ab.jpg"
+         alt="Sacred jungle temple — the movement lives here"/>
+    <span class="ttm-badge-close">Touch to move</span>
+  </div>
+  <!-- Breathing vignette frame (ESU-inspired) -->
+  <div aria-hidden="true" style="position: absolute; inset: 0; box-shadow: inset 0 0 140px rgba(5,3,9,0.75); animation: breatheSlow 6s ease-in-out infinite; pointer-events: none;"></div>
+  <!-- Dark overlay -->
+  <div style="position: absolute; inset: 0; background: rgba(5,3,9,0.65);"></div>
+  <!-- Ambient violet glow -->
+  <div aria-hidden="true" style="position: absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(640px,90vw); height:min(320px,45vw); background:radial-gradient(ellipse at 50% 50%, rgba(107,63,160,0.22) 0%, transparent 70%); pointer-events:none; animation:breatheSlow 10s ease-in-out infinite;"></div>
+
+  <!-- Content -->
+  <div style="position: relative; z-index: 1; text-align: center; padding: 24px;">
+    <!-- Breathing node -->
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" style="display: block; margin: 0 auto clamp(20px,4vw,36px);">
+      <defs>
+        <radialGradient id="lp-close-node" cx="35%" cy="30%" r="65%">
+          <stop offset="0%" stop-color="#9BE8E8"/>
+          <stop offset="50%" stop-color="#4AADAD"/>
+          <stop offset="100%" stop-color="#0D4038"/>
+        </radialGradient>
+      </defs>
+      <circle cx="9" cy="9" r="7" fill="url(#lp-close-node)" style="animation: nodeGlow 5s ease-in-out infinite;"/>
+    </svg>
+
+    <!-- Tagline — wrapped to isolate from reveal opacity conflict -->
+    <div class="reveal">
+      <p data-wrev data-wrev-delay="300" style="font-family: var(--font-display); font-weight: 300; font-style: italic; font-size: clamp(3rem,7vw,5.5rem); color: var(--gold-light); line-height: 1.1; animation: goldPulse 10s ease-in-out infinite;">make loving art</p>
+    </div>
+
+    <!-- Wordmark — fires on scroll via .wm-trigger -->
+    <div class="reveal rd1 wm-trigger" data-wm-delay="1500" style="margin-top: clamp(16px,3vw,28px);">
+      <p class="wm" style="font-family: var(--font-mono); font-size: 9px; color: var(--teal-bright); text-transform: uppercase;">SOUNDTEMPLE</p>
+    </div>
+
+    <!-- Rule -->
+    <div class="reveal rd2" style="width: 40px; height: 1px; background: rgba(92,197,197,0.22); margin: clamp(16px,3vw,28px) auto 0;"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+     ══════════════════════════════════════════════ -->
+<footer style="background: var(--void); border-top: 1px solid rgba(255,255,255,0.06); padding: clamp(24px,4vw,40px) clamp(24px,6vw,80px); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+  <span style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: var(--text-muted);">© 2026 Light Pump Labs</span>
+  <nav style="display: flex; gap: clamp(16px,3vw,28px); flex-wrap: wrap;">
+    <a href="brand-showcase.html" style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: var(--text-muted); text-decoration: none; text-transform: uppercase; transition: color 0.3s ease;" onmouseover="this.style.color='#F2EAD8'" onmouseout="this.style.color='rgba(242,234,216,0.52)'">Brand Guide</a>
+    <a href="look-book.html" style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: var(--text-muted); text-decoration: none; text-transform: uppercase; transition: color 0.3s ease;" onmouseover="this.style.color='#F2EAD8'" onmouseout="this.style.color='rgba(242,234,216,0.52)'">Look Book</a>
+    <a href="index.html" style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: var(--text-muted); text-decoration: none; text-transform: uppercase; transition: color 0.3s ease;" onmouseover="this.style.color='#F2EAD8'" onmouseout="this.style.color='rgba(242,234,216,0.52)'">Heart Weather</a>
+  </nav>
+  <span style="font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.2em; color: rgba(92,197,197,0.4);">A movement towards global coherence</span>
+</footer>
+
+<script>
+(function () {
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ── WORD-BY-WORD REVEAL ──────────────────────────────────────────
+  var wordObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        var items = e.target.querySelectorAll('.word-item');
+        var delay = parseInt(e.target.getAttribute('data-wrev-delay') || '62', 10);
+        items.forEach(function (item, i) {
+          setTimeout(function () { item.classList.add('wi-vis'); }, i * delay);
+        });
+        wordObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.25 });
+
+  document.querySelectorAll('[data-wrev]').forEach(function (el) {
+    var text = el.textContent.trim().replace(/\s+/g, ' ');
+    var words = text.split(' ');
+    // Safe DOM construction — no innerHTML used
+    var frag = document.createDocumentFragment();
+    words.forEach(function (w, i) {
+      var span = document.createElement('span');
+      span.className = 'word-item';
+      span.textContent = w;
+      frag.appendChild(span);
+      if (i < words.length - 1) { frag.appendChild(document.createTextNode(' ')); }
+    });
+    while (el.firstChild) { el.removeChild(el.firstChild); }
+    el.appendChild(frag);
+    el.classList.remove('reveal', 'rd1', 'rd2', 'rd3', 'rd4');
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+    if (reducedMotion) {
+      el.querySelectorAll('.word-item').forEach(function (w) { w.classList.add('wi-vis'); });
+    } else {
+      wordObserver.observe(el);
+    }
+  });
+
+  // ── SCROLL REVEAL + WORDMARK TRIGGER ────────────────────────────
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        if (e.target.classList.contains('wm-trigger')) {
+          var wmDelay = parseInt(e.target.getAttribute('data-wm-delay') || '0', 10);
+          var wmEl = e.target;
+          setTimeout(function () {
+            var wm = wmEl.querySelector('.wm');
+            if (wm) {
+              wm.classList.add('wm-play', 'wm-shimmer-ready');
+              if (!reducedMotion) {
+                setTimeout(function () { wm.classList.add('wm-shine'); }, 2800);
+              }
+            }
+          }, wmDelay);
+        }
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(function (el) { observer.observe(el); });
+
+  // ── SHIMMER ON PAGE-LOAD WORDMARK ────────────────────────────────
+  var heroWm = document.querySelector('.wm.wm-play');
+  if (heroWm && !reducedMotion) {
+    heroWm.classList.add('wm-shimmer-ready');
+    setTimeout(function () { heroWm.classList.add('wm-shine'); }, 2800);
+  }
+
+  // ── METRIC COUNTERS ON SCROLL-IN ─────────────────────────────────
+  function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
+
+  var metricBar = document.querySelector('.metric-bar');
+  if (metricBar && !reducedMotion) {
+    var metricObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.querySelectorAll('.metric-num[data-target]').forEach(function (num, idx) {
+            var target = parseFloat(num.getAttribute('data-target'));
+            var isFloat = num.getAttribute('data-target').indexOf('.') !== -1;
+            setTimeout(function () {
+              var startTime = null;
+              var dur = 1800;
+              (function step(ts) {
+                if (!startTime) { startTime = ts; }
+                var progress = Math.min((ts - startTime) / dur, 1);
+                var val = easeOutQuart(progress) * target;
+                num.textContent = isFloat
+                  ? val.toFixed(2)
+                  : (target >= 1000 ? Math.floor(val).toLocaleString() : String(Math.floor(val)));
+                if (progress < 1) { requestAnimationFrame(step); }
+              }(performance.now()));
+            }, idx * 120);
+          });
+          metricObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.35 });
+    metricObs.observe(metricBar);
+  }
+
+  // ── ONE-TIME COHERENCE PULSE ON SECTION ENTER ────────────────────
+  if (!reducedMotion) {
+    document.querySelectorAll('[data-coherence-pulse]').forEach(function (section) {
+      var color = section.getAttribute('data-coherence-pulse');
+      var fired = false;
+      var cpObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting && !fired) {
+            fired = true;
+            var ns = 'http://www.w3.org/2000/svg';
+            var svg = document.createElementNS(ns, 'svg');
+            svg.setAttribute('style',
+              'position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);' +
+              'pointer-events:none;z-index:0;overflow:visible;width:0;height:0;');
+            var circle = document.createElementNS(ns, 'circle');
+            circle.setAttribute('cx', '0'); circle.setAttribute('cy', '0'); circle.setAttribute('r', '0');
+            circle.setAttribute('fill', 'none');
+            circle.setAttribute('stroke', color);
+            circle.setAttribute('stroke-width', '1.2');
+            circle.style.cssText = 'animation:coherence-enter 2s ease-out forwards;';
+            svg.appendChild(circle);
+            section.appendChild(svg);
+            setTimeout(function () { if (svg.parentNode) { svg.parentNode.removeChild(svg); } }, 2300);
+            cpObs.unobserve(section);
+          }
+        });
+      }, { threshold: 0.35 });
+      cpObs.observe(section);
+    });
+  }
+
+  // ── NODE HOVER ACCELERATION ──────────────────────────────────────
+  if (!reducedMotion) {
+    document.querySelectorAll('circle[style*="nodeGlow"]').forEach(function (circle) {
+      circle.addEventListener('mouseenter', function () {
+        circle.style.animationDuration = '1.5s';
+      });
+      circle.addEventListener('mouseleave', function () {
+        circle.style.animationDuration = '';
+      });
+    });
+  }
+
+  // ── MAGNETIC CTA BUTTONS ─────────────────────────────────────────
+  if (!reducedMotion) {
+    document.querySelectorAll('.path-cta').forEach(function (btn) {
+      btn.addEventListener('mousemove', function (e) {
+        var rect = btn.getBoundingClientRect();
+        var x = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
+        var y = ((e.clientY - rect.top) / rect.height - 0.5) * 8;
+        btn.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+        btn.style.transitionProperty = 'transform';
+        btn.style.transitionDuration = '0.12s';
+      });
+      btn.addEventListener('mouseleave', function () {
+        btn.style.transform = 'translate(0,0)';
+        btn.style.transitionDuration = '0.4s';
+        btn.style.transitionTimingFunction = 'cubic-bezier(0.34,1.56,0.64,1)';
+      });
+    });
+  }
+
+}());
+</script>
+</body>
+</html>

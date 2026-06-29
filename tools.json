@@ -1,0 +1,32 @@
+[
+  {
+    "id": "opus-soundbed",
+    "name": "Opus SoundBed",
+    "maker": "Opus",
+    "category": "Full-body vibro-acoustic bed",
+    "blurb": "A full-body vibro-acoustic bed with transducers mapped to the body's energy centers — head, heart, belly, root, feet. Sound becomes something you feel in the bones, not just hear.",
+    "accent": "teal",
+    "site": "https://feelopus.com",
+    "tag": "Flagship"
+  },
+  {
+    "id": "immortal",
+    "name": "Immortal",
+    "maker": "",
+    "category": "Vibro-acoustic lounger",
+    "blurb": "A reclined vibro-acoustic system for deep nervous-system regulation — low-frequency waves carried through the whole body for rest, recovery, and coherence.",
+    "accent": "gold",
+    "site": "",
+    "tag": "Partner device"
+  },
+  {
+    "id": "bioharmonix-shiftwave",
+    "name": "BioHarmonix Shift Wave",
+    "maker": "BioHarmonix",
+    "category": "Resonance chair",
+    "blurb": "A resonance chair that pairs sound and pressure waves to move the body out of fight-or-flight in minutes — a fast doorway into a parasympathetic, settled state.",
+    "accent": "violet",
+    "site": "",
+    "tag": "Partner device"
+  }
+]

@@ -10,22 +10,32 @@
     "tag": "Flagship"
   },
   {
-    "id": "immortal",
-    "name": "Immortal",
-    "maker": "",
-    "category": "Vibro-acoustic lounger",
-    "blurb": "A reclined vibro-acoustic system for deep nervous-system regulation — low-frequency waves carried through the whole body for rest, recovery, and coherence.",
+    "id": "ammortal",
+    "name": "Ammortal",
+    "maker": "Ammortal",
+    "category": "Longevity chamber",
+    "blurb": "The Ammortal Chamber layers red light, PEMF, molecular hydrogen, breathwork, and vibro-acoustics into one guided reset — a full-system tune-up for body and nervous system.",
     "accent": "gold",
     "site": "",
     "tag": "Partner device"
   },
   {
-    "id": "bioharmonix-shiftwave",
-    "name": "BioHarmonix Shift Wave",
-    "maker": "BioHarmonix",
-    "category": "Resonance chair",
-    "blurb": "A resonance chair that pairs sound and pressure waves to move the body out of fight-or-flight in minutes — a fast doorway into a parasympathetic, settled state.",
+    "id": "shiftwave",
+    "name": "Shiftwave",
+    "maker": "Shiftwave",
+    "category": "Pressure-wave chair",
+    "blurb": "A chair that pairs sound with rhythmic pressure waves to move the body out of fight-or-flight in minutes — a fast doorway into a settled, parasympathetic state.",
     "accent": "violet",
+    "site": "",
+    "tag": "Partner device"
+  },
+  {
+    "id": "bioharmonics",
+    "name": "Bioharmonics",
+    "maker": "Bioharmonics",
+    "category": "Harmonic resonance",
+    "blurb": "Harmonic resonance technology that tunes the body with precise frequency and sound — restoring coherence and a felt sense of order from the inside out.",
+    "accent": "teal",
     "site": "",
     "tag": "Partner device"
   }

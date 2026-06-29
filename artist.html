@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SoundTemple — Facilitator</title>
+<title>SoundTemple — Sound Artist</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
@@ -99,20 +99,20 @@
 
 <nav class="nav">
   <a href="index.html" class="nav-wm">SoundTemple</a>
-  <a href="landing.html#artists" class="nav-back">← All facilitators</a>
+  <a href="landing.html#artists" class="nav-back">← All sound artists</a>
 </nav>
 
 <div id="loading" class="loading">Summoning the profile…</div>
 
 <div id="notfound" class="notfound" style="display:none;">
-  Facilitator not found. <a href="landing.html#artists">Return to the directory →</a>
+  Sound artist not found. <a href="landing.html#artists">Return to the directory →</a>
 </div>
 
 <main id="profile" class="wrap">
   <section class="hero">
     <div class="hero-photo"><img id="p-photo" src="" alt=""></div>
     <div>
-      <p class="role" id="p-role">Facilitator</p>
+      <p class="role" id="p-role">Sound Artist</p>
       <h1 class="name" id="p-name"></h1>
       <p class="bio" id="p-bio"></p>
       <div class="links" id="p-links"></div>
@@ -136,7 +136,7 @@
 
   <section class="booking">
     <h2 id="b-heading">Request a session</h2>
-    <p class="sub">SoundTemple coordinates the booking by hand for now. Send the details and we'll connect you directly with the facilitator.</p>
+    <p class="sub">SoundTemple coordinates the booking by hand for now. Send the details and we'll connect you directly with the sound artist.</p>
     <form name="session-request" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="booking-form">
       <input type="hidden" name="form-name" value="session-request">
       <input type="hidden" name="artist" id="form-artist" value="">
@@ -155,7 +155,7 @@
 
 <footer>
   <span>© 2026 Light Pump Labs · SoundTemple</span>
-  <a href="landing.html#artists">All facilitators →</a>
+  <a href="landing.html#artists">All sound artists →</a>
 </footer>
 
 <script>
@@ -201,7 +201,7 @@
       if (!a) { fail(); return; }
 
       document.title = 'SoundTemple — ' + a.name;
-      document.getElementById('p-role').textContent = a.tier === 'label' ? 'Partner' : 'Facilitator';
+      document.getElementById('p-role').textContent = a.tier === 'label' ? 'Partner' : 'Sound Artist';
       document.getElementById('p-name').textContent = a.name;
       document.getElementById('p-bio').textContent = a.bio || '';
 

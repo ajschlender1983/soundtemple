@@ -125,7 +125,7 @@
   <div class="nav-links">
     <a href="#tools">Tools</a>
     <a href="#transmissions">Transmissions</a>
-    <a href="#facilitators" class="hideable">Facilitators</a>
+    <a href="#artists" class="hideable">Sound Artists</a>
     <a href="#certification" class="hideable">Certification</a>
     <a href="#field" class="cta">The Field</a>
   </div>
@@ -183,7 +183,7 @@
 <div class="thread"></div>
 
 <!-- FACILITATORS -->
-<section class="pad" id="facilitators">
+<section class="pad" id="artists">
   <div class="wrap">
     <p class="eyebrow">The Voices</p>
     <h2 class="h-sec">Find them. Book them.</h2>
@@ -198,22 +198,22 @@
 <section class="pad" id="certification">
   <div class="wrap">
     <p class="eyebrow">Carry the work</p>
-    <h2 class="h-sec">Become a facilitator.</h2>
-    <p class="lead">Certification creates facilitators who can run sessions anywhere — a 2-day in-person intensive in Austin, co-located with Bathhouse, plus a 4-week remote practicum. Every certified facilitator is a node that operates on their own.</p>
+    <h2 class="h-sec">Become a certified guide.</h2>
+    <p class="lead">Certification creates guides who can run sessions anywhere — a 2-day in-person intensive in Austin, co-located with Bathhouse, plus a 4-week remote practicum. Every certified guide is a node that operates on their own.</p>
     <div class="cert-grid">
       <div class="cert t1">
         <span class="ct">Tier I</span><span class="cn">Practitioner</span><span class="cp">$2,500</span>
-        <p class="cd">Foundation training in SoundBed facilitation. A six-day immersive intensive. Open to all backgrounds.</p>
+        <p class="cd">Foundation training in SoundBed guiding. A six-day immersive intensive. Open to all backgrounds.</p>
         <span class="cmeta">6-day intensive · open enrollment</span>
       </div>
       <div class="cert t2">
-        <span class="ct">Tier II</span><span class="cn">Facilitator</span><span class="cp">$5,000</span>
-        <p class="cd">Advanced coherence facilitation and session design. Eligible to lead group sessions at partner venues.</p>
+        <span class="ct">Tier II</span><span class="cn">Certified Guide</span><span class="cp">$5,000</span>
+        <p class="cd">Advanced coherence guiding and session design. Eligible to lead group sessions at partner venues.</p>
         <span class="cmeta">Advanced pathway · venue-eligible</span>
       </div>
       <div class="cert t3">
         <span class="ct">Tier III</span><span class="cn">Master</span><span class="cp">$7,500</span>
-        <p class="cd">Master-level certification. Train the next generation of facilitators. Global network access.</p>
+        <p class="cd">Master-level certification. Train the next generation of guides. Global network access.</p>
         <span class="cmeta">By invitation · train-the-trainer</span>
       </div>
     </div>
@@ -228,7 +228,7 @@
     <nav style="display:flex;gap:clamp(14px,3vw,26px);flex-wrap:wrap;">
       <a href="#tools">Tools</a>
       <a href="#transmissions">Transmissions</a>
-      <a href="#facilitators">Facilitators</a>
+      <a href="#artists">Sound Artists</a>
       <a href="#certification">Certification</a>
       <a href="heart-weather.html">Heart Weather</a>
       <a href="brand-showcase.html">Brand</a>
@@ -274,7 +274,7 @@
   var TIERS=[
     {cad:'Weekly',color:'74,173,173',nz:'8px',name:'Friday Transmission',freq:'Every Friday',desc:'A live community sound journey, every week. The steady heartbeat of the temple — show up, lie down, be moved.'},
     {cad:'Every 6 weeks',color:'92,197,197',nz:'12px',name:'Marquee',freq:'~8 / year',desc:'A featured artist in a bigger room. The gatherings people travel for — a step up in scale, sound, and ceremony.'},
-    {cad:'Quarterly',color:'139,95,202',nz:'17px',name:'Convergence',freq:'4 / year',desc:'A seasonal convergence. Multiple facilitators, more bodies, a full day of the field tuning together.'},
+    {cad:'Quarterly',color:'139,95,202',nz:'17px',name:'Convergence',freq:'4 / year',desc:'A seasonal convergence. Multiple guides, more bodies, a full day of the field tuning together.'},
     {cad:'Annual',color:'232,184,75',nz:'24px',name:'The Gathering',freq:'Once a year',desc:'The flagship. Once a year the whole movement comes together in one place — the field, embodied, at full strength.'}
   ];
   (function(){
@@ -304,7 +304,7 @@
       var img=document.createElement('img');img.loading='lazy';img.src='artists/thumb/'+a.id+'.jpg';img.alt=a.name;photo.appendChild(img);
       var meta=document.createElement('div');meta.className='st-card-meta';
       var nm=document.createElement('span');nm.className='st-card-name';nm.textContent=a.name;
-      var rl=document.createElement('span');rl.className='st-card-role';rl.textContent=a.tier==='label'?'Partner':'Facilitator';
+      var rl=document.createElement('span');rl.className='st-card-role';rl.textContent=a.tier==='label'?'Partner':'Sound Artist';
       meta.appendChild(nm);meta.appendChild(rl);card.appendChild(photo);card.appendChild(meta);grid.appendChild(card);
     });
   }).catch(function(){});

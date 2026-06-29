@@ -22,7 +22,8 @@
   html,body{height:100%;}
   body{background:var(--void);color:var(--cream);font-family:var(--f-mono);overflow:hidden;}
   #map{position:absolute;inset:0;background:var(--void);}
-  #fx{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;}
+  #ocean,#land,#fx{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+  #ocean{z-index:1;} #land{z-index:2;} #fx{z-index:3;}
   .maplibregl-ctrl-attrib{font-size:8px!important;background:rgba(5,3,12,0.5)!important;}
   .maplibregl-ctrl-attrib a{color:rgba(242,234,216,0.4)!important;}
   .maplibregl-ctrl-group{background:rgba(13,10,26,0.7)!important;border:1px solid var(--line)!important;}
@@ -149,6 +150,8 @@
 <body>
 
 <div id="map"></div>
+<canvas id="ocean"></canvas>
+<canvas id="land"></canvas>
 <canvas id="fx"></canvas>
 
 <div class="topbar">
@@ -227,19 +230,17 @@
   }
   function auraFor(c){return AURA[Math.max(0,Math.min(BUCKETS-1,Math.round(c*(BUCKETS-1))))];}
 
-  var CARTO='https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png';
+  // No tiles — MapLibre is just the camera; the planet (ocean + glass land) is rendered on canvas.
   var map=new maplibregl.Map({
     container:'map',
-    style:{version:8,sources:{carto:{type:'raster',tiles:[CARTO],tileSize:256,
-      attribution:'© OpenStreetMap, © CARTO · SoundTemple illustrative data'}},
-      layers:[{id:'bg',type:'background',paint:{'background-color':'#05030c'}},
-        {id:'carto',type:'raster',source:'carto',paint:{'raster-opacity':0.82,'raster-saturation':-0.25}}]},
-    center:[-96,38.5],zoom:3.4,minZoom:3,maxZoom:17,dragRotate:false,attributionControl:true,
+    style:{version:8,sources:{},layers:[{id:'bg',type:'background',paint:{'background-color':'#05030c'}}]},
+    center:[-96,38.5],zoom:3.4,minZoom:2.4,maxZoom:17,dragRotate:false,attributionControl:false,
     pitchWithRotate:false,renderWorldCopies:false
   });
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),'bottom-left');
-  map.on('moveend',function(){fieldDirty=true;});
-  map.on('zoomend',function(){fieldDirty=true;});
+  map.on('move',function(){landDirty=true;});
+  map.on('moveend',function(){fieldDirty=true;landDirty=true;rebuildLand();});
+  map.on('zoomend',function(){fieldDirty=true;landDirty=true;});
   // embed mode (used by the landing-page hero): cleaner chrome, no scroll-zoom hijack
   var EMBED=/[?&]embed=1/.test(location.search);
   if(EMBED){ try{map.scrollZoom.disable();}catch(e){}
@@ -248,18 +249,37 @@
     var _cr=document.getElementById('crumb'); if(_cr)_cr.style.display='none'; }
 
   var fx=document.getElementById('fx'),fctx=fx.getContext('2d'),DPR=Math.min(2,window.devicePixelRatio||1);
-  function sizeFX(){fx.width=fx.clientWidth*DPR;fx.height=fx.clientHeight*DPR;fctx.setTransform(DPR,0,0,DPR,0,0);}
+  var ocean=document.getElementById('ocean'),octx=ocean.getContext('2d');
+  var land=document.getElementById('land'),lctx=land.getContext('2d');
+  var landDirty=true;
+  function sizeFX(){
+    [fx,ocean,land].forEach(function(cv){cv.width=cv.clientWidth*DPR;cv.height=cv.clientHeight*DPR;cv.getContext('2d').setTransform(DPR,0,0,DPR,0,0);});
+    landDirty=true; initParticles();
+  }
   window.addEventListener('resize',sizeFX);sizeFX();
 
   var LOC=[],USR=[],SESS={},usersByLoc={},rendered=[],mode='nation',selLoc=null,selUser=null;
-  var layer='field',introWaveStart=0,t0=performance.now();
+  var layer='field',introWaveStart=0,t0=performance.now(),LAND=null;
 
   Promise.all([
     fetch('data/locations.json').then(function(r){return r.json();}),
     fetch('data/users.json').then(function(r){return r.json();}),
-    fetch('data/sessions.json').then(function(r){return r.json();})
+    fetch('data/sessions.json').then(function(r){return r.json();}),
+    fetch('data/land.geojson').then(function(r){return r.json();}).catch(function(){return null;})
   ]).then(function(res){
     LOC=res[0];USR=res[1];res[2].forEach(function(s){SESS[s.key]=s;});
+    if(res[3]&&res[3].features){
+      LAND=res[3].features.map(function(ft){
+        var g=ft.geometry,rings=[];
+        function addPoly(poly){for(var r=0;r<poly.length;r++)rings.push(poly[r]);}
+        if(g.type==='Polygon')addPoly(g.coordinates);
+        else if(g.type==='MultiPolygon')for(var i=0;i<g.coordinates.length;i++)addPoly(g.coordinates[i]);
+        var mnx=180,mny=90,mxx=-180,mxy=-90;
+        for(var a=0;a<rings.length;a++)for(var b=0;b<rings[a].length;b++){var c=rings[a][b];if(c[0]<mnx)mnx=c[0];if(c[0]>mxx)mxx=c[0];if(c[1]<mny)mny=c[1];if(c[1]>mxy)mxy=c[1];}
+        return {rings:rings,minLon:mnx,maxLon:mxx,minLat:mny,maxLat:mxy};
+      });
+      landDirty=true;
+    }
     USR.forEach(function(u){(usersByLoc[u.locationId]=usersByLoc[u.locationId]||[]).push(u);});
     var avg=LOC.reduce(function(a,l){return a+l.coherence;},0)/LOC.length;
     document.getElementById('globalCoherence').textContent=avg.toFixed(2);
@@ -305,6 +325,53 @@
       return out;
     }
     return LOC.map(function(l){return{type:'loc',ref:l,lng:l.lon,lat:l.lat,c:l.coherence,big:true};});
+  }
+
+  // ── living ocean: flow-field particle streaklines (wind-map style) ──
+  var particles=[];
+  function initParticles(){
+    var W=ocean.clientWidth,H=ocean.clientHeight,N=Math.max(400,Math.min(1700,Math.round(W*H/900)));
+    particles=[];for(var i=0;i<N;i++)particles.push({x:Math.random()*W,y:Math.random()*H,life:20+Math.random()*180,sp:0.6+Math.random()*0.9});
+  }
+  function flow(px,py,T){ // divergence-free curl of a cheap sin/cos potential → swirling currents
+    var x=px*3.0,y=py*3.0,t=T*0.06,e=0.012;
+    var dpx=(Math.sin((x+e)+t)*Math.cos(y*0.8-t*0.7)-Math.sin((x-e)+t)*Math.cos(y*0.8-t*0.7))/(2*e);
+    var dpy=(Math.sin(x+t)*Math.cos((y+e)*0.8-t*0.7)-Math.sin(x+t)*Math.cos((y-e)*0.8-t*0.7))/(2*e);
+    return {vx:dpy,vy:-dpx};
+  }
+  function drawOcean(T,breath){
+    var W=ocean.clientWidth,H=ocean.clientHeight;if(!W)return;
+    if(!particles.length)initParticles();
+    octx.globalCompositeOperation='source-over';octx.fillStyle='rgba(5,3,12,0.062)';octx.fillRect(0,0,W,H); // trail fade
+    if(REDUCED)return;
+    octx.globalCompositeOperation='lighter';octx.lineWidth=1;
+    for(var i=0;i<particles.length;i++){var p=particles[i];
+      var v=flow(p.x/W,p.y/H,T);var spd=Math.hypot(v.vx,v.vy)||0.001;
+      var nx=p.x+v.vx*p.sp*2.4,ny=p.y+v.vy*p.sp*2.4;
+      var a=(0.035+Math.min(0.16,spd*0.05))*breath;
+      octx.strokeStyle=(p.life>150?'rgba(92,197,197,':'rgba(74,173,173,')+a.toFixed(3)+')';
+      octx.beginPath();octx.moveTo(p.x,p.y);octx.lineTo(nx,ny);octx.stroke();
+      p.x=nx;p.y=ny;p.life--;
+      if(p.life<0||p.x<-5||p.x>W+5||p.y<-5||p.y>H+5){p.x=Math.random()*W;p.y=Math.random()*H;p.life=20+Math.random()*180;}
+    }
+  }
+  // ── frosted-glass elevated landmasses (cached, rebuilt on camera move) ──
+  function rebuildLand(){
+    if(!LAND){landDirty=false;return;}
+    var W=land.clientWidth,H=land.clientHeight;lctx.clearRect(0,0,W,H);
+    var bd=map.getBounds(),west=bd.getWest(),east=bd.getEast(),south=bd.getSouth(),north=bd.getNorth(),rings=[];
+    for(var f=0;f<LAND.length;f++){var ft=LAND[f];
+      if(ft.maxLon<west||ft.minLon>east||ft.maxLat<south||ft.minLat>north)continue;
+      for(var r=0;r<ft.rings.length;r++){var ring=ft.rings[r];if(ring.length<3)continue;var pr=[];
+        for(var k=0;k<ring.length;k++)pr.push(map.project(ring[k]));rings.push(pr);}}
+    if(!rings.length){landDirty=false;return;}
+    function pathAll(){lctx.beginPath();for(var i=0;i<rings.length;i++){var pr=rings[i];lctx.moveTo(pr[0].x,pr[0].y);for(var j=1;j<pr.length;j++)lctx.lineTo(pr[j].x,pr[j].y);lctx.closePath();}}
+    lctx.save();lctx.shadowColor='rgba(0,0,0,0.5)';lctx.shadowBlur=16;lctx.shadowOffsetY=7; // 1) raised slab + drop shadow
+    var g=lctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(48,44,78,0.86)');g.addColorStop(1,'rgba(18,15,38,0.80)');
+    pathAll();lctx.fillStyle=g;lctx.fill();lctx.restore();
+    lctx.save();pathAll();lctx.clip();lctx.translate(-1.3,-1.3);lctx.lineWidth=2;lctx.strokeStyle='rgba(242,234,216,0.10)';pathAll();lctx.stroke();lctx.restore(); // 2) inner sheen
+    lctx.lineWidth=1.2;lctx.strokeStyle='rgba(92,197,197,0.62)';lctx.shadowColor='rgba(92,197,197,0.55)';lctx.shadowBlur=4;pathAll();lctx.stroke();lctx.shadowBlur=0; // 3) lit coastline
+    landDirty=false;
   }
 
   // ── hex heat field (interlocking, undulating, coherence-driven; "data is the mask") ──
@@ -359,12 +426,15 @@
     if(!map)return;
     var _t=map.project([-96,38.5]); if(!_t||!isFinite(_t.x))return; // wait only until projection is ready (independent of tile/style load)
     var W=fx.clientWidth,H=fx.clientHeight;
-    fctx.clearRect(0,0,W,H);
     var T=(now-t0)/1000;
+    var planetBreath=REDUCED?1:(0.9+0.1*Math.sin(T*2*Math.PI/13)); // one 13s planetary breath ties ocean+field+nodes into a single organism
     var moving=map.isMoving&&map.isMoving();
     var calm=(moving&&!REDUCED)?0.6:1;
+    drawOcean(T,planetBreath);                          // living ocean (own canvas, beneath)
+    if(landDirty&&LAND) rebuildLand();                  // frosted-glass land (own canvas, cached)
+    fctx.clearRect(0,0,W,H);
     if((fieldDirty||!hexes)&&LOC.length&&!moving) buildHexField();
-    drawHexField(T,calm);                                  // 1) hex heat field (bottom, source-over)
+    drawHexField(T,calm*planetBreath);                                  // 1) hex heat field (bottom, source-over)
     if(layer==='circadian'){fctx.globalCompositeOperation='source-over';drawCircadian(W,H);} // 2) circadian wash
     var waveFront=null;
     if(introWaveStart){var e=(now-introWaveStart)/2600;if(e>=1.15)introWaveStart=0;else waveFront=e*1.25-0.1;}
@@ -386,7 +456,7 @@
     // 3) wide auras — 'screen' so clusters pool into rich color, not white mud
     fctx.globalCompositeOperation='screen';
     for(var i=0;i<fr.length;i++){var f=fr[i];var mult=f.big?3.4:2.6;var ar=f.base*mult*(0.88+0.24*f.auraBreath);
-      fctx.globalAlpha=Math.min(0.13,(f.big?0.11:0.07)*(0.7+0.6*f.auraBreath))*calm;
+      fctx.globalAlpha=Math.min(0.13,(f.big?0.11:0.07)*(0.7+0.6*f.auraBreath))*calm*planetBreath;
       fctx.drawImage(auraFor(f.c),f.x-ar,f.y-ar,ar*2,ar*2);}
     // 4) midglow (lighter) + user cores
     fctx.globalCompositeOperation='lighter';

@@ -5,38 +5,42 @@
     "maker": "Opus",
     "category": "Full-body vibro-acoustic bed",
     "blurb": "A full-body vibro-acoustic bed with transducers mapped to the body's energy centers — head, heart, belly, root, feet. Sound becomes something you feel in the bones, not just hear.",
+    "image": "tools-img/opus-soundbed.jpg",
     "accent": "teal",
     "site": "https://feelopus.com",
     "tag": "Flagship"
+  },
+  {
+    "id": "shiftwave",
+    "name": "Shiftwave",
+    "maker": "Shiftwave",
+    "category": "Pulsed pressure-wave chair",
+    "blurb": "The Shiftwave Pro is a zero-gravity chair with 18 transducers delivering pulsed pressure waves and guided breathwork — a 10-minute nervous-system reset trusted across pro sports.",
+    "image": "tools-img/shiftwave.jpg",
+    "accent": "violet",
+    "site": "https://shiftwave.co",
+    "tag": "Partner device"
   },
   {
     "id": "ammortal",
     "name": "Ammortal",
     "maker": "Ammortal",
     "category": "Longevity chamber",
-    "blurb": "The Ammortal Chamber layers red light, PEMF, molecular hydrogen, breathwork, and vibro-acoustics into one guided reset — a full-system tune-up for body and nervous system.",
+    "blurb": "The Ammortal Chamber stacks red & near-infrared light, PEMF, molecular hydrogen, breathwork, and vibro-acoustic sound into one reclined session — calm and energized at once.",
+    "image": "tools-img/ammortal.jpg",
     "accent": "gold",
-    "site": "",
+    "site": "https://ammortal.com",
     "tag": "Partner device"
   },
   {
-    "id": "shiftwave",
-    "name": "Shiftwave",
-    "maker": "Shiftwave",
-    "category": "Pressure-wave chair",
-    "blurb": "A chair that pairs sound with rhythmic pressure waves to move the body out of fight-or-flight in minutes — a fast doorway into a settled, parasympathetic state.",
-    "accent": "violet",
-    "site": "",
-    "tag": "Partner device"
-  },
-  {
-    "id": "bioharmonics",
-    "name": "Bioharmonics",
-    "maker": "Bioharmonics",
-    "category": "Harmonic resonance",
-    "blurb": "Harmonic resonance technology that tunes the body with precise frequency and sound — restoring coherence and a felt sense of order from the inside out.",
+    "id": "vibe",
+    "name": "VIBE",
+    "maker": "Bioharmonic Technologies",
+    "category": "Vibro-acoustic bed",
+    "blurb": "VIBE plays neurologically-tuned music through full-body transducers — low-frequency sound and vibration that calm and regulate the nervous system in a 20-minute session.",
+    "image": "tools-img/vibe.jpg",
     "accent": "teal",
-    "site": "",
+    "site": "https://healwithvibe.com",
     "tag": "Partner device"
   }
 ]

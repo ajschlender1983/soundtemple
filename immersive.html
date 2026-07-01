@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>SoundTemple — Sound, made solid.</title>
+<meta name="description" content="An immersive passage into SoundTemple: sound made solid. A living crystal, the instruments behind the feeling, and the field of the world's heart breathing together." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Playfair+Display:ital,wght@1,400;1,500;0,500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --void:#050309; --void2:#0a0713;
+  --teal:#4AADAD; --teal-lt:#5CC5C5;
+  --violet:#6B3FA0; --violet-lt:#8B5FCA;
+  --gold:#C4922A; --gold-lt:#E8B84B;
+  --ivory:#F2EAD8; --ivory-dim:rgba(242,234,216,.62);
+  --glass:rgba(242,234,216,.045);
+  --glass-line:rgba(242,234,216,.12);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --disp:'Playfair Display',Georgia,serif;
+  --mono:'DM Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--void);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{
+  font-family:var(--serif); color:var(--ivory); background:var(--void);
+  overflow-x:hidden;
+}
+/* buttery scroll target for lenis */
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+
+/* ---------- persistent WebGL void ---------- */
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block}
+/* fallback aurora when WebGL2 is unavailable */
+.no-gl #gl{display:none}
+.void-fallback{position:fixed;inset:0;z-index:0;display:none;
+  background:
+    radial-gradient(60% 55% at 50% 34%, rgba(92,197,197,.20), transparent 60%),
+    radial-gradient(70% 60% at 72% 66%, rgba(139,95,202,.20), transparent 62%),
+    radial-gradient(50% 45% at 26% 74%, rgba(232,184,75,.12), transparent 60%),
+    var(--void);
+}
+.no-gl .void-fallback{display:block;animation:driftbg 26s ease-in-out infinite alternate}
+@keyframes driftbg{from{filter:hue-rotate(0) saturate(1)}to{filter:hue-rotate(18deg) saturate(1.12)}}
+
+/* grain + vignette over everything for cinema */
+.grain{position:fixed;inset:0;z-index:2;pointer-events:none;mix-blend-mode:soft-light;opacity:.5;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/></svg>")}
+.vignette{position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(3,2,7,.65) 100%)}
+
+/* ---------- loader / enter gate ---------- */
+#loader{position:fixed;inset:0;z-index:40;background:var(--void);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4rem;
+  transition:opacity 1.1s ease, visibility 1.1s}
+#loader.gone{opacity:0;visibility:hidden;pointer-events:none}
+#loader .mark{font-family:var(--mono);font-size:.72rem;letter-spacing:.5em;text-transform:uppercase;
+  color:var(--ivory-dim);padding-left:.5em}
+#loader .bar{width:min(240px,52vw);height:1px;background:rgba(242,234,216,.12);position:relative;overflow:hidden}
+#loader .bar i{position:absolute;inset:0;transform-origin:left;transform:scaleX(0);
+  background:linear-gradient(90deg,var(--teal-lt),var(--gold-lt));transition:transform .4s ease}
+#loader .pct{font-family:var(--mono);font-size:.62rem;letter-spacing:.35em;color:var(--ivory-dim)}
+
+/* ---------- nav ---------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem clamp(1.1rem,4vw,2.6rem);
+  background:linear-gradient(180deg,rgba(5,3,9,.55),transparent);
+  -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+nav .wm{font-family:var(--disp);font-style:italic;font-size:1.12rem;letter-spacing:.02em;color:var(--ivory);text-decoration:none}
+nav .wm b{font-style:normal;font-weight:500}
+nav .links{display:flex;gap:clamp(.9rem,2.4vw,2rem);align-items:center}
+nav .links a{font-family:var(--mono);font-size:.66rem;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--ivory-dim);text-decoration:none;transition:color .3s}
+nav .links a:hover{color:var(--ivory)}
+nav .links a.cta{color:var(--void);background:var(--ivory);padding:.5rem .9rem;border-radius:2rem}
+nav .links a.cta:hover{background:var(--gold-lt)}
+@media(max-width:680px){nav .links a:not(.cta){display:none}}
+
+/* progress rail */
+#prog{position:fixed;left:0;top:0;height:2px;width:100%;z-index:21;transform-origin:left;transform:scaleX(0);
+  background:linear-gradient(90deg,var(--teal-lt),var(--violet-lt),var(--gold-lt))}
+
+/* ---------- layout ---------- */
+main{position:relative;z-index:1}
+.scene{min-height:100vh;display:flex;align-items:center;padding:clamp(4rem,10vh,8rem) clamp(1.2rem,6vw,4rem);position:relative}
+.wrap{width:100%;max-width:1160px;margin:0 auto}
+.eyebrow{font-family:var(--mono);font-size:.66rem;letter-spacing:.42em;text-transform:uppercase;color:var(--teal-lt);opacity:.85;margin-bottom:1.3rem}
+h1{font-family:var(--disp);font-weight:500;font-size:clamp(3.4rem,12vw,9.5rem);line-height:.92;letter-spacing:-.01em}
+h2{font-family:var(--disp);font-weight:500;font-size:clamp(2rem,6vw,4.2rem);line-height:1.02;letter-spacing:-.01em}
+.script{font-style:italic;color:var(--gold-lt)}
+.lead{font-size:clamp(1.25rem,2.6vw,1.9rem);line-height:1.5;font-weight:300;color:var(--ivory);max-width:38ch}
+.dim{color:var(--ivory-dim)}
+p.body{font-size:clamp(1.05rem,1.7vw,1.28rem);line-height:1.62;font-weight:300;color:var(--ivory-dim);max-width:52ch;margin-top:1.1rem}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(30px);filter:blur(7px);transition:opacity 1.1s cubic-bezier(.2,.7,.2,1),transform 1.1s cubic-bezier(.2,.7,.2,1),filter 1.1s}
+.rv.in{opacity:1;transform:none;filter:none}
+.rv.d1{transition-delay:.08s}.rv.d2{transition-delay:.16s}.rv.d3{transition-delay:.24s}.rv.d4{transition-delay:.32s}
+.reduce .rv{opacity:1;transform:none;filter:none;transition:none}
+
+/* ---- COVER ---- */
+#cover .wrap{text-align:center}
+#cover h1{margin:0 auto}
+#cover .sub{margin-top:1.6rem;font-family:var(--disp);font-style:italic;font-size:clamp(1.2rem,3vw,2.1rem);color:var(--ivory);opacity:.92}
+.scrollcue{position:absolute;left:50%;bottom:2.2rem;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.6rem;
+  font-family:var(--mono);font-size:.58rem;letter-spacing:.34em;text-transform:uppercase;color:var(--ivory-dim)}
+.scrollcue .ln{width:1px;height:44px;background:linear-gradient(var(--ivory-dim),transparent);animation:cue 2.4s ease-in-out infinite}
+@keyframes cue{0%,100%{transform:scaleY(.4);opacity:.4;transform-origin:top}50%{transform:scaleY(1);opacity:1;transform-origin:top}}
+
+/* ---- ethos ---- */
+#ethos .wrap{max-width:900px}
+#ethos h2{max-width:16ch}
+
+/* ---- instruments (crystal slabs) ---- */
+#instruments .head{margin-bottom:clamp(2rem,5vw,3.4rem);max-width:640px}
+.slabs{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(1rem,2.4vw,1.7rem)}
+@media(max-width:760px){.slabs{grid-template-columns:1fr}}
+.slab{position:relative;border-radius:18px;overflow:hidden;isolation:isolate;
+  background:var(--glass);border:1px solid var(--glass-line);
+  -webkit-backdrop-filter:blur(9px) saturate(1.1);backdrop-filter:blur(9px) saturate(1.1);
+  transition:transform .7s cubic-bezier(.2,.7,.2,1),border-color .5s}
+.slab:hover{transform:translateY(-6px);border-color:rgba(242,234,216,.28)}
+.slab .ph{aspect-ratio:16/10;overflow:hidden;position:relative}
+.slab .ph::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 40%,rgba(5,3,9,.72));z-index:1}
+.slab .ph img{width:100%;height:100%;object-fit:cover;filter:saturate(1.02) contrast(1.02);
+  transform:scale(1.04);transition:transform 1.1s ease}
+.slab:hover .ph img{transform:scale(1.11)}
+/* refraction sheen */
+.slab .ph::before{content:"";position:absolute;inset:0;z-index:2;mix-blend-mode:screen;opacity:.5;
+  background:linear-gradient(125deg,transparent 42%,rgba(92,197,197,.28) 50%,rgba(139,95,202,.2) 58%,transparent 66%);
+  transform:translateX(-30%);transition:transform 1s ease}
+.slab:hover .ph::before{transform:translateX(30%)}
+.slab .meta{padding:1.15rem 1.25rem 1.35rem;position:relative;z-index:3;margin-top:-3.2rem}
+.slab .cat{font-family:var(--mono);font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:var(--teal-lt);opacity:.9}
+.slab h3{font-family:var(--disp);font-weight:500;font-size:1.5rem;margin:.35rem 0 .5rem}
+.slab p{font-size:1rem;line-height:1.5;font-weight:300;color:var(--ivory-dim)}
+.slab a.visit{display:inline-flex;align-items:center;gap:.4rem;margin-top:.9rem;
+  font-family:var(--mono);font-size:.64rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ivory);text-decoration:none;opacity:.85;transition:opacity .3s,gap .3s}
+.slab a.visit:hover{opacity:1;gap:.7rem}
+.slab .tag{position:absolute;top:.9rem;left:.9rem;z-index:3;font-family:var(--mono);font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ivory);background:rgba(5,3,9,.5);border:1px solid var(--glass-line);padding:.32rem .6rem;border-radius:2rem;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+
+/* ---- field ---- */
+#field .head{text-align:center;max-width:700px;margin:0 auto clamp(1.6rem,4vw,2.8rem)}
+.field-window{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--glass-line);
+  box-shadow:0 40px 120px -40px rgba(0,0,0,.8), inset 0 0 0 1px rgba(242,234,216,.05);
+  background:var(--void)}
+.field-window::before{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  box-shadow:inset 0 0 120px rgba(5,3,9,.6);border-radius:20px}
+.field-window iframe{display:block;width:100%;height:min(72vh,640px);border:0;background:var(--void)}
+.field-cap{text-align:center;margin-top:1rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ivory-dim)}
+
+/* ---- gathering ---- */
+#gathering{overflow:hidden}
+.gather-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(1.6rem,4vw,3.4rem);align-items:center}
+@media(max-width:820px){.gather-grid{grid-template-columns:1fr}}
+.rhythm{display:flex;flex-direction:column;gap:1px;border-radius:16px;overflow:hidden;border:1px solid var(--glass-line);background:var(--glass-line)}
+.rhythm .row{display:grid;grid-template-columns:auto 1fr;gap:1rem;padding:1.05rem 1.2rem;background:rgba(10,7,19,.66);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);align-items:baseline}
+.rhythm .cad{font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-lt);white-space:nowrap;padding-top:.2rem}
+.rhythm .row h4{font-family:var(--disp);font-weight:500;font-size:1.25rem;margin-bottom:.2rem}
+.rhythm .row p{font-size:.98rem;font-weight:300;line-height:1.45;color:var(--ivory-dim)}
+.artist-card{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--glass-line);min-height:420px;display:flex;align-items:flex-end}
+.artist-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(1.02)}
+.artist-card .scrim{position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(5,3,9,.9))}
+.artist-card .who{position:relative;z-index:2;padding:1.5rem}
+.artist-card .who .role{font-family:var(--mono);font-size:.6rem;letter-spacing:.26em;text-transform:uppercase;color:var(--teal-lt)}
+.artist-card .who h4{font-family:var(--disp);font-weight:500;font-size:1.9rem;margin:.3rem 0 .5rem}
+.artist-card .who p{font-size:1rem;font-weight:300;color:var(--ivory-dim);max-width:34ch}
+.artist-card .who a{display:inline-block;margin-top:.9rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ivory);text-decoration:none;opacity:.85}
+.artist-card .who a:hover{opacity:1}
+
+/* ---- path (certification) ---- */
+#path .head{max-width:640px;margin-bottom:clamp(1.8rem,4vw,3rem)}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(.9rem,2vw,1.4rem)}
+@media(max-width:820px){.tiers{grid-template-columns:1fr}}
+.tier{position:relative;padding:1.6rem 1.4rem;border-radius:16px;border:1px solid var(--glass-line);background:var(--glass);
+  -webkit-backdrop-filter:blur(9px);backdrop-filter:blur(9px);transition:transform .6s cubic-bezier(.2,.7,.2,1),border-color .4s}
+.tier:hover{transform:translateY(-5px);border-color:rgba(242,234,216,.26)}
+.tier.mid{border-color:rgba(232,184,75,.4)}
+.tier .lvl{font-family:var(--mono);font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--teal-lt)}
+.tier h4{font-family:var(--disp);font-weight:500;font-size:1.5rem;margin:.5rem 0 .3rem}
+.tier .price{font-family:var(--serif);font-size:1.5rem;color:var(--gold-lt);margin-bottom:.7rem}
+.tier p{font-size:.98rem;font-weight:300;line-height:1.5;color:var(--ivory-dim)}
+
+/* ---- close ---- */
+#close .wrap{text-align:center;max-width:900px}
+#close h2{font-size:clamp(2.2rem,7vw,5rem)}
+.actions{display:flex;flex-wrap:wrap;gap:.9rem;justify-content:center;margin-top:2.4rem}
+.btn{font-family:var(--mono);font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;
+  padding:.95rem 1.7rem;border-radius:2.4rem;transition:transform .3s,background .3s,color .3s,border-color .3s}
+.btn.solid{background:var(--ivory);color:var(--void)}
+.btn.solid:hover{background:var(--gold-lt);transform:translateY(-2px)}
+.btn.ghost{border:1px solid var(--glass-line);color:var(--ivory)}
+.btn.ghost:hover{border-color:var(--ivory);transform:translateY(-2px)}
+footer{position:relative;z-index:1;text-align:center;padding:3rem 1.5rem 3.4rem;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--ivory-dim)}
+footer a{color:var(--ivory-dim);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .3s,color .3s}
+footer a:hover{color:var(--ivory);border-color:var(--ivory-dim)}
+</style>
+</head>
+<body>
+
+<div class="void-fallback" aria-hidden="true"></div>
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div id="prog" aria-hidden="true"></div>
+
+<div id="loader">
+  <div class="mark">SOUNDTEMPLE</div>
+  <div class="bar"><i></i></div>
+  <div class="pct">0</div>
+</div>
+
+<nav>
+  <a class="wm" href="landing.html"><b>Sound</b>Temple</a>
+  <div class="links">
+    <a href="#instruments">Instruments</a>
+    <a href="#field">The Field</a>
+    <a href="#gathering">Gather</a>
+    <a class="cta" href="landing.html">Enter</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- COVER -->
+  <section class="scene" id="cover">
+    <div class="wrap">
+      <h1 class="rv">SoundTemple</h1>
+      <div class="sub rv d1">Sound, made solid.</div>
+    </div>
+    <div class="scrollcue"><span>Descend</span><span class="ln"></span></div>
+  </section>
+
+  <!-- ETHOS -->
+  <section class="scene" id="ethos">
+    <div class="wrap">
+      <div class="eyebrow rv">The premise</div>
+      <h2 class="rv d1">Sound is medicine. <span class="script">This is where it takes form.</span></h2>
+      <p class="body rv d2">Before it is a session or a schedule, it is a frequency moving through the body. SoundTemple gathers the instruments, the guides, and the field they create into one vessel you can step inside.</p>
+    </div>
+  </section>
+
+  <!-- INSTRUMENTS -->
+  <section class="scene" id="instruments">
+    <div class="wrap">
+      <div class="head">
+        <div class="eyebrow rv">Web Acoustic Devices</div>
+        <h2 class="rv d1">The instruments behind the feeling.</h2>
+        <p class="body rv d2">Each one turns sound into something you feel in the bones. SoundTemple stays device agnostic. Every vessel that moves you belongs here.</p>
+      </div>
+      <div class="slabs">
+        <article class="slab rv">
+          <div class="ph"><span class="tag">Flagship</span><img src="tools-img/opus-soundbed.jpg" alt="Opus SoundBed" loading="lazy" /></div>
+          <div class="meta">
+            <div class="cat">Full-body vibro-acoustic bed</div>
+            <h3>Opus SoundBed</h3>
+            <p>Transducers mapped to the body's centers. Sound you feel in the bones, not only hear.</p>
+            <a class="visit" href="https://feelopus.com" target="_blank" rel="noopener">feelopus.com ↗</a>
+          </div>
+        </article>
+        <article class="slab rv d1">
+          <div class="ph"><span class="tag">Partner device</span><img src="tools-img/shiftwave.jpg" alt="Shiftwave" loading="lazy" /></div>
+          <div class="meta">
+            <div class="cat">Pulsed pressure-wave chair</div>
+            <h3>Shiftwave</h3>
+            <p>A zero-gravity chair with 18 transducers and guided breathwork. A ten-minute nervous-system reset.</p>
+            <a class="visit" href="https://shiftwave.co" target="_blank" rel="noopener">shiftwave.co ↗</a>
+          </div>
+        </article>
+        <article class="slab rv d2">
+          <div class="ph"><span class="tag">Partner device</span><img src="tools-img/ammortal.jpg" alt="Ammortal Chamber" loading="lazy" /></div>
+          <div class="meta">
+            <div class="cat">Longevity chamber</div>
+            <h3>Ammortal</h3>
+            <p>Red and near-infrared light, PEMF, molecular hydrogen, breath, and sound in one reclined session.</p>
+            <a class="visit" href="https://ammortal.com" target="_blank" rel="noopener">ammortal.com ↗</a>
+          </div>
+        </article>
+        <article class="slab rv d3">
+          <div class="ph"><span class="tag">Partner device</span><img src="tools-img/vibe.jpg" alt="VIBE by Bioharmonic Technologies" loading="lazy" /></div>
+          <div class="meta">
+            <div class="cat">Vibro-acoustic bed</div>
+            <h3>VIBE</h3>
+            <p>Neurologically tuned music through full-body transducers. Low frequency that calms and regulates.</p>
+            <a class="visit" href="https://healwithvibe.com" target="_blank" rel="noopener">healwithvibe.com ↗</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE FIELD -->
+  <section class="scene" id="field">
+    <div class="wrap">
+      <div class="head">
+        <div class="eyebrow rv">Heart Weather</div>
+        <h2 class="rv d1">This is how the world's heart <span class="script">is breathing right now.</span></h2>
+      </div>
+      <div class="field-window rv d2">
+        <iframe src="heart-weather.html?embed=1" title="Heart Weather — the living field of collective coherence" loading="lazy"></iframe>
+      </div>
+      <div class="field-cap rv d3">Illustrative preview · a living picture of the field SoundTemple is growing</div>
+    </div>
+  </section>
+
+  <!-- GATHERING -->
+  <section class="scene" id="gathering">
+    <div class="wrap">
+      <div class="gather-grid">
+        <div>
+          <div class="eyebrow rv">Transmissions</div>
+          <h2 class="rv d1" style="margin-bottom:1.6rem">A rhythm to return to.</h2>
+          <div class="rhythm rv d2">
+            <div class="row"><div class="cad">Weekly · Fri</div><div><h4>The Friday Field</h4><p>A live sound bath to close the week, open to everyone.</p></div></div>
+            <div class="row"><div class="cad">Every 6 wks</div><div><h4>The Marquee</h4><p>A six-week immersive arc with a featured Sound Artist.</p></div></div>
+            <div class="row"><div class="cad">Quarterly</div><div><h4>The Gathering</h4><p>A seasonal convergence of guides, devices, and community.</p></div></div>
+            <div class="row"><div class="cad">Annual</div><div><h4>The Temple</h4><p>One flagship gathering a year. The whole field in one room.</p></div></div>
+          </div>
+        </div>
+        <div class="artist-card rv d2">
+          <img src="artists/web/porangui.jpg" alt="Poranguí" loading="lazy" />
+          <div class="scrim"></div>
+          <div class="who">
+            <div class="role">Sound Artist</div>
+            <h4>Poranguí</h4>
+            <p>Live looping, ancestral song, and body-moving rhythm. One of many artists who carry the field.</p>
+            <a href="landing.html#artists">Meet the artists ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PATH -->
+  <section class="scene" id="path">
+    <div class="wrap">
+      <div class="head">
+        <div class="eyebrow rv">Certification</div>
+        <h2 class="rv d1">Become a certified guide.</h2>
+        <p class="body rv d2">The field grows through people. Train on the instruments, the science, and the craft of holding a room in sound.</p>
+      </div>
+      <div class="tiers">
+        <div class="tier rv">
+          <div class="lvl">Level 01</div><h4>Practitioner</h4><div class="price">$2,500</div>
+          <p>Foundations of vibro-acoustic practice and safe session design.</p>
+        </div>
+        <div class="tier mid rv d1">
+          <div class="lvl">Level 02</div><h4>Certified Guide</h4><div class="price">$5,000</div>
+          <p>Hold your own sessions across devices, listed and bookable on SoundTemple.</p>
+        </div>
+        <div class="tier rv d2">
+          <div class="lvl">Level 03</div><h4>Master</h4><div class="price">$7,500</div>
+          <p>Train other guides and shape the curriculum of the field.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLOSE -->
+  <section class="scene" id="close">
+    <div class="wrap">
+      <div class="eyebrow rv" style="text-align:center">The invitation</div>
+      <h2 class="rv d1">Sound is medicine. <br /><span class="script">Now you are part of the cure.</span></h2>
+      <div class="actions rv d2">
+        <a class="btn solid" href="landing.html">Enter SoundTemple</a>
+        <a class="btn ghost" href="story.html">Read the journey</a>
+        <a class="btn ghost" href="heart-weather.html">Explore the field</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  SoundTemple · Light Pump Labs &nbsp;·&nbsp; <a href="landing.html">Home</a> &nbsp;·&nbsp; <a href="story.html">The Journey</a> &nbsp;·&nbsp; <a href="heart-weather.html">Heart Weather</a>
+</footer>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<!-- smooth scroll -->
+<script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+
+<script type="module">
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (REDUCE) document.body.classList.add('reduce');
+
+/* ---------------- reveal engine (scroll-driven, never leaves content hidden) ---------------- */
+(function(){
+  const items = [...document.querySelectorAll('.rv')];
+  function VH(){ return window.innerHeight || document.documentElement.clientHeight || 800; }
+  function pass(){
+    const vh = VH();
+    for (const el of items){
+      if (el.classList.contains('in')) continue;
+      const r = el.getBoundingClientRect();
+      if (r.top < vh*0.9 && r.bottom > -80) el.classList.add('in');
+    }
+  }
+  window.__revealPass = pass;
+  if (REDUCE){ items.forEach(el=>el.classList.add('in')); }
+  else {
+    let last=0;
+    addEventListener('scroll', ()=>{ const t=Date.now(); if(t-last<70) return; last=t; pass(); }, {passive:true});
+    addEventListener('resize', pass);
+    setTimeout(pass,300); setTimeout(pass,900); setTimeout(pass,1800);
+  }
+})();
+
+/* ---------------- smooth scroll (lenis) ---------------- */
+let lenis = null;
+if (!REDUCE && window.Lenis){
+  lenis = new Lenis({ lerp:0.085, wheelMultiplier:1.0, smoothWheel:true });
+  function rafL(t){ lenis.raf(t); requestAnimationFrame(rafL); }
+  requestAnimationFrame(rafL);
+  // anchor links go through lenis
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click', e=>{
+      const el = document.querySelector(a.getAttribute('href'));
+      if (el){ e.preventDefault(); lenis.scrollTo(el, {offset:0, duration:1.4}); }
+    });
+  });
+}
+
+/* scroll progress bar (works with or without lenis) */
+const prog = document.getElementById('prog');
+function scrollProgress(){
+  const h = document.documentElement.scrollHeight - innerHeight;
+  return h>0 ? Math.min(1, Math.max(0, scrollY / h)) : 0;
+}
+
+/* ---------------- WebGL crystal ---------------- */
+const canvas = document.getElementById('gl');
+let renderer, running = false, sceneReady = false;
+
+function fail(){
+  document.body.classList.add('no-gl');
+  finishLoad();
+}
+
+function finishLoad(){
+  const loader = document.getElementById('loader');
+  const bar = loader.querySelector('.bar i');
+  const pct = loader.querySelector('.pct');
+  let v = 0;
+  const iv = setInterval(()=>{
+    v = Math.min(100, v + (sceneReady? 26 : 9) + Math.random()*10);
+    bar.style.transform = 'scaleX('+(v/100)+')';
+    pct.textContent = Math.round(v);
+    if (v>=100){ clearInterval(iv); setTimeout(()=>{ loader.classList.add('gone'); window.__revealPass && window.__revealPass(); }, 260); }
+  }, 90);
+}
+
+async function initGL(){
+  if (!window.WebGL2RenderingContext){ fail(); return; }
+  let THREE;
+  try{
+    THREE = await import('three');
+  }catch(e){ console.warn('three load failed', e); fail(); return; }
+
+  // on-brand light-field environment (teal / violet / gold on void) for refraction
+  function makeEnv(renderer){
+    const c = document.createElement('canvas'); c.width=1024; c.height=512;
+    const x = c.getContext('2d');
+    x.fillStyle = '#07060f'; x.fillRect(0,0,1024,512);
+    function blob(cx,cy,r,color,a){
+      const g = x.createRadialGradient(cx,cy,0,cx,cy,r);
+      g.addColorStop(0,color); g.addColorStop(1,'rgba(0,0,0,0)');
+      x.globalAlpha=a; x.fillStyle=g; x.beginPath(); x.arc(cx,cy,r,0,Math.PI*2); x.fill(); x.globalAlpha=1;
+    }
+    blob(300,150,330,'#5CC5C5',0.95);  // teal key
+    blob(770,175,300,'#8B5FCA',0.9);   // violet key
+    blob(540,430,270,'#E8B84B',0.72);  // gold underlight
+    blob(120,430,210,'#F2EAD8',0.5);   // ivory rim
+    blob(900,380,180,'#6B3FA0',0.6);   // deep violet fill
+    const tex = new THREE.CanvasTexture(c);
+    tex.mapping = THREE.EquirectangularReflectionMapping;
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const env = pmrem.fromEquirectangular(tex).texture;
+    tex.dispose(); pmrem.dispose();
+    return env;
+  }
+
+  let gl;
+  try{ gl = canvas.getContext('webgl2', {antialias:true, alpha:true}); }catch(e){}
+  if (!gl){ fail(); return; }
+
+  try{
+    renderer = new THREE.WebGLRenderer({ canvas, context:gl, antialias:true, alpha:true, powerPreference:'high-performance' });
+    renderer.setClearColor(0x000000, 0);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(0, 0, 5.2);
+
+    // environment for refraction
+    scene.environment = makeEnv(renderer);
+
+    // group holds crystal + core
+    const group = new THREE.Group();
+    scene.add(group);
+
+    const crystalGeo = new THREE.IcosahedronGeometry(1.25, 0); // faceted gem
+    const crystalMat = new THREE.MeshPhysicalMaterial({
+      transmission: 1.0, thickness: 1.5, roughness: 0.045, metalness: 0.0,
+      ior: 1.62, iridescence: 0.7, iridescenceIOR: 1.35, iridescenceThicknessRange:[140, 480],
+      clearcoat: 1.0, clearcoatRoughness: 0.1,
+      attenuationColor: new THREE.Color('#8fb8cf'), attenuationDistance: 2.6,
+      color: new THREE.Color('#eef4f6'), flatShading: true,
+      envMapIntensity: 1.65, specularIntensity: 1.0, specularColor: new THREE.Color('#E8B84B')
+    });
+    const crystal = new THREE.Mesh(crystalGeo, crystalMat);
+    group.add(crystal);
+
+    // inner heart of light
+    const coreMat = new THREE.MeshStandardMaterial({ color:0x000000, emissive:new THREE.Color('#E8B84B'), emissiveIntensity:2.6, roughness:1 });
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.46, 1), coreMat);
+    group.add(core);
+
+    // colored key lights for refraction glints
+    const l1 = new THREE.PointLight(0x5CC5C5, 26, 30); l1.position.set(3.4, 2.2, 3.2);
+    const l2 = new THREE.PointLight(0x8B5FCA, 24, 30); l2.position.set(-3.6, -1.6, 2.4);
+    const l3 = new THREE.PointLight(0xE8B84B, 18, 30); l3.position.set(0, -3, 3.6);
+    scene.add(l1, l2, l3, new THREE.AmbientLight(0x223044, 1.1));
+
+    // drifting motes
+    const N = 700;
+    const pos = new Float32Array(N*3), col = new Float32Array(N*3);
+    const pal = [new THREE.Color('#5CC5C5'), new THREE.Color('#8B5FCA'), new THREE.Color('#E8B84B'), new THREE.Color('#F2EAD8')];
+    for (let i=0;i<N;i++){
+      const r = 3 + Math.random()*7, th = Math.random()*Math.PI*2, ph = Math.acos(2*Math.random()-1);
+      pos[i*3]   = r*Math.sin(ph)*Math.cos(th);
+      pos[i*3+1] = r*Math.sin(ph)*Math.sin(th)*0.7;
+      pos[i*3+2] = r*Math.cos(ph) - 3;
+      const c = pal[(Math.random()*pal.length)|0];
+      col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
+    }
+    const pg = new THREE.BufferGeometry();
+    pg.setAttribute('position', new THREE.BufferAttribute(pos,3));
+    pg.setAttribute('color', new THREE.BufferAttribute(col,3));
+    const motes = new THREE.Points(pg, new THREE.PointsMaterial({ size:0.028, vertexColors:true, transparent:true, opacity:0.85, depthWrite:false, blending:THREE.AdditiveBlending }));
+    scene.add(motes);
+
+    // sizing
+    function resize(){
+      const w = innerWidth, h = innerHeight;
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.setSize(w, h, false);
+      camera.aspect = w/h; camera.updateProjectionMatrix();
+    }
+    resize(); addEventListener('resize', resize);
+
+    // pointer parallax
+    const ptr = {x:0, y:0, tx:0, ty:0};
+    addEventListener('pointermove', e=>{ ptr.tx = (e.clientX/innerWidth - .5); ptr.ty = (e.clientY/innerHeight - .5); }, {passive:true});
+
+    const clock = new THREE.Clock();
+    let p = 0, pT = 0;
+    function frame(){
+      const t = clock.getElapsedTime();
+      pT = scrollProgress();
+      p += (pT - p) * 0.08;
+
+      // progress bar
+      prog.style.transform = 'scaleX('+pT+')';
+
+      // camera dolly + crystal recede as you descend
+      camera.position.z = 5.2 - p*1.1;
+      camera.position.y = p*0.35;
+
+      // parallax ease
+      ptr.x += (ptr.tx - ptr.x)*0.05; ptr.y += (ptr.ty - ptr.y)*0.05;
+
+      // crystal life
+      const breathe = 1 + Math.sin(t*0.9)*0.03;
+      group.scale.setScalar((1 - p*0.18) * breathe);
+      group.position.x = -p*1.4 + ptr.x*0.5;      // slides aside as content enters
+      group.rotation.y = t*0.16 + p*1.2 + ptr.x*0.5;
+      group.rotation.x = Math.sin(t*0.4)*0.12 + ptr.y*0.35 - p*0.15;
+      core.rotation.y = -t*0.3; core.rotation.x = t*0.22;
+      coreMat.emissiveIntensity = 2.2 + Math.sin(t*1.6)*0.7;
+
+      // warm the crystal as you descend (teal -> gold)
+      crystalMat.attenuationColor.setRGB(
+        0.36 + p*0.5, 0.77 - p*0.2, 0.77 - p*0.45
+      );
+
+      motes.rotation.y = t*0.02; motes.rotation.z = t*0.01;
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(frame);
+    }
+
+    sceneReady = true;
+    finishLoad();
+    // render one frame immediately (so a screenshot has paint even if rAF is throttled)
+    renderer.render(scene, camera);
+    if (REDUCE){ renderer.render(scene, camera); }
+    else { running = true; requestAnimationFrame(frame); }
+
+  }catch(e){ console.warn('gl init error', e); fail(); }
+}
+
+initGL();
+// safety: never let the loader hang if init stalls
+setTimeout(()=>{ if(!sceneReady && !document.body.classList.contains('no-gl')){ /* still show page */ finishLoad(); } }, 4500);
+</script>
+</body>
+</html>

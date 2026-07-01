@@ -1,8 +1,8 @@
-/* SoundTemple — aliveness engine (shared). Zero dependencies, < 2KB-ish.
+/* SoundTemple — aliveness engine (shared). Zero dependencies.
    - confirms JS is alive (.js) so the hidden reveal-state can apply
    - phase-locks the CSS breath to a shared wall-clock epoch
-   - auto-targets elements for blur-coalesce scroll-reveal (IntersectionObserver)
-   - re-scans dynamically added content (e.g. the fetched artist grid)
+   - scroll-driven blur-coalesce reveal (robust across any viewport; never leaves
+     content stuck hidden — safety passes guarantee it) + re-scans fetched content
    - full prefers-reduced-motion kill-switch */
 (function () {
   'use strict';
@@ -21,7 +21,6 @@
     ['.st-artist-card', 'scale'],
     ['.h-sec, .lead, .eyebrow, .tool, .cert, .doc-item, .field-frame, .cert-grid > *, .tool-grid > *', '']
   ];
-
   function tag(el, variant) {
     if (el.classList.contains('reveal') || el.closest('.no-reveal')) return;
     el.classList.add('reveal');
@@ -31,51 +30,46 @@
     VARIANTS.forEach(function (pair) {
       Array.prototype.forEach.call((scope || doc).querySelectorAll(pair[0]), function (el) { tag(el, pair[1]); });
     });
+    // capped group-of-8 stagger on any not-yet-processed reveal
+    var n = 0;
+    Array.prototype.forEach.call((scope || doc).querySelectorAll('.reveal:not([data-st])'), function (el) {
+      el.dataset.st = '1'; el.style.setProperty('--stagger', ((n++ % 8) * 60) + 'ms');
+    });
   }
 
   if (REDUCED) {
-    // organism at rest: present everything immediately, never observe
+    // organism at rest: present everything immediately, never animate
     collect(doc);
     Array.prototype.forEach.call(doc.querySelectorAll('.reveal'), function (el) { el.classList.add('is-in'); });
     return;
   }
 
-  var io = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) {
-      if (!e.isIntersecting) return;
-      e.target.classList.add('is-in');
-      io.unobserve(e.target);
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-
-  var vh = function () { return window.innerHeight || doc.documentElement.clientHeight; };
-  function observeNew() {
-    var fresh = [];
+  function VH() { return window.innerHeight || root.clientHeight || 800; } // never 0
+  function revealPass() {
+    var vh = VH();
     Array.prototype.forEach.call(doc.querySelectorAll('.reveal:not(.is-in)'), function (el) {
-      if (el.dataset.obs) return; el.dataset.obs = '1'; fresh.push(el);
-    });
-    // read all positions first (no interleaved write → no layout thrash)
-    var rects = fresh.map(function (el) { return el.getBoundingClientRect(); });
-    var n = 0;
-    fresh.forEach(function (el, i) {
-      var r = rects[i];
-      if (r.top < vh() * 0.95 && r.bottom > 0) {   // already on screen at load → present it, no flash, no journey
-        el.classList.add('is-in');
-      } else {
-        el.style.setProperty('--stagger', ((n++ % 8) * 60) + 'ms'); // below the fold → blur-coalesce on scroll
-        io.observe(el);
-      }
+      var r = el.getBoundingClientRect();
+      if (r.top < vh * 0.92 && r.bottom > -80) el.classList.add('is-in'); // in / just past view → coalesce
     });
   }
-  function scan(scope) { collect(scope); observeNew(); }
+
+  var last = 0;
+  function onScroll() { var t = Date.now(); if (t - last < 80) return; last = t; revealPass(); } // time-throttled (not rAF, which hidden tabs throttle)
+
+  function scan(scope) { collect(scope); revealPass(); }
   window.aliveScan = scan;
 
   function ready() {
     scan(doc);
-    // catch content added after first paint (fetched grids, etc.)
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    // dynamically added content (fetched grids, etc.)
     var t = null;
     new MutationObserver(function () { clearTimeout(t); t = setTimeout(function () { scan(doc); }, 120); })
       .observe(doc.body, { childList: true, subtree: true });
+    // safety passes — content in view must never stay hidden even if a scroll never happens
+    setTimeout(revealPass, 350);
+    setTimeout(revealPass, 1200);
   }
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', ready);
   else ready();
